@@ -1,0 +1,1066 @@
+{
+  "schema_version": "2.0.0",
+  "dataset_version": "2026-07-18T08:27:56Z",
+  "generated_at": "2026-07-18T08:27:56Z",
+  "proof_only": true,
+  "production_publication_approved": false,
+  "providers": [
+    {
+      "id": "openai",
+      "name": "OpenAI"
+    },
+    {
+      "id": "anthropic",
+      "name": "Anthropic"
+    },
+    {
+      "id": "google-gemini",
+      "name": "Google Gemini"
+    }
+  ],
+  "provider_links": [
+    {
+      "id": "link:openai:api-key",
+      "provider_id": "openai",
+      "url": "https://platform.openai.com/api-keys",
+      "access_status": "official_login_required",
+      "source_id": "source:openai:api-key",
+      "source_locator": "OpenAI Platform / API Keys",
+      "link_type": "api_key",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:link-openai-api-key",
+      "freshness": {
+        "verified_at": "2026-07-18T08:24:44Z",
+        "check_due_at": "2026-07-25T08:24:44Z",
+        "stale_at": "2026-08-01T08:24:44Z",
+        "expires_at": "2026-08-17T08:24:44Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:24:44Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "link:anthropic:api-key",
+      "provider_id": "anthropic",
+      "url": "https://platform.claude.com/settings/keys",
+      "access_status": "official_login_required",
+      "source_id": "source:anthropic:api-key",
+      "source_locator": "Claude Platform / Settings / API keys",
+      "link_type": "api_key",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:link-anthropic-api-key",
+      "freshness": {
+        "verified_at": "2026-07-18T08:24:08Z",
+        "check_due_at": "2026-07-25T08:24:08Z",
+        "stale_at": "2026-08-01T08:24:08Z",
+        "expires_at": "2026-08-17T08:24:08Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:24:08Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "link:gemini:api-key",
+      "provider_id": "google-gemini",
+      "url": "https://aistudio.google.com/app/apikey",
+      "access_status": "official_login_required",
+      "source_id": "source:gemini:api-key",
+      "source_locator": "Using Gemini API keys / Create or view a Gemini API Key",
+      "link_type": "api_key",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:link-gemini-api-key",
+      "freshness": {
+        "verified_at": "2026-07-18T08:23:24Z",
+        "check_due_at": "2026-07-25T08:23:24Z",
+        "stale_at": "2026-08-01T08:23:24Z",
+        "expires_at": "2026-08-17T08:23:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:23:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "openai:gpt-5.6-terra",
+      "provider_id": "openai",
+      "name": "GPT-5.6 Terra",
+      "api_model_id": "gpt-5.6-terra",
+      "lifecycle": "unknown",
+      "lifecycle_note_hu": "A hivatalos oldal aktuális frontier modellként közli, de nem ad a projekt enumjára közvetlenül leképezhető lifecycle címkét.",
+      "retirement_at": null,
+      "context_window_tokens": 1050000,
+      "max_output_tokens": 128000,
+      "source_id": "source:openai:model:terra",
+      "source_locator": "Model header; API ID; context window; max output tokens",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:openai-terra-model",
+      "freshness": {
+        "verified_at": "2026-07-18T08:24:44Z",
+        "check_due_at": "2026-07-25T08:24:44Z",
+        "stale_at": "2026-07-28T08:24:44Z",
+        "expires_at": "2026-08-17T08:24:44Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:24:44Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "openai:gpt-5.6-luna",
+      "provider_id": "openai",
+      "name": "GPT-5.6 Luna",
+      "api_model_id": "gpt-5.6-luna",
+      "lifecycle": "unknown",
+      "lifecycle_note_hu": "A hivatalos oldal aktuális frontier modellként közli, de nem ad a projekt enumjára közvetlenül leképezhető lifecycle címkét.",
+      "retirement_at": null,
+      "context_window_tokens": 1050000,
+      "max_output_tokens": 128000,
+      "source_id": "source:openai:model:luna",
+      "source_locator": "Model header; API ID; context window; max output tokens",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:openai-luna-model",
+      "freshness": {
+        "verified_at": "2026-07-18T08:24:44Z",
+        "check_due_at": "2026-07-25T08:24:44Z",
+        "stale_at": "2026-07-28T08:24:44Z",
+        "expires_at": "2026-08-17T08:24:44Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:24:44Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "anthropic:claude-opus-4-8",
+      "provider_id": "anthropic",
+      "name": "Claude Opus 4.8",
+      "api_model_id": "claude-opus-4-8",
+      "lifecycle": "unknown",
+      "official_lifecycle_label": "Active",
+      "lifecycle_source_id": "source:anthropic:lifecycle",
+      "lifecycle_source_locator": "Current models / claude-opus-4-8 / Status; Tentative retirement date",
+      "lifecycle_note_hu": "Az Anthropic hivatalos címkéje Active; ezt Gate 2B nem térképezi automatikusan stable értékre.",
+      "retirement_at": null,
+      "tentative_retirement_not_before_date": "2027-05-28",
+      "context_window_tokens": 1000000,
+      "max_output_tokens": 128000,
+      "source_id": "source:anthropic:models",
+      "source_locator": "Models overview / Claude Opus 4.8",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:anthropic-opus-model",
+      "freshness": {
+        "verified_at": "2026-07-18T08:24:08Z",
+        "check_due_at": "2026-07-25T08:24:08Z",
+        "stale_at": "2026-07-28T08:24:08Z",
+        "expires_at": "2026-08-17T08:24:08Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:24:08Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "anthropic:claude-sonnet-5",
+      "provider_id": "anthropic",
+      "name": "Claude Sonnet 5",
+      "api_model_id": "claude-sonnet-5",
+      "lifecycle": "unknown",
+      "official_lifecycle_label": "Active",
+      "lifecycle_source_id": "source:anthropic:lifecycle",
+      "lifecycle_source_locator": "Current models / claude-sonnet-5 / Status; Tentative retirement date",
+      "lifecycle_note_hu": "Az Anthropic hivatalos címkéje Active; ezt Gate 2B nem térképezi automatikusan stable értékre.",
+      "retirement_at": null,
+      "tentative_retirement_not_before_date": "2027-06-30",
+      "context_window_tokens": 1000000,
+      "max_output_tokens": 128000,
+      "source_id": "source:anthropic:models",
+      "source_locator": "Models overview / Claude Sonnet 5",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:anthropic-sonnet-model",
+      "freshness": {
+        "verified_at": "2026-07-18T08:24:08Z",
+        "check_due_at": "2026-07-25T08:24:08Z",
+        "stale_at": "2026-07-28T08:24:08Z",
+        "expires_at": "2026-08-17T08:24:08Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:24:08Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "google-gemini:gemini-3.5-flash",
+      "provider_id": "google-gemini",
+      "name": "Gemini 3.5 Flash",
+      "api_model_id": "gemini-3.5-flash",
+      "lifecycle": "stable",
+      "retirement_at": null,
+      "context_window_tokens": 1048576,
+      "max_output_tokens": 65536,
+      "source_id": "source:gemini:model:3.5-flash",
+      "source_locator": "gemini-3.5-flash / Model code; token limits; Versions / Stable",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:gemini-35-model",
+      "freshness": {
+        "verified_at": "2026-07-18T08:23:24Z",
+        "check_due_at": "2026-07-25T08:23:24Z",
+        "stale_at": "2026-07-28T08:23:24Z",
+        "expires_at": "2026-08-17T08:23:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:23:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "google-gemini:gemini-3.1-flash-lite",
+      "provider_id": "google-gemini",
+      "name": "Gemini 3.1 Flash-Lite",
+      "api_model_id": "gemini-3.1-flash-lite",
+      "lifecycle": "stable",
+      "retirement_at": null,
+      "context_window_tokens": 1048576,
+      "max_output_tokens": 65536,
+      "source_id": "source:gemini:model:3.1-flash-lite",
+      "source_locator": "gemini-3.1-flash-lite / Model code; token limits; Versions / Stable",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:gemini-31-model",
+      "freshness": {
+        "verified_at": "2026-07-18T08:23:24Z",
+        "check_due_at": "2026-07-25T08:23:24Z",
+        "stale_at": "2026-07-28T08:23:24Z",
+        "expires_at": "2026-08-17T08:23:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:23:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    }
+  ],
+  "prices": [
+    {
+      "id": "price:openai:gpt-5.6-terra:input",
+      "model_id": "openai:gpt-5.6-terra",
+      "charge_type": "input_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "2.500000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 272000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "default_non_data_residency_endpoint"
+        },
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cached_input",
+          "cache_write",
+          "cache_storage",
+          "batch",
+          "flex",
+          "priority",
+          "fast",
+          "tools",
+          "web_search",
+          "grounding",
+          "image",
+          "audio",
+          "video"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-18T08:24:44Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:openai:pricing",
+      "source_locator": "Flagship models / Standard / Short context / gpt-5.6-terra / Input",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-openai-gpt-5.6-terra-input",
+      "freshness": {
+        "verified_at": "2026-07-18T08:24:44Z",
+        "check_due_at": "2026-07-19T08:24:44Z",
+        "stale_at": "2026-07-19T20:24:44Z",
+        "expires_at": "2026-07-21T08:24:44Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:24:44Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:openai:gpt-5.6-terra:output",
+      "model_id": "openai:gpt-5.6-terra",
+      "charge_type": "output_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "15.000000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 272000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "default_non_data_residency_endpoint"
+        },
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cached_input",
+          "cache_write",
+          "cache_storage",
+          "batch",
+          "flex",
+          "priority",
+          "fast",
+          "tools",
+          "web_search",
+          "grounding",
+          "image",
+          "audio",
+          "video"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-18T08:24:44Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:openai:pricing",
+      "source_locator": "Flagship models / Standard / Short context / gpt-5.6-terra / Output",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-openai-gpt-5.6-terra-output",
+      "freshness": {
+        "verified_at": "2026-07-18T08:24:44Z",
+        "check_due_at": "2026-07-19T08:24:44Z",
+        "stale_at": "2026-07-19T20:24:44Z",
+        "expires_at": "2026-07-21T08:24:44Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:24:44Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:openai:gpt-5.6-luna:input",
+      "model_id": "openai:gpt-5.6-luna",
+      "charge_type": "input_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "1.000000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 272000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "default_non_data_residency_endpoint"
+        },
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cached_input",
+          "cache_write",
+          "cache_storage",
+          "batch",
+          "flex",
+          "priority",
+          "fast",
+          "tools",
+          "web_search",
+          "grounding",
+          "image",
+          "audio",
+          "video"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-18T08:24:44Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:openai:pricing",
+      "source_locator": "Flagship models / Standard / Short context / gpt-5.6-luna / Input",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-openai-gpt-5.6-luna-input",
+      "freshness": {
+        "verified_at": "2026-07-18T08:24:44Z",
+        "check_due_at": "2026-07-19T08:24:44Z",
+        "stale_at": "2026-07-19T20:24:44Z",
+        "expires_at": "2026-07-21T08:24:44Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:24:44Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:openai:gpt-5.6-luna:output",
+      "model_id": "openai:gpt-5.6-luna",
+      "charge_type": "output_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "6.000000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 272000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "default_non_data_residency_endpoint"
+        },
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cached_input",
+          "cache_write",
+          "cache_storage",
+          "batch",
+          "flex",
+          "priority",
+          "fast",
+          "tools",
+          "web_search",
+          "grounding",
+          "image",
+          "audio",
+          "video"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-18T08:24:44Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:openai:pricing",
+      "source_locator": "Flagship models / Standard / Short context / gpt-5.6-luna / Output",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-openai-gpt-5.6-luna-output",
+      "freshness": {
+        "verified_at": "2026-07-18T08:24:44Z",
+        "check_due_at": "2026-07-19T08:24:44Z",
+        "stale_at": "2026-07-19T20:24:44Z",
+        "expires_at": "2026-07-21T08:24:44Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:24:44Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:anthropic:claude-opus-4-8:input",
+      "model_id": "anthropic:claude-opus-4-8",
+      "charge_type": "input_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "5.000000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 1000000
+        },
+        "region_pricing": {
+          "kind": "inference_geo",
+          "value": "global",
+          "multiplier": "1.0"
+        },
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cached_input",
+          "cache_write",
+          "cache_storage",
+          "batch",
+          "flex",
+          "priority",
+          "fast",
+          "tools",
+          "web_search",
+          "grounding",
+          "image",
+          "audio",
+          "video"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-18T08:24:08Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:anthropic:pricing",
+      "source_locator": "Model pricing / Claude Opus 4.8 / Base Input Tokens",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-anthropic-claude-opus-4-8-input",
+      "freshness": {
+        "verified_at": "2026-07-18T08:24:08Z",
+        "check_due_at": "2026-07-19T08:24:08Z",
+        "stale_at": "2026-07-19T20:24:08Z",
+        "expires_at": "2026-07-21T08:24:08Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:24:08Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:anthropic:claude-opus-4-8:output",
+      "model_id": "anthropic:claude-opus-4-8",
+      "charge_type": "output_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "25.000000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 1000000
+        },
+        "region_pricing": {
+          "kind": "inference_geo",
+          "value": "global",
+          "multiplier": "1.0"
+        },
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cached_input",
+          "cache_write",
+          "cache_storage",
+          "batch",
+          "flex",
+          "priority",
+          "fast",
+          "tools",
+          "web_search",
+          "grounding",
+          "image",
+          "audio",
+          "video"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-18T08:24:08Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:anthropic:pricing",
+      "source_locator": "Model pricing / Claude Opus 4.8 / Output Tokens",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-anthropic-claude-opus-4-8-output",
+      "freshness": {
+        "verified_at": "2026-07-18T08:24:08Z",
+        "check_due_at": "2026-07-19T08:24:08Z",
+        "stale_at": "2026-07-19T20:24:08Z",
+        "expires_at": "2026-07-21T08:24:08Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:24:08Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:anthropic:claude-sonnet-5:input",
+      "model_id": "anthropic:claude-sonnet-5",
+      "charge_type": "input_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "2.000000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 1000000
+        },
+        "region_pricing": {
+          "kind": "inference_geo",
+          "value": "global",
+          "multiplier": "1.0"
+        },
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cached_input",
+          "cache_write",
+          "cache_storage",
+          "batch",
+          "flex",
+          "priority",
+          "fast",
+          "tools",
+          "web_search",
+          "grounding",
+          "image",
+          "audio",
+          "video"
+        ],
+        "price_phase": "introductory",
+        "announced_valid_through_date": "2026-08-31",
+        "announced_next_price_date": "2026-09-01",
+        "announced_next_amount": "3.000000",
+        "announced_timezone": "not_specified"
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-18T08:24:08Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:anthropic:pricing",
+      "source_locator": "Model pricing / Claude Sonnet 5 through August 31, 2026 / Base Input Tokens",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-anthropic-claude-sonnet-5-input",
+      "freshness": {
+        "verified_at": "2026-07-18T08:24:08Z",
+        "check_due_at": "2026-07-19T08:24:08Z",
+        "stale_at": "2026-07-19T20:24:08Z",
+        "expires_at": "2026-07-21T08:24:08Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:24:08Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:anthropic:claude-sonnet-5:output",
+      "model_id": "anthropic:claude-sonnet-5",
+      "charge_type": "output_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "10.000000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 1000000
+        },
+        "region_pricing": {
+          "kind": "inference_geo",
+          "value": "global",
+          "multiplier": "1.0"
+        },
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cached_input",
+          "cache_write",
+          "cache_storage",
+          "batch",
+          "flex",
+          "priority",
+          "fast",
+          "tools",
+          "web_search",
+          "grounding",
+          "image",
+          "audio",
+          "video"
+        ],
+        "price_phase": "introductory",
+        "announced_valid_through_date": "2026-08-31",
+        "announced_next_price_date": "2026-09-01",
+        "announced_next_amount": "15.000000",
+        "announced_timezone": "not_specified"
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-18T08:24:08Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:anthropic:pricing",
+      "source_locator": "Model pricing / Claude Sonnet 5 through August 31, 2026 / Output Tokens",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-anthropic-claude-sonnet-5-output",
+      "freshness": {
+        "verified_at": "2026-07-18T08:24:08Z",
+        "check_due_at": "2026-07-19T08:24:08Z",
+        "stale_at": "2026-07-19T20:24:08Z",
+        "expires_at": "2026-07-21T08:24:08Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:24:08Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:gemini:gemini-3.5-flash:input",
+      "model_id": "google-gemini:gemini-3.5-flash",
+      "charge_type": "input_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "1.500000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 1048576
+        },
+        "region_pricing": {
+          "kind": "gemini_developer_api_published_scope",
+          "availability_requires_supported_region": true
+        },
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cached_input",
+          "cache_write",
+          "cache_storage",
+          "batch",
+          "flex",
+          "priority",
+          "fast",
+          "tools",
+          "web_search",
+          "grounding",
+          "image",
+          "audio",
+          "video"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-18T08:23:24Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:gemini:pricing",
+      "source_locator": "Gemini 3.5 Flash / Standard / Paid Tier / Input price",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-gemini-gemini-3.5-flash-input",
+      "freshness": {
+        "verified_at": "2026-07-18T08:23:24Z",
+        "check_due_at": "2026-07-19T08:23:24Z",
+        "stale_at": "2026-07-19T20:23:24Z",
+        "expires_at": "2026-07-21T08:23:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:23:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:gemini:gemini-3.5-flash:output",
+      "model_id": "google-gemini:gemini-3.5-flash",
+      "charge_type": "output_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "9.000000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 1048576
+        },
+        "region_pricing": {
+          "kind": "gemini_developer_api_published_scope",
+          "availability_requires_supported_region": true
+        },
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cached_input",
+          "cache_write",
+          "cache_storage",
+          "batch",
+          "flex",
+          "priority",
+          "fast",
+          "tools",
+          "web_search",
+          "grounding",
+          "image",
+          "audio",
+          "video"
+        ],
+        "output_price_includes_thinking_tokens": true
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-18T08:23:24Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:gemini:pricing",
+      "source_locator": "Gemini 3.5 Flash / Standard / Paid Tier / Output price including thinking tokens",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-gemini-gemini-3.5-flash-output",
+      "freshness": {
+        "verified_at": "2026-07-18T08:23:24Z",
+        "check_due_at": "2026-07-19T08:23:24Z",
+        "stale_at": "2026-07-19T20:23:24Z",
+        "expires_at": "2026-07-21T08:23:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:23:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:gemini:gemini-3.1-flash-lite:input",
+      "model_id": "google-gemini:gemini-3.1-flash-lite",
+      "charge_type": "input_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "0.250000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 1048576
+        },
+        "region_pricing": {
+          "kind": "gemini_developer_api_published_scope",
+          "availability_requires_supported_region": true
+        },
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cached_input",
+          "cache_write",
+          "cache_storage",
+          "batch",
+          "flex",
+          "priority",
+          "fast",
+          "tools",
+          "web_search",
+          "grounding",
+          "image",
+          "audio",
+          "video"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-18T08:23:24Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:gemini:pricing",
+      "source_locator": "Gemini 3.1 Flash-Lite / Standard / Paid Tier / Input price text",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-gemini-gemini-3.1-flash-lite-input",
+      "freshness": {
+        "verified_at": "2026-07-18T08:23:24Z",
+        "check_due_at": "2026-07-19T08:23:24Z",
+        "stale_at": "2026-07-19T20:23:24Z",
+        "expires_at": "2026-07-21T08:23:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:23:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:gemini:gemini-3.1-flash-lite:output",
+      "model_id": "google-gemini:gemini-3.1-flash-lite",
+      "charge_type": "output_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "1.500000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 1048576
+        },
+        "region_pricing": {
+          "kind": "gemini_developer_api_published_scope",
+          "availability_requires_supported_region": true
+        },
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cached_input",
+          "cache_write",
+          "cache_storage",
+          "batch",
+          "flex",
+          "priority",
+          "fast",
+          "tools",
+          "web_search",
+          "grounding",
+          "image",
+          "audio",
+          "video"
+        ],
+        "output_price_includes_thinking_tokens": true
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-18T08:23:24Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:gemini:pricing",
+      "source_locator": "Gemini 3.1 Flash-Lite / Standard / Paid Tier / Output price including thinking tokens",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-18T08:27:56Z",
+      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-gemini-gemini-3.1-flash-lite-output",
+      "freshness": {
+        "verified_at": "2026-07-18T08:23:24Z",
+        "check_due_at": "2026-07-19T08:23:24Z",
+        "stale_at": "2026-07-19T20:23:24Z",
+        "expires_at": "2026-07-21T08:23:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-18T08:23:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    }
+  ],
+  "capabilities": [],
+  "sources": [
+    {
+      "id": "source:openai:model:terra",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "GPT-5.6 Terra Model",
+      "publisher": "OpenAI",
+      "url": "https://developers.openai.com/api/docs/models/gpt-5.6-terra",
+      "retrieved_at": "2026-07-18T08:24:44Z"
+    },
+    {
+      "id": "source:openai:model:luna",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "GPT-5.6 Luna Model",
+      "publisher": "OpenAI",
+      "url": "https://developers.openai.com/api/docs/models/gpt-5.6-luna",
+      "retrieved_at": "2026-07-18T08:24:44Z"
+    },
+    {
+      "id": "source:openai:pricing",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "OpenAI API pricing",
+      "publisher": "OpenAI",
+      "url": "https://developers.openai.com/api/docs/pricing",
+      "retrieved_at": "2026-07-18T08:24:44Z"
+    },
+    {
+      "id": "source:openai:api-key",
+      "source_type": "official_provider_page",
+      "source_status": "official_login_required",
+      "title": "OpenAI Platform API Keys",
+      "publisher": "OpenAI",
+      "url": "https://platform.openai.com/api-keys",
+      "retrieved_at": "2026-07-18T08:24:44Z"
+    },
+    {
+      "id": "source:anthropic:models",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "Claude models overview",
+      "publisher": "Anthropic",
+      "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
+      "retrieved_at": "2026-07-18T08:24:08Z"
+    },
+    {
+      "id": "source:anthropic:pricing",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "Claude API pricing",
+      "publisher": "Anthropic",
+      "url": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "retrieved_at": "2026-07-18T08:24:08Z"
+    },
+    {
+      "id": "source:anthropic:lifecycle",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "Claude model deprecations",
+      "publisher": "Anthropic",
+      "url": "https://platform.claude.com/docs/en/about-claude/model-deprecations",
+      "retrieved_at": "2026-07-18T08:24:08Z"
+    },
+    {
+      "id": "source:anthropic:api-key",
+      "source_type": "official_provider_page",
+      "source_status": "official_login_required",
+      "title": "Claude Platform API keys",
+      "publisher": "Anthropic",
+      "url": "https://platform.claude.com/settings/keys",
+      "retrieved_at": "2026-07-18T08:24:08Z"
+    },
+    {
+      "id": "source:gemini:model:3.5-flash",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "Gemini 3.5 Flash model",
+      "publisher": "Google",
+      "url": "https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash",
+      "retrieved_at": "2026-07-18T08:23:24Z"
+    },
+    {
+      "id": "source:gemini:model:3.1-flash-lite",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "Gemini 3.1 Flash-Lite model",
+      "publisher": "Google",
+      "url": "https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-lite",
+      "retrieved_at": "2026-07-18T08:23:24Z"
+    },
+    {
+      "id": "source:gemini:pricing",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "Gemini Developer API pricing",
+      "publisher": "Google",
+      "url": "https://ai.google.dev/gemini-api/docs/pricing",
+      "retrieved_at": "2026-07-18T08:23:24Z"
+    },
+    {
+      "id": "source:gemini:api-key",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "Using Gemini API keys",
+      "publisher": "Google",
+      "url": "https://ai.google.dev/gemini-api/docs/api-key",
+      "retrieved_at": "2026-07-18T08:23:24Z"
+    }
+  ]
+}
