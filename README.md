@@ -1,30 +1,48 @@
-# LLM Cost App
+# LLM Observatory
 
-Interaktív, statikus webalkalmazás LLM API-költségek, tool calling alkalmasság,
-szolgáltatói megbízhatóság és felhasználási esetek összevetésére.
+Magyar nyelvű, build nélküli statikus prototípus LLM API-költségek átlátható összehasonlítására.
 
-## Mire jó?
+## Élő változat
 
-- Home Assistant voice / okosotthon AI döntéstámogatás
-- ügyfélszolgálati chatbot költségbecslés
-- kódolós agent modellválasztás
-- dokumentumelemzési költségprofilok
+- Netlify: [https://llm-kivalaszto.netlify.app](https://llm-kivalaszto.netlify.app)
+- GitHub: [tdaroczi/llm-cost-app](https://github.com/tdaroczi/llm-cost-app)
 
-Az app nem csak tokenárat mutat, hanem külön kezeli:
+## Mit tud a Gate 3 verzió?
 
-- input / cached input / output árakat
-- tool calling alkalmasságot
-- szolgáltatói megbízhatóságot
-- privacy / régiós kockázatot
-- egyszerű és haladó nézetet
-- API-kulcs létrehozási linkeket
+- két modellt ugyanazzal a tokenforgalmi profillal hasonlít össze;
+- feladatjellegű forgalmi mintából indulva műszaki feltételek és teljes USD-költség alapján szűr;
+- rekordszinten mutatja a forrást, az ellenőrzés idejét és a frissességi állapotot;
+- csak teljes, használható input- és outputárból számol;
+- ellenőrzött szolgáltatói rekordból ad kattintható API-kulcs linket;
+- ugyanazt a `evaluateModel` motort használja mindkét felhasználói úton.
 
-## Használat
+## Fontos korlát
 
-Nyisd meg az `index.html` fájlt böngészőben. Nincs build lépés és nincs backend.
+A jelenlegi katalógus `proof_only` mintaadat. Nem production adatkiadás, ezért az alkalmazás minden nézetben **Mintaadat** jelzést mutat. A proof nem tartalmaz capability- és quickstart-rekordot; emiatt a tool calling állapota ismeretlen, quickstart link pedig nem jelenik meg.
 
-## Megjegyzés
+Az alkalmazás nem ad benchmark- vagy minőségi pontszámot, nem nevez ki győztest, és nem állít bizonyítatlan feladatspecifikus alkalmasságot. Lejárt, stale, karanténba tett vagy hiányos ár nem vehet részt a számításban.
 
-Az árak és kvalitatív pontszámok publikus szolgáltatói oldalakból és gyakorlati
-döntési szempontokból indulnak ki. Éles integráció előtt mindig érdemes saját
-tool-calling és latency tesztet futtatni.
+## Helyi futtatás
+
+A projekt gyökeréből:
+
+```bash
+python3 -m http.server 4173 --bind 127.0.0.1 --directory public
+```
+
+Ezután nyisd meg: `http://127.0.0.1:4173/#compare`.
+
+Nincs npm-függőség, build lépés, backend, adatbázis vagy futásidejű LLM-hívás.
+
+## Ellenőrzés
+
+```bash
+node --check public/app.js
+node --check public/core.mjs
+node --test tests/core.test.mjs
+git diff --check
+```
+
+## Publikálás
+
+A `netlify.toml` kizárólag a `public/` könyvtárat jelöli publikálható gyökérnek. A Gate 3 kiadás 2026-07-18-án került a meglévő `llm-kivalaszto` Netlify-site-ra. A kiadás statikus fájlokat használ; új fizetős add-on, backend, adatbázis vagy futásidejű LLM-szolgáltatás nem lett bekapcsolva.
