@@ -5,15 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Ellenőrizhető, forrásolt LLM API-költség összehasonlítás mintaadatokon.">
     <title>LLM Observatory</title>
-    <link rel="stylesheet" href="./styles.css?v=gate3-review-2">
+    <link rel="stylesheet" href="./styles.css?v=ux-option-3">
   </head>
   <body>
     <a class="skip-link" href="#main">Ugrás a tartalomra</a>
     <header class="app-header">
-      <a class="brand" href="#compare" aria-label="LLM Observatory – kezdőlap">
-        <span class="brand-mark" aria-hidden="true"></span>
-        <span>LLM Observatory</span>
-      </a>
+      <a class="brand" href="#compare" aria-label="LLM Observatory – kezdőlap">LLM Observatory</a>
       <nav class="mode-switch" aria-label="Alkalmazásmód">
         <a href="#compare" data-route-link="compare">Modelleket hasonlítok</a>
         <a href="#task" data-route-link="task">Feladathoz keresek</a>
@@ -26,161 +23,147 @@
 
     <main id="main">
       <section class="route" id="compareRoute" data-route="compare" aria-labelledby="compareTitle">
-        <div class="hero compare-hero">
+        <div class="page-shell">
           <div class="hero-copy">
-            <p class="eyebrow">Model Lens · Mintaadat</p>
-            <h1 id="compareTitle">Ugyanaz a feladat. Két modell.<br> Látható kompromisszumok.</h1>
+            <p class="eyebrow">Azonos profil · ellenőrzött árrekordok</p>
+            <h1 id="compareTitle">Két modell. Egy használati profil. Tiszta költségkülönbség.</h1>
           </div>
-          <div class="model-selectors" aria-label="Összehasonlítandó modellek">
-            <label class="model-selector model-a" for="modelA">
-              <span>Első modell · A</span>
-              <select id="modelA"></select>
-              <small id="modelAId">API ID</small>
-            </label>
-            <label class="model-selector model-b" for="modelB">
-              <span>Második modell · B</span>
-              <select id="modelB"></select>
-              <small id="modelBId">API ID</small>
-            </label>
-          </div>
-          <button class="primary-action" id="compareButton" type="button" aria-describedby="compareHelp">
-            Összehasonlítás indítása
-          </button>
-          <p class="form-help" id="compareHelp">Válassz két különböző modellt.</p>
-        </div>
 
-        <div class="profile-rail" aria-label="Aktív összehasonlítási profil">
-          <div><span>Futás / hó</span><strong id="compareRunsSummary">10 000</strong></div>
-          <div><span>Input / futás</span><strong id="compareInputSummary">8 000 token</strong></div>
-          <div><span>Cached input</span><strong>0 token</strong></div>
-          <div><span>Output / futás</span><strong id="compareOutputSummary">2 000 token</strong></div>
-          <div><span>Mód</span><strong>Standard · direct</strong></div>
-          <div><span>Deviza</span><strong>USD</strong></div>
-          <details class="profile-editor">
-            <summary>Profil szerkesztése</summary>
-            <div class="profile-form">
-              <label for="compareRuns">Futás / hó<input id="compareRuns" type="number" min="1" step="1" value="10000" inputmode="numeric"></label>
-              <label for="compareInput">Nem cache-elt input token / futás<input id="compareInput" type="number" min="0" step="1" value="8000" inputmode="numeric"></label>
-              <label for="compareOutput">Output token / futás<input id="compareOutput" type="number" min="0" step="1" value="2000" inputmode="numeric"></label>
+          <section class="control-panel" aria-label="Összehasonlítás beállításai">
+            <div class="model-selectors">
+              <label class="model-selector model-a" for="modelA">
+                <span>A · Modell</span>
+                <select id="modelA"></select>
+                <small id="modelAId">API ID</small>
+              </label>
+              <label class="model-selector model-b" for="modelB">
+                <span>B · Modell</span>
+                <select id="modelB"></select>
+                <small id="modelBId">API ID</small>
+              </label>
             </div>
-          </details>
-        </div>
+            <button class="primary-action" id="compareButton" type="button" aria-describedby="compareHelp">Összehasonlítás indítása</button>
+            <p class="form-help" id="compareHelp">Direct · standard · szöveg · cache nélkül · USD</p>
 
-        <section class="data-canvas" id="compareCanvas" aria-labelledby="comparisonHeading">
-          <header class="canvas-heading">
-            <div>
-              <p class="eyebrow">Egy profil · két modell</p>
-              <h2 id="comparisonHeading" tabindex="-1">Összehasonlítás</h2>
+            <div class="profile-summary" aria-label="Aktív összehasonlítási profil">
+              <span>Használati profil:</span>
+              <strong><span id="compareRunsSummary">10 000</span> futás / hó</strong>
+              <strong><span id="compareInputSummary">8 000</span> input token / futás</strong>
+              <strong><span id="compareOutputSummary">2 000</span> output token / futás</strong>
+              <strong>Cache: nem</strong>
+              <strong>Mód: Standard · direct</strong>
+              <strong>Deviza: USD</strong>
             </div>
-            <p class="coverage" id="comparisonCoverage">Nincs még számítás</p>
-          </header>
-          <div class="comparison-table" role="table" aria-label="Modell-összehasonlítás">
-            <div class="comparison-head" role="row">
-              <span role="columnheader" aria-label="Mérőszám"></span>
-              <strong class="a-text" id="columnA" role="columnheader">A modell</strong>
-              <span class="axis" aria-hidden="true">A / B</span>
-              <strong class="b-text" id="columnB" role="columnheader">B modell</strong>
-            </div>
-            <div class="comparison-row cost-row" role="row">
-              <h3 id="costLabel" role="rowheader">Havi becsült költség</h3>
-              <div class="comparison-cell model-a-cell" id="costA" role="cell" aria-labelledby="costLabel columnA"></div>
-              <span class="axis" aria-hidden="true">↔</span>
-              <div class="comparison-cell model-b-cell" id="costB" role="cell" aria-labelledby="costLabel columnB"></div>
-            </div>
-            <div class="comparison-row" role="row">
-              <h3 id="contextLabel" role="rowheader">Kontextus megfelelés</h3>
-              <div class="comparison-cell" id="contextA" role="cell" aria-labelledby="contextLabel columnA"></div><span class="axis" aria-hidden="true">◆</span><div class="comparison-cell" id="contextB" role="cell" aria-labelledby="contextLabel columnB"></div>
-            </div>
-            <div class="comparison-row" role="row">
-              <h3 id="toolLabel" role="rowheader">Tool calling</h3>
-              <div class="comparison-cell" id="toolA" role="cell" aria-labelledby="toolLabel columnA"></div><span class="axis" aria-hidden="true">◇</span><div class="comparison-cell" id="toolB" role="cell" aria-labelledby="toolLabel columnB"></div>
-            </div>
-            <div class="comparison-row" role="row">
-              <h3 id="lifecycleLabel" role="rowheader">Lifecycle</h3>
-              <div class="comparison-cell" id="lifecycleA" role="cell" aria-labelledby="lifecycleLabel columnA"></div><span class="axis" aria-hidden="true">○</span><div class="comparison-cell" id="lifecycleB" role="cell" aria-labelledby="lifecycleLabel columnB"></div>
-            </div>
-            <div class="comparison-row" role="row">
-              <h3 id="sourceLabel" role="rowheader">Forrás és ellenőrzés</h3>
-              <div class="comparison-cell" id="sourceA" role="cell" aria-labelledby="sourceLabel columnA"></div><span class="axis" aria-hidden="true">□</span><div class="comparison-cell" id="sourceB" role="cell" aria-labelledby="sourceLabel columnB"></div>
-            </div>
-          </div>
-          <div class="provenance-grid" id="compareProvenance"></div>
-        </section>
+
+            <details class="advanced-settings" id="compareSettings">
+              <summary>Speciális beállítások</summary>
+              <div class="profile-form">
+                <label for="compareRuns">Futás / hó<input id="compareRuns" type="number" min="1" step="1" value="10000" inputmode="numeric"></label>
+                <label for="compareInput">Input token / futás<input id="compareInput" type="number" min="0" step="1" value="8000" inputmode="numeric"></label>
+                <label for="compareOutput">Output token / futás<input id="compareOutput" type="number" min="0" step="1" value="2000" inputmode="numeric"></label>
+              </div>
+            </details>
+          </section>
+
+          <p class="refresh-notice" id="compareDirty" role="status" hidden>A beállítások megváltoztak. Indíts új összehasonlítást a friss eredményhez.</p>
+
+          <section class="result-canvas" id="compareCanvas" aria-labelledby="comparisonHeading">
+            <header class="result-heading">
+              <div>
+                <p class="eyebrow">Ugyanaz az öt kérdés mindkét modellnél</p>
+                <h2 id="comparisonHeading" tabindex="-1">Összehasonlítás</h2>
+              </div>
+              <p class="coverage" id="comparisonCoverage">Nincs még számítás</p>
+            </header>
+            <div class="model-result-grid compare-results" id="compareResults"></div>
+            <details class="technical-details" id="compareTechnical">
+              <summary>Technikai részletek és források</summary>
+              <div class="provenance-grid" id="compareProvenance"></div>
+            </details>
+          </section>
+        </div>
 
         <footer class="trust-strip">
-          <span><strong>Mintaadat</strong> · nem production katalógus</span>
+          <span><strong>Mintaadat</strong> · nem teljes production katalógus</span>
           <span>Lejárt ár nem használható</span>
-          <button class="link-button" type="button" data-open-details="methodCompare">Módszertan</button>
-          <details id="methodCompare"><summary>Adatkezelési részlet</summary><p>Csak current, rekordszinten ellenőrzött direct standard text input/output ár számolhat. Nincs benchmark vagy minőségi pontszám.</p></details>
+          <details><summary>Módszertan</summary><p>Csak current, rekordszinten ellenőrzött direct standard text input/output ár számolhat. Nincs benchmark vagy minőségi pontszám.</p></details>
         </footer>
       </section>
 
       <section class="route" id="taskRoute" data-route="task" aria-labelledby="taskTitle" hidden>
-        <div class="hero task-hero">
+        <div class="page-shell">
           <div class="hero-copy">
-            <p class="eyebrow">Strukturált technikai profil · Mintaadat</p>
-            <h1 id="taskTitle">A feladat forgalmából indulunk. Nem találgatunk minőséget.</h1>
-            <p class="hero-note">A két minta csak tokenforgalmat ír le. Nem állítja, hogy bármely modell szakmailag jobb lenne az adott munkára.</p>
+            <p class="eyebrow">Feladatból költségprofil · ugyanazok az ellenőrzött adatok</p>
+            <h1 id="taskTitle">Mondd meg, mire használod.<br>Mutatjuk a számítható modelleket.</h1>
           </div>
-          <div class="task-builder">
-            <label for="taskPreset">Forgalmi mintaprofil
+
+          <section class="control-panel task-control-panel" aria-label="Feladatprofil beállításai">
+            <label class="preset-selector" for="taskPreset">
+              <span>Milyen munkára keresel modellt?</span>
               <select id="taskPreset">
                 <option value="technical-chat-10k">Technikai asszisztenshez hasonló forgalom</option>
                 <option value="document-analysis-2500">Dokumentumelemzéshez hasonló forgalom</option>
               </select>
             </label>
-            <div class="profile-form task-form">
-              <label for="taskRuns">Futás / hó<input id="taskRuns" type="number" min="1" step="1" value="10000" inputmode="numeric"></label>
-              <label for="taskInput">Nem cache-elt input / futás<input id="taskInput" type="number" min="0" step="1" value="8000" inputmode="numeric"></label>
-              <label for="taskOutput">Output / futás<input id="taskOutput" type="number" min="0" step="1" value="2000" inputmode="numeric"></label>
-            </div>
-            <div class="requirement-toggles">
-              <label><input id="taskPreview" type="checkbox"> Preview lifecycle engedélyezett</label>
-              <label><input id="taskStable" type="checkbox"> Csak dokumentált stable lifecycle</label>
-              <label><input id="taskTool" type="checkbox"> Tool calling kötelező</label>
-            </div>
-            <button class="primary-action" id="taskButton" type="button">Technikai szűrés indítása</button>
-            <p class="form-help" id="taskHelp">Direct · standard · text · cache nélkül · USD</p>
-          </div>
-        </div>
+            <button class="primary-action" id="taskButton" type="button" aria-describedby="taskHelp">Költségek megmutatása</button>
+            <p class="form-help" id="taskHelp">A sorrend kizárólag a teljes, ellenőrzött havi költséget követi.</p>
 
-        <div class="profile-rail task-profile-rail" aria-label="Aktív feladatprofil">
-          <div><span>Profil</span><strong id="taskProfileName">Technikai asszisztenshez hasonló forgalom</strong></div>
-          <div><span>Scope</span><strong>Direct · standard · text</strong></div>
-          <div><span>Cache / tool díj</span><strong>Nem számolt</strong></div>
-          <div><span>Rangsor</span><strong>Csak teljes igazolt költség</strong></div>
-        </div>
-
-        <section class="data-canvas task-canvas" aria-labelledby="taskResultsHeading">
-          <header class="canvas-heading">
-            <div>
-              <p class="eyebrow">Ugyanaz a core · minden modell</p>
-              <h2 id="taskResultsHeading" tabindex="-1">Technikai szűrés eredménye</h2>
+            <div class="profile-summary" aria-label="Aktív feladatprofil">
+              <span>Használati profil:</span>
+              <strong id="taskProfileName">Technikai asszisztenshez hasonló forgalom</strong>
+              <strong><span id="taskRunsSummary">10 000</span> futás / hó</strong>
+              <strong><span id="taskInputSummary">8 000</span> input token / futás</strong>
+              <strong><span id="taskOutputSummary">2 000</span> output token / futás</strong>
             </div>
-            <p class="coverage" id="taskCoverage">Nincs még számítás</p>
-          </header>
-          <div class="task-result-list" id="taskResults"></div>
-          <details class="excluded-models">
-            <summary id="excludedSummary">Kizárt vagy nem számítható modellek</summary>
-            <div id="excludedResults"></div>
-          </details>
-        </section>
+
+            <details class="advanced-settings" id="taskSettings">
+              <summary>Speciális beállítások</summary>
+              <div class="profile-form task-form">
+                <label for="taskRuns">Futás / hó<input id="taskRuns" type="number" min="1" step="1" value="10000" inputmode="numeric"></label>
+                <label for="taskInput">Input token / futás<input id="taskInput" type="number" min="0" step="1" value="8000" inputmode="numeric"></label>
+                <label for="taskOutput">Output token / futás<input id="taskOutput" type="number" min="0" step="1" value="2000" inputmode="numeric"></label>
+              </div>
+              <div class="requirement-toggles">
+                <label><input id="taskPreview" type="checkbox"> Preview modell is jöhet</label>
+                <label><input id="taskStable" type="checkbox"> Csak dokumentált stable modell</label>
+                <label><input id="taskTool" type="checkbox"> Tool calling kötelező</label>
+              </div>
+            </details>
+          </section>
+
+          <p class="refresh-notice" id="taskDirty" role="status" hidden>A feladatprofil megváltozott. Indíts új számítást a friss eredményhez.</p>
+
+          <section class="result-canvas task-canvas" id="taskCanvas" aria-labelledby="taskResultsHeading">
+            <header class="result-heading">
+              <div>
+                <p class="eyebrow">Legfeljebb három azonnali találat</p>
+                <h2 id="taskResultsHeading" tabindex="-1">A profilhoz számítható modellek</h2>
+              </div>
+              <p class="coverage" id="taskCoverage">Nincs még számítás</p>
+            </header>
+            <div class="model-result-grid task-results" id="taskResults"></div>
+            <details class="technical-details" id="taskMore">
+              <summary id="taskMoreSummary">További modellek és kizárási okok</summary>
+              <div class="model-result-grid task-results more-results" id="additionalTaskResults"></div>
+              <div class="excluded-results" id="excludedResults"></div>
+            </details>
+          </section>
+        </div>
 
         <footer class="trust-strip">
-          <span><strong>Mintaadat</strong> · a profil nem alkalmassági benchmark</span>
-          <span>Ismeretlen képesség nem teljesít hard feltételt</span>
-          <button class="link-button" type="button" data-open-details="methodTask">Módszertan</button>
-          <details id="methodTask"><summary>Szűrési részlet</summary><p>A sorrend kizárólag a teljes, current és ellenőrzött USD költséget követi. Nincs score, győztes vagy feladatspecifikus minőségi állítás.</p></details>
+          <span><strong>Mintaadat</strong> · a profil nem minőségi benchmark</span>
+          <span>Ismeretlen képesség nem teljesít kötelező feltételt</span>
+          <details><summary>Módszertan</summary><p>A sorrend csak a teljes, current és ellenőrzött USD költséget követi. Ha egy szükséges adat hiányzik vagy lejárt, a modell nem kerül a számítható találatok közé.</p></details>
         </footer>
       </section>
 
       <section class="load-error" id="loadError" hidden aria-labelledby="loadErrorTitle">
         <h1 id="loadErrorTitle">A mintaadat nem tölthető be</h1>
-        <p id="loadErrorMessage">A katalógus fail-closed módon leállt.</p>
+        <p id="loadErrorMessage">A katalógus biztonsági okból leállt.</p>
       </section>
       <p class="sr-only" id="liveRegion" aria-live="polite"></p>
     </main>
 
-    <script type="module" src="./app.js"></script>
+    <script type="module" src="./app.js?v=ux-option-3"></script>
   </body>
 </html>

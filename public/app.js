@@ -25,6 +25,14 @@ const TRAFFIC_PROFILES = Object.freeze({
   }
 });
 
+const RESULT_FIELD_ORDER = Object.freeze([
+  "Modell és szolgáltató",
+  "Havi becsült költség",
+  "Ár állapota",
+  "Kontextus",
+  "API-kulcs"
+]);
+
 const state = {
   index: null,
   asOf: new Date(),
@@ -34,7 +42,7 @@ const state = {
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
-const clear = (node) => { while (node.firstChild) node.removeChild(node.firstChild); };
+const clear = (element) => { while (element.firstChild) element.removeChild(element.firstChild); };
 const node = (tag, options = {}) => {
   const element = document.createElement(tag);
   if (options.className) element.className = options.className;
@@ -46,7 +54,7 @@ const node = (tag, options = {}) => {
 const formatInteger = (value) => new Intl.NumberFormat("hu-HU").format(value);
 const formatDate = (value) => {
   if (!value) return "nincs adat";
-  return new Intl.DateTimeFormat("hu-HU", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(new Date(value));
+  return new Intl.DateTimeFormat("hu-HU", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(value));
 };
 
 function announce(message) {
@@ -108,8 +116,8 @@ function syncHeaderCoverage() {
 
 function renderRoute() {
   state.route = routeFromHash();
-  $$("[data-route]").forEach((route) => { route.hidden = route.dataset.route !== state.route; });
-  $$("[data-route-link]").forEach((link) => {
+  $$('[data-route]').forEach((route) => { route.hidden = route.dataset.route !== state.route; });
+  $$('[data-route-link]').forEach((link) => {
     if (link.dataset.routeLink === state.route) link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   });
@@ -142,83 +150,119 @@ function updateModelLabels() {
   const b = state.index?.models.get($("#modelB").value);
   $("#modelAId").textContent = a?.api_model_id ?? "API ID nem elérhető";
   $("#modelBId").textContent = b?.api_model_id ?? "API ID nem elérhető";
-  const same = Boolean(a && b && a.id === b.id);
-  const button = $("#compareButton");
-  button.disabled = !a || !b || same;
-  $("#compareHelp").textContent = same ? "A két modellnek különbözőnek kell lennie." : "Direct · standard · text · cache nélkül · USD";
-  $("#compareHelp").classList.toggle("error", same);
+  updateCompareValidity();
+}
+
+function updateCompareValidity() {
+  const same = $("#modelA").value === $("#modelB").value;
+  const valid = normalizeProfile(compareProfile()).valid;
+  $("#compareButton").disabled = same || !valid;
+  if (!valid) {
+    $("#compareHelp").textContent = "A futásszám legalább 1 legyen, a tokenértékek pedig nemnegatív egész számok.";
+    $("#compareHelp").classList.add("error");
+  } else if (same) {
+    $("#compareHelp").textContent = "Válassz két különböző modellt.";
+    $("#compareHelp").classList.add("error");
+  } else {
+    $("#compareHelp").textContent = "Direct · standard · szöveg · cache nélkül · USD";
+    $("#compareHelp").classList.remove("error");
+  }
 }
 
 function updateCompareProfileSummary() {
   const profile = compareProfile();
   $("#compareRunsSummary").textContent = formatInteger(profile.runsPerMonth || 0);
-  $("#compareInputSummary").textContent = `${formatInteger(profile.inputTextTokensPerRun || 0)} token`;
-  $("#compareOutputSummary").textContent = `${formatInteger(profile.outputTextTokensPerRun || 0)} token`;
-  const valid = normalizeProfile(profile).valid;
-  $("#compareButton").disabled = $("#modelA").value === $("#modelB").value || !valid;
-  if (!valid) {
-    $("#compareHelp").textContent = "Minden tokenérték legyen nemnegatív egész, a futásszám pedig legalább 1.";
-    $("#compareHelp").classList.add("error");
-  } else if ($("#modelA").value !== $("#modelB").value) {
-    $("#compareHelp").textContent = "Direct · standard · text · cache nélkül · USD";
-    $("#compareHelp").classList.remove("error");
-  }
+  $("#compareInputSummary").textContent = formatInteger(profile.inputTextTokensPerRun || 0);
+  $("#compareOutputSummary").textContent = formatInteger(profile.outputTextTokensPerRun || 0);
+  updateCompareValidity();
 }
 
-function appendStatus(target, title, detail, tone = "warning") {
-  clear(target);
-  const line = node("span", { className: `status-line state-${tone}` });
-  line.append(node("span", { className: "status-shape", attrs: { "aria-hidden": "true" } }), node("strong", { text: title }));
-  target.append(line);
-  if (detail) target.append(node("small", { text: detail }));
+function updateTaskProfileSummary() {
+  const profile = taskProfile();
+  $("#taskRunsSummary").textContent = formatInteger(profile.runsPerMonth || 0);
+  $("#taskInputSummary").textContent = formatInteger(profile.inputTextTokensPerRun || 0);
+  $("#taskOutputSummary").textContent = formatInteger(profile.outputTextTokensPerRun || 0);
 }
 
-function costCell(target, result, maxNumerator) {
-  clear(target);
+function markDirty(route) {
+  state.coverage[route] = "";
+  $(`#${route}Dirty`).hidden = false;
+  $(`#${route === "compare" ? "compareCanvas" : "taskCanvas"}`).hidden = true;
+  syncHeaderCoverage();
+  announce(route === "compare" ? "A beállítások megváltoztak. Új összehasonlítás szükséges." : "A feladatprofil megváltozott. Új számítás szükséges.");
+}
+
+function revealResults(route, focus) {
+  const canvas = $(`#${route === "compare" ? "compareCanvas" : "taskCanvas"}`);
+  $(`#${route}Dirty`).hidden = true;
+  canvas.hidden = false;
+  if (!focus) return;
+  const heading = route === "compare" ? $("#comparisonHeading") : $("#taskResultsHeading");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  canvas.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+  window.requestAnimationFrame(() => heading.focus({ preventScroll: true }));
+}
+
+function resultField(label, content, className = "") {
+  const wrapper = node("div", { className: `result-field ${className}`.trim() });
+  wrapper.append(node("dt", { text: label }));
+  const value = node("dd");
+  if (typeof content === "string") value.textContent = content;
+  else if (content) value.append(content);
+  wrapper.append(value);
+  return wrapper;
+}
+
+function priceStateContent(result, tone) {
   if (result.costStatus !== "complete") {
-    appendStatus(target, "Nem számítható", result.reasons[0]?.label ?? "Nincs teljes, használható árrekord.", "danger");
-    return;
-  }
-  target.append(node("strong", { text: formatUsd(result.totalCostUsd) }));
-  target.append(node("small", { text: `${formatInteger(result.monthlyInputTokens)} input + ${formatInteger(result.monthlyOutputTokens)} output token / hó` }));
-  const track = node("span", { className: "cost-track", attrs: { "aria-hidden": "true" } });
-  const fill = node("span");
-  const width = maxNumerator > 0n ? Number((result.costNumerator * 10000n) / maxNumerator) / 100 : 0;
-  fill.style.setProperty("--bar-width", `${Math.max(1, width)}%`);
-  track.append(fill);
-  target.append(track);
-}
-
-function contextCell(target, result, profile) {
-  const needed = profile.inputTextTokensPerRun + profile.outputTextTokensPerRun;
-  const available = result.model.context_window_tokens;
-  if (result.modelHealth?.usable && Number.isFinite(available)) {
-    const fits = needed <= available;
-    appendStatus(target, fits ? "Megfelel" : "Nem felel meg", `${formatInteger(needed)} / ${formatInteger(available)} token`, fits ? "current" : "danger");
-  } else appendStatus(target, "Ismeretlen", "A modellrekord jelenleg nem használható.", "danger");
-}
-
-function toolCell(target, modelId) {
-  const capability = capabilityFor(state.index, modelId, "tool_calling", state.asOf);
-  if (capability.support === "supported") appendStatus(target, "Támogatott", `Rekordállapot: ${capability.state}`, "current");
-  else if (capability.support === "limited") appendStatus(target, "Korlátozott", `Rekordállapot: ${capability.state}`, "warning");
-  else appendStatus(target, "Ismeretlen", "Nincs igazolt tool-calling capability rekord.", "warning");
-}
-
-function lifecycleCell(target, result) {
-  const lifecycle = result.model.lifecycle ?? "unknown";
-  const tone = lifecycle === "stable" ? "current" : ["deprecated", "retired"].includes(lifecycle) ? "danger" : "warning";
-  appendStatus(target, lifecycle, `Modellrekord: ${result.modelHealth?.state ?? "unverified"}`, tone);
-}
-
-function sourceCell(target, result) {
-  if (result.costStatus !== "complete") {
-    appendStatus(target, "Nincs használható ár", result.reasons[0]?.label ?? "Fail-closed", "danger");
-    return;
+    return node("span", { className: "status-text danger", text: "Nem használható – hiányos vagy lejárt adat" });
   }
   const states = [effectiveFreshness(result.inputPrice, state.asOf), effectiveFreshness(result.outputPrice, state.asOf)];
   const degraded = states.some((value) => value.includes("degraded"));
-  appendStatus(target, degraded ? "Aktuális · degraded" : "Aktuális árrekord", `Ellenőrizve: ${formatDate(result.verifiedAt[0])} UTC`, degraded ? "warning" : "current");
+  const label = degraded ? "Aktuális, újraellenőrzés esedékes" : "Aktuális";
+  const wrapper = node("span");
+  wrapper.append(node("span", { className: `status-text ${degraded ? "warning" : ""}`.trim(), text: label }));
+  wrapper.append(node("small", { text: ` · ellenőrizve: ${formatDate(result.verifiedAt[0])}` }));
+  return wrapper;
+}
+
+function contextContent(result, profile) {
+  const needed = profile.inputTextTokensPerRun + profile.outputTextTokensPerRun;
+  const available = result.model.context_window_tokens;
+  if (!result.modelHealth?.usable || !Number.isFinite(available)) return node("span", { className: "status-text danger", text: "Nem igazolható" });
+  const fits = needed <= available;
+  const wrapper = node("span");
+  wrapper.append(node("span", { className: `status-text ${fits ? "" : "danger"}`.trim(), text: fits ? "Megfelel" : "Nem felel meg" }));
+  wrapper.append(node("small", { text: ` · ${formatInteger(needed)} / ${formatInteger(available)} token` }));
+  return wrapper;
+}
+
+function apiKeyContent(result) {
+  if (!result.apiKeyLink) return node("span", { className: "unavailable-link", text: "Nincs aktuális, ellenőrzött kulcslink" });
+  return node("a", {
+    className: "api-link",
+    text: "API-kulcs létrehozása",
+    attrs: { href: result.apiKeyLink.url, target: "_blank", rel: "noopener noreferrer" }
+  });
+}
+
+function modelResultCard(result, profile, marker, tone = "neutral") {
+  const provider = state.index.providers.get(result.model.provider_id);
+  const card = node("article", { className: `model-result tone-${tone}` });
+  card.dataset.modelId = result.model.id;
+  card.append(node("h3", { className: "model-result-head", text: `${marker} · ${result.model.name} · ${provider?.name ?? result.model.provider_id}` }));
+  const facts = node("dl", { className: "result-facts" });
+  const cost = result.costStatus === "complete" ? node("span") : null;
+  if (cost) cost.append(document.createTextNode(formatUsd(result.totalCostUsd)), node("small", { text: " USD / hó" }));
+  facts.append(
+    resultField(RESULT_FIELD_ORDER[0], `${result.model.name} · ${provider?.name ?? result.model.provider_id}`),
+    resultField(RESULT_FIELD_ORDER[1], cost ?? "Nem számítható", "cost"),
+    resultField(RESULT_FIELD_ORDER[2], priceStateContent(result, tone)),
+    resultField(RESULT_FIELD_ORDER[3], contextContent(result, profile)),
+    resultField(RESULT_FIELD_ORDER[4], apiKeyContent(result))
+  );
+  card.append(facts);
+  return card;
 }
 
 function sourceAnchor(source, label = "Hivatalos árforrás") {
@@ -229,65 +273,29 @@ function sourceAnchor(source, label = "Hivatalos árforrás") {
 function provenanceCard(result, marker) {
   const card = node("article", { className: "provenance-card" });
   card.append(node("h3", { text: `${marker} · ${result.model.name}` }));
+  const tool = capabilityFor(state.index, result.model.id, "tool_calling", state.asOf);
   const list = node("dl", { className: "provenance-list" });
   const facts = [
     ["API ID", result.model.api_model_id],
     ["Dataset", state.index.raw.dataset_version],
     ["Lifecycle", result.model.lifecycle],
+    ["Tool calling", tool.support === "unknown" ? "nincs igazolt rekord" : tool.support],
     ["Modell ellenőrizve", formatDate(result.model.freshness?.verified_at)],
+    ["Input ár", result.inputPrice ? `${result.inputPrice.amount} USD / 1M token` : "nem használható"],
+    ["Output ár", result.outputPrice ? `${result.outputPrice.amount} USD / 1M token` : "nem használható"],
     ["Input árrekord", result.inputPrice?.id ?? "nem használható"],
     ["Output árrekord", result.outputPrice?.id ?? "nem használható"],
-    ["Teljesség", result.costStatus],
-    ["Feltétel", "direct · standard · text · standard_paid · cache=0"]
+    ["Feltétel", "direct · standard · text · cache=0"]
   ];
   for (const [term, value] of facts) list.append(node("dt", { text: term }), node("dd", { text: String(value ?? "nincs adat") }));
-  const recordDetails = node("details", { className: "record-details" });
-  recordDetails.append(node("summary", { text: "Árrekord és forrás részletei" }));
-  recordDetails.append(list);
-  const recordList = node("dl", { className: "provenance-list" });
-  const priceSource = result.inputPrice ? state.index.sources.get(result.inputPrice.source_id) : null;
-  const recordFacts = [
-    ["Input ár", result.inputPrice ? `${result.inputPrice.amount} USD / 1m token` : "nem használható"],
-    ["Input verified_at", result.inputPrice?.freshness?.verified_at ?? "nincs adat"],
-    ["Input freshness", result.inputPrice ? effectiveFreshness(result.inputPrice, state.asOf) : "unavailable"],
-    ["Input refresh", result.inputPrice?.freshness?.refresh_result ?? "nincs adat"],
-    ["Output ár", result.outputPrice ? `${result.outputPrice.amount} USD / 1m token` : "nem használható"],
-    ["Output verified_at", result.outputPrice?.freshness?.verified_at ?? "nincs adat"],
-    ["Output freshness", result.outputPrice ? effectiveFreshness(result.outputPrice, state.asOf) : "unavailable"],
-    ["Output refresh", result.outputPrice?.freshness?.refresh_result ?? "nincs adat"],
-    ["Forrás", priceSource?.title ?? "nincs használható forrás"],
-    ["Locator", result.inputPrice?.source_locator ?? "nincs adat"],
-    ["Forrás letöltve", priceSource?.retrieved_at ?? "nincs adat"]
-  ];
-  for (const [term, value] of recordFacts) recordList.append(node("dt", { text: term }), node("dd", { text: String(value) }));
-  recordDetails.append(recordList);
-  card.append(recordDetails);
+  card.append(list);
   const actions = node("div", { className: "provenance-actions" });
-  const source = sourceAnchor(priceSource);
-  if (source) actions.append(source);
-  if (result.apiKeyLink) {
-    actions.append(node("a", {
-      className: "text-link",
-      text: "API-kulcs létrehozása",
-      attrs: { href: result.apiKeyLink.url, target: "_blank", rel: "noopener noreferrer" }
-    }));
-  } else actions.append(node("span", { className: "unavailable-link", text: "Nincs current, igazolt API-kulcs link" }));
-  actions.append(node("span", { className: "unavailable-link", text: "Quickstart nincs a proof adatkészletben" }));
+  const source = result.inputPrice ? state.index.sources.get(result.inputPrice.source_id) : null;
+  const sourceLink = sourceAnchor(source);
+  if (sourceLink) actions.append(sourceLink);
+  if (result.apiKeyLink) actions.append(apiKeyContent(result));
   card.append(actions);
   return card;
-}
-
-function resultCoverage(result, profile) {
-  const tool = capabilityFor(state.index, result.model.id, "tool_calling", state.asOf);
-  const link = providerLinkFor(state.index, result.model.provider_id, "api_key", state.asOf);
-  const fields = [
-    result.modelHealth?.usable,
-    Number.isFinite(result.model.context_window_tokens) && profile.inputTextTokensPerRun + profile.outputTextTokensPerRun <= result.model.context_window_tokens,
-    result.model.lifecycle !== "unknown",
-    tool.record !== null && tool.state !== "unverified",
-    Boolean(link)
-  ];
-  return { usable: fields.filter(Boolean).length, total: fields.length, priceUsable: result.costStatus === "complete" ? 2 : 0, priceTotal: 2 };
 }
 
 function renderCompare({ focus = true } = {}) {
@@ -295,33 +303,19 @@ function renderCompare({ focus = true } = {}) {
   if (!normalizeProfile(profile).valid || $("#modelA").value === $("#modelB").value) return;
   const resultA = evaluateModel(state.index, $("#modelA").value, profile, state.asOf);
   const resultB = evaluateModel(state.index, $("#modelB").value, profile, state.asOf);
-  $("#columnA").textContent = `A · ${resultA.model.name}`;
-  $("#columnB").textContent = `B · ${resultB.model.name}`;
-  const completeCosts = [resultA, resultB].filter((item) => item.costStatus === "complete").map((item) => item.costNumerator);
-  const max = completeCosts.length ? completeCosts.reduce((a, b) => a > b ? a : b) : 0n;
-  costCell($("#costA"), resultA, max);
-  costCell($("#costB"), resultB, max);
-  contextCell($("#contextA"), resultA, profile);
-  contextCell($("#contextB"), resultB, profile);
-  toolCell($("#toolA"), resultA.model.id);
-  toolCell($("#toolB"), resultB.model.id);
-  lifecycleCell($("#lifecycleA"), resultA);
-  lifecycleCell($("#lifecycleB"), resultB);
-  sourceCell($("#sourceA"), resultA);
-  sourceCell($("#sourceB"), resultB);
-  const coverageA = resultCoverage(resultA, profile);
-  const coverageB = resultCoverage(resultB, profile);
-  const coverageText = `${coverageA.usable + coverageB.usable}/${coverageA.total + coverageB.total} kategória • ${coverageA.priceUsable + coverageB.priceUsable}/${coverageA.priceTotal + coverageB.priceTotal} ár`;
-  $("#comparisonCoverage").textContent = coverageText;
-  state.coverage.compare = coverageText;
-  syncHeaderCoverage();
+  const results = $("#compareResults");
+  clear(results);
+  results.append(modelResultCard(resultA, profile, "A", "a"), modelResultCard(resultB, profile, "B", "b"));
   const provenance = $("#compareProvenance");
   clear(provenance);
   provenance.append(provenanceCard(resultA, "A"), provenanceCard(resultB, "B"));
-  if (focus) {
-    $("#comparisonHeading").focus({ preventScroll: true });
-    announce("Az összehasonlítás frissült.");
-  }
+  const complete = [resultA, resultB].filter((item) => item.costStatus === "complete").length;
+  const coverageText = `${complete}/2 modell teljes, használható költséggel`;
+  $("#comparisonCoverage").textContent = coverageText;
+  state.coverage.compare = coverageText;
+  syncHeaderCoverage();
+  revealResults("compare", focus);
+  if (focus) announce("Az összehasonlítás frissült.");
 }
 
 function applyTaskPreset() {
@@ -331,79 +325,81 @@ function applyTaskPreset() {
   $("#taskInput").value = preset.inputTextTokensPerRun;
   $("#taskOutput").value = preset.outputTextTokensPerRun;
   $("#taskProfileName").textContent = preset.name;
-}
-
-function taskResultRow(result, position) {
-  const row = node("article", { className: "task-result" });
-  const identity = node("div");
-  const orderLabel = position === 1 ? "Legalacsonyabb teljes, igazolt költség" : `Ársorrend ${position}.`;
-  identity.append(node("h3", { text: result.model.name }), node("p", { text: `${result.model.api_model_id} · ${orderLabel}` }));
-  row.append(identity, node("strong", { className: "task-cost", text: formatUsd(result.totalCostUsd) }));
-  const facts = node("div", { className: "task-facts" });
-  facts.append(
-    node("span", { text: `Lifecycle: ${result.model.lifecycle}` }),
-    node("span", { text: `Kontextus: ${formatInteger(result.model.context_window_tokens)}` }),
-    node("span", { text: "Tool: ismeretlen" }),
-    node("span", { text: `Ár: ${effectiveFreshness(result.inputPrice, state.asOf)}` })
-  );
-  row.append(facts);
-  if (result.apiKeyLink) row.append(node("a", { className: "text-link", text: "API-kulcs", attrs: { href: result.apiKeyLink.url, target: "_blank", rel: "noopener noreferrer" } }));
-  else row.append(node("span", { className: "unavailable-link", text: "Nincs igazolt kulcslink" }));
-  return row;
+  updateTaskProfileSummary();
 }
 
 function excludedRow(result) {
   const row = node("article", { className: "excluded-item" });
   row.append(node("strong", { text: result.model?.name ?? "Ismeretlen modell" }));
-  row.append(node("p", { text: result.reasons.map((item) => item.label).join(" ") || "Nem számítható." }));
+  row.append(node("p", { text: result.reasons.map((item) => item.label).join(" ") || "Ehhez a profilhoz nem készíthető ellenőrzött költség." }));
   return row;
 }
 
 function renderTask({ focus = true } = {}) {
   const profile = taskProfile();
   if (!normalizeProfile(profile).valid) {
-    $("#taskHelp").textContent = "Minden tokenérték legyen nemnegatív egész, a futásszám pedig legalább 1.";
+    $("#taskHelp").textContent = "A futásszám legalább 1 legyen, a tokenértékek pedig nemnegatív egész számok.";
     $("#taskHelp").classList.add("error");
     return;
   }
-  $("#taskHelp").textContent = "Direct · standard · text · cache nélkül · USD";
+  $("#taskHelp").textContent = "A sorrend kizárólag a teljes, ellenőrzött havi költséget követi.";
   $("#taskHelp").classList.remove("error");
   const results = evaluateAllModels(state.index, profile, state.asOf);
-  const eligible = results.filter((item) => item.costStatus === "complete").sort((a, b) => a.costNumerator < b.costNumerator ? -1 : a.costNumerator > b.costNumerator ? 1 : a.model.name.localeCompare(b.model.name, "hu"));
+  const eligible = results
+    .filter((item) => item.costStatus === "complete")
+    .sort((a, b) => a.costNumerator < b.costNumerator ? -1 : a.costNumerator > b.costNumerator ? 1 : a.model.name.localeCompare(b.model.name, "hu"));
   const excluded = results.filter((item) => item.costStatus !== "complete");
+  const visible = eligible.slice(0, 3);
+  const additional = eligible.slice(3);
+
   const list = $("#taskResults");
   clear(list);
-  if (eligible.length) eligible.forEach((result, index) => list.append(taskResultRow(result, index + 1)));
-  else list.append(node("p", { className: "load-error", text: "Nincs olyan modell, amely minden hard feltételt current és ellenőrzött adatokkal teljesít. Ez fail-closed eredmény." }));
+  if (visible.length) visible.forEach((result, index) => list.append(modelResultCard(result, profile, `${index + 1}.`, "neutral")));
+  else list.append(node("p", { className: "empty-state", text: "Ehhez a profilhoz most nincs olyan modell, amelynek minden szükséges adata aktuális és ellenőrzött." }));
+
+  const additionalList = $("#additionalTaskResults");
+  clear(additionalList);
+  additional.forEach((result, index) => additionalList.append(modelResultCard(result, profile, `${index + 4}.`, "neutral")));
   const excludedList = $("#excludedResults");
   clear(excludedList);
   excluded.forEach((result) => excludedList.append(excludedRow(result)));
-  $("#excludedSummary").textContent = `Kizárt vagy nem számítható modellek (${excluded.length})`;
-  const coverageText = `${eligible.length}/${results.length} teljes költséggel • ${excluded.length} kizárt`;
+  $("#taskMoreSummary").textContent = `További modellek (${additional.length}) és kizárási okok (${excluded.length})`;
+
+  const coverageText = `${eligible.length}/${results.length} modell teljes, használható költséggel`;
   $("#taskCoverage").textContent = coverageText;
   state.coverage.task = coverageText;
   syncHeaderCoverage();
-  if (focus) {
-    $("#taskResultsHeading").focus({ preventScroll: true });
-    announce("A technikai szűrés frissült.");
-  }
+  revealResults("task", focus);
+  if (focus) announce("A feladathoz illesztett költséglista frissült.");
 }
 
 function bindEvents() {
   window.addEventListener("hashchange", renderRoute);
-  $$('[data-open-details]').forEach((button) => {
-    button.addEventListener("click", () => {
-      const details = document.getElementById(button.dataset.openDetails);
-      if (!details) return;
-      details.open = true;
-      details.querySelector("summary")?.focus();
+  for (const id of ["modelA", "modelB"]) {
+    $("#" + id).addEventListener("change", () => {
+      updateModelLabels();
+      markDirty("compare");
     });
+  }
+  for (const id of ["compareRuns", "compareInput", "compareOutput"]) {
+    $("#" + id).addEventListener("input", () => {
+      updateCompareProfileSummary();
+      markDirty("compare");
+    });
+  }
+  $("#compareButton").addEventListener("click", () => renderCompare());
+  $("#taskPreset").addEventListener("change", () => {
+    applyTaskPreset();
+    markDirty("task");
   });
-  for (const id of ["modelA", "modelB"]) $("#" + id).addEventListener("change", updateModelLabels);
-  for (const id of ["compareRuns", "compareInput", "compareOutput"]) $("#" + id).addEventListener("input", updateCompareProfileSummary);
-  $("#compareButton").addEventListener("click", renderCompare);
-  $("#taskPreset").addEventListener("change", () => { applyTaskPreset(); renderTask(); });
-  $("#taskButton").addEventListener("click", renderTask);
+  for (const id of ["taskRuns", "taskInput", "taskOutput"]) {
+    $("#" + id).addEventListener("input", () => {
+      updateTaskProfileSummary();
+      markDirty("task");
+    });
+  }
+  for (const id of ["taskPreview", "taskStable", "taskTool"]) $("#" + id).addEventListener("change", () => markDirty("task"));
+  $("#taskButton").addEventListener("click", () => renderTask());
 }
 
 async function init() {

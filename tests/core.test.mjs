@@ -21,6 +21,7 @@ const baseCatalog = await loadJson("public/data/catalog.sample.json");
 const profileFixture = await loadJson("outputs/gate2b/proof/calculation-profiles.json");
 const oracle = await loadJson("outputs/gate2b/proof/calculation-results.json");
 const publicHtml = await readFile(join(root, "public/index.html"), "utf8");
+const publicApp = await readFile(join(root, "public/app.js"), "utf8");
 
 const toProfile = (item) => ({
   runsPerMonth: item.runs_per_month,
@@ -194,13 +195,15 @@ test("API-kulcs CTA csak egyetlen current, ellenőrzött HTTPS provider-linkből
   }
 });
 
-test("az A/B összehasonlítás szemantikus táblát, oszlop- és sorcímkéket ad", () => {
-  assert.match(publicHtml, /class="comparison-table" role="table"/);
-  assert.doesNotMatch(publicHtml, /class="comparison-head"[^>]*aria-hidden/);
-  for (const id of ["cost", "context", "tool", "lifecycle", "source"]) {
-    const label = `${id}Label`;
-    assert.match(publicHtml, new RegExp(`id="${label}" role="rowheader"`));
-    assert.match(publicHtml, new RegExp(`id="${id}A"[^>]*aria-labelledby="${label} columnA"`));
-    assert.match(publicHtml, new RegExp(`id="${id}B"[^>]*aria-labelledby="${label} columnB"`));
+test("mindkét útvonal ugyanazt az ötmezős modellkártyát és frissítési védelmet használja", () => {
+  for (const label of ["Modell és szolgáltató", "Havi becsült költség", "Ár állapota", "Kontextus", "API-kulcs"]) {
+    assert.match(publicApp, new RegExp(`\\"${label}\\"`));
   }
+  assert.match(publicApp, /modelResultCard\(resultA, profile, "A", "a"\)/);
+  assert.match(publicApp, /modelResultCard\(result, profile, `\$\{index \+ 1\}\.`, "neutral"\)/);
+  assert.match(publicApp, /function markDirty\(route\)/);
+  assert.match(publicHtml, /id="compareDirty" role="status" hidden/);
+  assert.match(publicHtml, /id="taskDirty" role="status" hidden/);
+  assert.match(publicHtml, /id="comparisonHeading" tabindex="-1"/);
+  assert.match(publicHtml, /id="taskResultsHeading" tabindex="-1"/);
 });
