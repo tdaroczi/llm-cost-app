@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "profiles": [
+    {
+      "id": "technical-chat-10k",
+      "name_hu": "Technikai asszisztens – 10 000 futás/hó",
+      "runs_per_month": 10000,
+      "input_text_tokens_per_run": 8000,
+      "output_text_tokens_per_run": 2000,
+      "cached_input_text_tokens_per_run": 0,
+      "required_processing_mode": "standard",
+      "required_api_channel": "direct",
+      "required_input_modality": "text",
+      "required_output_modality": "text",
+      "allow_preview": false,
+      "require_documented_stable": false,
+      "excluded_components": [
+        "batch",
+        "flex",
+        "priority",
+        "cache",
+        "tools",
+        "web_search",
+        "grounding",
+        "image",
+        "audio",
+        "video"
+      ]
+    },
+    {
+      "id": "document-analysis-2500",
+      "name_hu": "Dokumentumelemzés – 2 500 futás/hó",
+      "runs_per_month": 2500,
+      "input_text_tokens_per_run": 30000,
+      "output_text_tokens_per_run": 1500,
+      "cached_input_text_tokens_per_run": 0,
+      "required_processing_mode": "standard",
+      "required_api_channel": "direct",
+      "required_input_modality": "text",
+      "required_output_modality": "text",
+      "allow_preview": false,
+      "require_documented_stable": false,
+      "excluded_components": [
+        "batch",
+        "flex",
+        "priority",
+        "cache",
+        "tools",
+        "web_search",
+        "grounding",
+        "image",
+        "audio",
+        "video"
+      ]
+    }
+  ]
+}
