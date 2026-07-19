@@ -7,7 +7,7 @@ Magyar nyelvű, build nélküli statikus prototípus LLM API-költségek átlát
 - Netlify: [https://llm-kivalaszto.netlify.app](https://llm-kivalaszto.netlify.app)
 - GitHub: [tdaroczi/llm-cost-app](https://github.com/tdaroczi/llm-cost-app)
 
-## Mit tud a Gate 3 verzió?
+## Mit tud az alkalmazás?
 
 - két modellt ugyanazzal a tokenforgalmi profillal hasonlít össze;
 - feladatjellegű forgalmi mintából indulva műszaki feltételek és teljes USD-költség alapján szűr;
@@ -45,4 +45,8 @@ git diff --check
 
 ## Publikálás
 
-A `netlify.toml` kizárólag a `public/` könyvtárat jelöli publikálható gyökérnek. A Gate 3 kiadás 2026-07-18-án került a meglévő `llm-kivalaszto` Netlify-site-ra. A kiadás statikus fájlokat használ; új fizetős add-on, backend, adatbázis vagy futásidejű LLM-szolgáltatás nem lett bekapcsolva.
+A `netlify.toml` kizárólag a `public/` könyvtárat jelöli publikálható gyökérnek. A kiadás statikus fájlokat használ; nincs bekapcsolva fizetős add-on, backend, adatbázis vagy futásidejű LLM-szolgáltatás.
+
+## Adatfrissítés
+
+A katalógusban szereplő árak és modelladatok időérzékenyek. Új adat kiadása előtt minden érintett rekordot élő, hivatalos szolgáltatói forrásból kell újra ellenőrizni, és a rekord szintjén rögzíteni kell a forrást, az ellenőrzés idejét és a frissességi állapotot.

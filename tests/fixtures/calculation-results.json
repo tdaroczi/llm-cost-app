@@ -1,0 +1,327 @@
+{
+  "proof_version": "1.0.0",
+  "calculated_as_of": "2026-07-18T08:27:56Z",
+  "catalog_schema_version": "2.0.0",
+  "dataset_version": "2026-07-18T08:27:56Z",
+  "validation": {
+    "status": "PASS",
+    "error_count": 0,
+    "errors": [],
+    "warning_count": 0,
+    "warnings": []
+  },
+  "results": [
+    {
+      "profile_id": "technical-chat-10k",
+      "model_id": "openai:gpt-5.6-terra",
+      "status": "complete",
+      "monthly_input_tokens": "80000000",
+      "monthly_output_tokens": "20000000",
+      "input_cost_usd": "200.000000",
+      "output_cost_usd": "300.000000",
+      "total_cost_usd": "500.000000",
+      "price_ids": [
+        "price:openai:gpt-5.6-terra:input",
+        "price:openai:gpt-5.6-terra:output"
+      ],
+      "price_verified_at": [
+        "2026-07-18T08:24:44Z",
+        "2026-07-18T08:24:44Z"
+      ],
+      "dataset_version": "2026-07-18T08:27:56Z",
+      "assumptions": [
+        "direct API",
+        "standard processing",
+        "text input/output",
+        "cache=0",
+        "nincs tool vagy grounding díj"
+      ]
+    },
+    {
+      "profile_id": "technical-chat-10k",
+      "model_id": "openai:gpt-5.6-luna",
+      "status": "complete",
+      "monthly_input_tokens": "80000000",
+      "monthly_output_tokens": "20000000",
+      "input_cost_usd": "80.000000",
+      "output_cost_usd": "120.000000",
+      "total_cost_usd": "200.000000",
+      "price_ids": [
+        "price:openai:gpt-5.6-luna:input",
+        "price:openai:gpt-5.6-luna:output"
+      ],
+      "price_verified_at": [
+        "2026-07-18T08:24:44Z",
+        "2026-07-18T08:24:44Z"
+      ],
+      "dataset_version": "2026-07-18T08:27:56Z",
+      "assumptions": [
+        "direct API",
+        "standard processing",
+        "text input/output",
+        "cache=0",
+        "nincs tool vagy grounding díj"
+      ]
+    },
+    {
+      "profile_id": "technical-chat-10k",
+      "model_id": "anthropic:claude-opus-4-8",
+      "status": "complete",
+      "monthly_input_tokens": "80000000",
+      "monthly_output_tokens": "20000000",
+      "input_cost_usd": "400.000000",
+      "output_cost_usd": "500.000000",
+      "total_cost_usd": "900.000000",
+      "price_ids": [
+        "price:anthropic:claude-opus-4-8:input",
+        "price:anthropic:claude-opus-4-8:output"
+      ],
+      "price_verified_at": [
+        "2026-07-18T08:24:08Z",
+        "2026-07-18T08:24:08Z"
+      ],
+      "dataset_version": "2026-07-18T08:27:56Z",
+      "assumptions": [
+        "direct API",
+        "standard processing",
+        "text input/output",
+        "cache=0",
+        "nincs tool vagy grounding díj"
+      ]
+    },
+    {
+      "profile_id": "technical-chat-10k",
+      "model_id": "anthropic:claude-sonnet-5",
+      "status": "complete",
+      "monthly_input_tokens": "80000000",
+      "monthly_output_tokens": "20000000",
+      "input_cost_usd": "160.000000",
+      "output_cost_usd": "200.000000",
+      "total_cost_usd": "360.000000",
+      "price_ids": [
+        "price:anthropic:claude-sonnet-5:input",
+        "price:anthropic:claude-sonnet-5:output"
+      ],
+      "price_verified_at": [
+        "2026-07-18T08:24:08Z",
+        "2026-07-18T08:24:08Z"
+      ],
+      "dataset_version": "2026-07-18T08:27:56Z",
+      "assumptions": [
+        "direct API",
+        "standard processing",
+        "text input/output",
+        "cache=0",
+        "nincs tool vagy grounding díj"
+      ]
+    },
+    {
+      "profile_id": "technical-chat-10k",
+      "model_id": "google-gemini:gemini-3.5-flash",
+      "status": "complete",
+      "monthly_input_tokens": "80000000",
+      "monthly_output_tokens": "20000000",
+      "input_cost_usd": "120.000000",
+      "output_cost_usd": "180.000000",
+      "total_cost_usd": "300.000000",
+      "price_ids": [
+        "price:gemini:gemini-3.5-flash:input",
+        "price:gemini:gemini-3.5-flash:output"
+      ],
+      "price_verified_at": [
+        "2026-07-18T08:23:24Z",
+        "2026-07-18T08:23:24Z"
+      ],
+      "dataset_version": "2026-07-18T08:27:56Z",
+      "assumptions": [
+        "direct API",
+        "standard processing",
+        "text input/output",
+        "cache=0",
+        "nincs tool vagy grounding díj"
+      ]
+    },
+    {
+      "profile_id": "technical-chat-10k",
+      "model_id": "google-gemini:gemini-3.1-flash-lite",
+      "status": "complete",
+      "monthly_input_tokens": "80000000",
+      "monthly_output_tokens": "20000000",
+      "input_cost_usd": "20.000000",
+      "output_cost_usd": "30.000000",
+      "total_cost_usd": "50.000000",
+      "price_ids": [
+        "price:gemini:gemini-3.1-flash-lite:input",
+        "price:gemini:gemini-3.1-flash-lite:output"
+      ],
+      "price_verified_at": [
+        "2026-07-18T08:23:24Z",
+        "2026-07-18T08:23:24Z"
+      ],
+      "dataset_version": "2026-07-18T08:27:56Z",
+      "assumptions": [
+        "direct API",
+        "standard processing",
+        "text input/output",
+        "cache=0",
+        "nincs tool vagy grounding díj"
+      ]
+    },
+    {
+      "profile_id": "document-analysis-2500",
+      "model_id": "openai:gpt-5.6-terra",
+      "status": "complete",
+      "monthly_input_tokens": "75000000",
+      "monthly_output_tokens": "3750000",
+      "input_cost_usd": "187.500000",
+      "output_cost_usd": "56.250000",
+      "total_cost_usd": "243.750000",
+      "price_ids": [
+        "price:openai:gpt-5.6-terra:input",
+        "price:openai:gpt-5.6-terra:output"
+      ],
+      "price_verified_at": [
+        "2026-07-18T08:24:44Z",
+        "2026-07-18T08:24:44Z"
+      ],
+      "dataset_version": "2026-07-18T08:27:56Z",
+      "assumptions": [
+        "direct API",
+        "standard processing",
+        "text input/output",
+        "cache=0",
+        "nincs tool vagy grounding díj"
+      ]
+    },
+    {
+      "profile_id": "document-analysis-2500",
+      "model_id": "openai:gpt-5.6-luna",
+      "status": "complete",
+      "monthly_input_tokens": "75000000",
+      "monthly_output_tokens": "3750000",
+      "input_cost_usd": "75.000000",
+      "output_cost_usd": "22.500000",
+      "total_cost_usd": "97.500000",
+      "price_ids": [
+        "price:openai:gpt-5.6-luna:input",
+        "price:openai:gpt-5.6-luna:output"
+      ],
+      "price_verified_at": [
+        "2026-07-18T08:24:44Z",
+        "2026-07-18T08:24:44Z"
+      ],
+      "dataset_version": "2026-07-18T08:27:56Z",
+      "assumptions": [
+        "direct API",
+        "standard processing",
+        "text input/output",
+        "cache=0",
+        "nincs tool vagy grounding díj"
+      ]
+    },
+    {
+      "profile_id": "document-analysis-2500",
+      "model_id": "anthropic:claude-opus-4-8",
+      "status": "complete",
+      "monthly_input_tokens": "75000000",
+      "monthly_output_tokens": "3750000",
+      "input_cost_usd": "375.000000",
+      "output_cost_usd": "93.750000",
+      "total_cost_usd": "468.750000",
+      "price_ids": [
+        "price:anthropic:claude-opus-4-8:input",
+        "price:anthropic:claude-opus-4-8:output"
+      ],
+      "price_verified_at": [
+        "2026-07-18T08:24:08Z",
+        "2026-07-18T08:24:08Z"
+      ],
+      "dataset_version": "2026-07-18T08:27:56Z",
+      "assumptions": [
+        "direct API",
+        "standard processing",
+        "text input/output",
+        "cache=0",
+        "nincs tool vagy grounding díj"
+      ]
+    },
+    {
+      "profile_id": "document-analysis-2500",
+      "model_id": "anthropic:claude-sonnet-5",
+      "status": "complete",
+      "monthly_input_tokens": "75000000",
+      "monthly_output_tokens": "3750000",
+      "input_cost_usd": "150.000000",
+      "output_cost_usd": "37.500000",
+      "total_cost_usd": "187.500000",
+      "price_ids": [
+        "price:anthropic:claude-sonnet-5:input",
+        "price:anthropic:claude-sonnet-5:output"
+      ],
+      "price_verified_at": [
+        "2026-07-18T08:24:08Z",
+        "2026-07-18T08:24:08Z"
+      ],
+      "dataset_version": "2026-07-18T08:27:56Z",
+      "assumptions": [
+        "direct API",
+        "standard processing",
+        "text input/output",
+        "cache=0",
+        "nincs tool vagy grounding díj"
+      ]
+    },
+    {
+      "profile_id": "document-analysis-2500",
+      "model_id": "google-gemini:gemini-3.5-flash",
+      "status": "complete",
+      "monthly_input_tokens": "75000000",
+      "monthly_output_tokens": "3750000",
+      "input_cost_usd": "112.500000",
+      "output_cost_usd": "33.750000",
+      "total_cost_usd": "146.250000",
+      "price_ids": [
+        "price:gemini:gemini-3.5-flash:input",
+        "price:gemini:gemini-3.5-flash:output"
+      ],
+      "price_verified_at": [
+        "2026-07-18T08:23:24Z",
+        "2026-07-18T08:23:24Z"
+      ],
+      "dataset_version": "2026-07-18T08:27:56Z",
+      "assumptions": [
+        "direct API",
+        "standard processing",
+        "text input/output",
+        "cache=0",
+        "nincs tool vagy grounding díj"
+      ]
+    },
+    {
+      "profile_id": "document-analysis-2500",
+      "model_id": "google-gemini:gemini-3.1-flash-lite",
+      "status": "complete",
+      "monthly_input_tokens": "75000000",
+      "monthly_output_tokens": "3750000",
+      "input_cost_usd": "18.750000",
+      "output_cost_usd": "5.625000",
+      "total_cost_usd": "24.375000",
+      "price_ids": [
+        "price:gemini:gemini-3.1-flash-lite:input",
+        "price:gemini:gemini-3.1-flash-lite:output"
+      ],
+      "price_verified_at": [
+        "2026-07-18T08:23:24Z",
+        "2026-07-18T08:23:24Z"
+      ],
+      "dataset_version": "2026-07-18T08:27:56Z",
+      "assumptions": [
+        "direct API",
+        "standard processing",
+        "text input/output",
+        "cache=0",
+        "nincs tool vagy grounding díj"
+      ]
+    }
+  ]
+}

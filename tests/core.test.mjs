@@ -18,8 +18,8 @@ const root = join(here, "..");
 const asOf = "2026-07-18T08:27:56Z";
 const loadJson = async (path) => JSON.parse(await readFile(join(root, path), "utf8"));
 const baseCatalog = await loadJson("public/data/catalog.sample.json");
-const profileFixture = await loadJson("outputs/gate2b/proof/calculation-profiles.json");
-const oracle = await loadJson("outputs/gate2b/proof/calculation-results.json");
+const profileFixture = await loadJson("tests/fixtures/calculation-profiles.json");
+const oracle = await loadJson("tests/fixtures/calculation-results.json");
 const publicHtml = await readFile(join(root, "public/index.html"), "utf8");
 const publicApp = await readFile(join(root, "public/app.js"), "utf8");
 
@@ -41,8 +41,8 @@ const profileById = new Map(profileFixture.profiles.map((item) => [item.id, toPr
 const defaultProfile = profileById.get("technical-chat-10k");
 const reasonSet = (result) => new Set(result.reasonCodes);
 
-test("a publikus katalógus a Gate 2B proof pontos másolata", async () => {
-  const source = await readFile(join(root, "outputs/gate2b/proof/sample-catalog.json"));
+test("a publikus katalógus a rögzített proof-fixture pontos másolata", async () => {
+  const source = await readFile(join(root, "tests/fixtures/sample-catalog.json"));
   const publicCopy = await readFile(join(root, "public/data/catalog.sample.json"));
   assert.deepEqual(publicCopy, source);
   assert.equal(normalizeCatalog(baseCatalog, asOf).isSample, true);
