@@ -4504,6 +4504,7 @@
       "default_output_tokens": 800,
       "cost_scope": "standard_text_complete",
       "required_capabilities": [],
+      "accepted_quality_benchmark_ids": [],
       "excluded_cost_hu": null,
       "methodology_note_hu": "A technikai szűréshez nincs a szöveges API-n felüli kötelező képesség."
     },
@@ -4518,6 +4519,9 @@
       "default_output_tokens": 1500,
       "cost_scope": "standard_text_complete",
       "required_capabilities": [],
+      "accepted_quality_benchmark_ids": [
+        "benchmark:livebench-2026-06-25:coding"
+      ],
       "excluded_cost_hu": null,
       "methodology_note_hu": "A technikai szűréshez nincs a szöveges API-n felüli kötelező képesség."
     },
@@ -4526,12 +4530,15 @@
       "version": 1,
       "status": "active",
       "display_order": 3,
-      "label_hu": "Nehéz problémát oldok meg",
+      "label_hu": "Logikai következtetést végzek",
       "icon": "reason",
       "default_input_tokens": 3500,
       "default_output_tokens": 1800,
       "cost_scope": "standard_text_complete",
       "required_capabilities": [],
+      "accepted_quality_benchmark_ids": [
+        "benchmark:livebench-2026-06-25:reasoning"
+      ],
       "excluded_cost_hu": null,
       "methodology_note_hu": "A technikai szűréshez nincs a szöveges API-n felüli kötelező képesség."
     },
@@ -4546,6 +4553,7 @@
       "default_output_tokens": 1500,
       "cost_scope": "standard_text_complete",
       "required_capabilities": [],
+      "accepted_quality_benchmark_ids": [],
       "excluded_cost_hu": null,
       "methodology_note_hu": "A technikai szűréshez nincs a szöveges API-n felüli kötelező képesség."
     },
@@ -4562,6 +4570,7 @@
       "required_capabilities": [
         "structured_output"
       ],
+      "accepted_quality_benchmark_ids": [],
       "excluded_cost_hu": null,
       "methodology_note_hu": "A technikai találatokhoz minden felsorolt képesség támogatása kötelező."
     },
@@ -4578,6 +4587,7 @@
       "required_capabilities": [
         "function_calling"
       ],
+      "accepted_quality_benchmark_ids": [],
       "excluded_cost_hu": null,
       "methodology_note_hu": "A technikai találatokhoz minden felsorolt képesség támogatása kötelező."
     },
@@ -4592,6 +4602,7 @@
       "default_output_tokens": 1800,
       "cost_scope": "standard_text_complete",
       "required_capabilities": [],
+      "accepted_quality_benchmark_ids": [],
       "excluded_cost_hu": null,
       "methodology_note_hu": "A technikai szűréshez nincs a szöveges API-n felüli kötelező képesség."
     },
@@ -4608,6 +4619,7 @@
       "required_capabilities": [
         "image_input"
       ],
+      "accepted_quality_benchmark_ids": [],
       "excluded_cost_hu": "A kép- vagy dokumentumfeldolgozás esetleges külön díja nincs benne.",
       "methodology_note_hu": "A technikai találatokhoz minden felsorolt képesség támogatása kötelező."
     },
@@ -4624,6 +4636,7 @@
       "required_capabilities": [
         "function_calling"
       ],
+      "accepted_quality_benchmark_ids": [],
       "excluded_cost_hu": "A keresés, a fájlok és az eszközhívások esetleges külön díja nincs benne.",
       "methodology_note_hu": "A technikai találatokhoz minden felsorolt képesség támogatása kötelező."
     },
@@ -4640,6 +4653,7 @@
       "required_capabilities": [
         "provider_web_search"
       ],
+      "accepted_quality_benchmark_ids": [],
       "excluded_cost_hu": "A webes keresés és a külső adatforrások esetleges külön díja nincs benne.",
       "methodology_note_hu": "A technikai találatokhoz minden felsorolt képesség támogatása kötelező."
     }
@@ -4661,8 +4675,12 @@
       "version": 1,
       "status": "active",
       "priority_id": "quality",
-      "ranking_basis": "benchmark_required",
-      "ranking_available": false,
+      "ranking_basis": "independent_benchmark",
+      "ranking_available": true,
+      "ranking_task_ids": [
+        "coding",
+        "reasoning"
+      ],
       "result_limit": 3,
       "fail_closed": true,
       "disclosure_hu": "Ehhez a sorrendhez még nincs független, feladatspecifikus mérési bizonyíték."

@@ -4,8 +4,10 @@ import {
   evaluateAllModels,
   evaluateModel,
   formatUsd,
+  normalizeBenchmarkDataset,
   normalizeCatalog,
   normalizeProfile,
+  qualityRankingFor,
   recommendationPolicyFor,
   recordHealth,
   taskFor
@@ -55,6 +57,7 @@ const RESULT_FIELD_ORDER = Object.freeze([
 
 const state = {
   index: null,
+  benchmarks: null,
   asOf: new Date(),
   route: "task",
   coverage: { compare: "", task: "" },
@@ -510,6 +513,88 @@ function advisorSecondaryResult(result, index) {
   return article;
 }
 
+function benchmarkParameterLabel(parameter) {
+  if (parameter?.status === "set") return String(parameter.value);
+  if (parameter?.status === "provider_managed") return "szolgáltató kezeli";
+  if (parameter?.status === "not_applicable") return "nem alkalmazható";
+  return "a benchmark nem állította be";
+}
+
+function advisorBenchmarkNotice(ranking) {
+  const definition = ranking.definition;
+  const source = state.benchmarks.sources.get(definition.source_id);
+  const notice = node("article", { className: "benchmark-notice" });
+  notice.append(
+    node("h2", { text: "LiveBench-eredmény erre a feladatra" }),
+    node("p", { className: "benchmark-edition", text: `${definition.benchmark_name} ${definition.benchmark_version} · ${definition.category} · ${formatInteger(definition.sample_size)} ${definition.sample_unit_hu}` }),
+    node("p", { text: `A ${ranking.totalModelCount} nyilvántartott modellből ${ranking.sourceMeasuredCount} rendelkezik pontosan összekapcsolható méréssel, ${ranking.sourceProviderCount} szolgáltatótól.` }),
+    node("p", { className: "benchmark-caveat", text: "A kimaradó modellek nem kaptak rosszabb helyezést: egyszerűen nem szerepelnek ebben a sorrendben." })
+  );
+  if (ranking.eligibleMeasuredCount < ranking.sourceMeasuredCount) notice.append(node("p", { className: "benchmark-filter-note", text: `A választásaidnak megfelelően ${ranking.eligibleMeasuredCount} mért modell maradt a rangsorban.` }));
+  if (ranking.freshnessState.includes("degraded")) notice.append(node("p", { className: "benchmark-warning", text: "A mérés újraellenőrzése esedékes. Lejárat után a rangsor automatikusan eltűnik." }));
+  const links = node("div", { className: "benchmark-links" });
+  links.append(
+    node("a", { className: "text-link", text: "LiveBench-forrás", attrs: { href: source?.url ?? definition.source_url, target: "_blank", rel: "noopener noreferrer" } }),
+    node("a", { className: "text-link", text: "Módszertan", attrs: { href: definition.methodology_url, target: "_blank", rel: "noopener noreferrer" } }),
+    node("a", { className: "text-link", text: "CC BY-SA 4.0 licenc", attrs: { href: state.benchmarks.raw.license_url, target: "_blank", rel: "noopener noreferrer" } })
+  );
+  notice.append(links, node("small", { text: `${state.benchmarks.raw.modification_notice_hu} Ellenőrizve: ${formatDate(definition.freshness.verified_at)}` }));
+  return notice;
+}
+
+function advisorQualityResult(row, ranking, profile, { primary = false } = {}) {
+  const result = row.evaluation;
+  const benchmark = row.benchmarkResult;
+  const provider = state.index.providers.get(result.model.provider_id);
+  const article = node("article", { className: `advisor-quality-result ${primary ? "is-primary" : ""}`.trim() });
+  const identity = node("div", { className: "quality-result-identity" });
+  const isFilteredRanking = ranking.eligibleMeasuredCount < ranking.sourceMeasuredCount;
+  const placementLabel = isFilteredRanking
+    ? `${row.position}. a választásaidnak megfelelő ${ranking.eligibleMeasuredCount} mért modell között`
+    : `${row.position}. a ${ranking.sourceMeasuredCount} pontosan összekapcsolható konfiguráció közül`;
+  identity.append(
+    node("p", { className: "result-label", text: placementLabel }),
+    node(primary ? "h2" : "h3", { text: result.model.name }),
+    node("p", { className: "provider-name", text: provider?.name ?? result.model.provider_id })
+  );
+  const score = node("div", { className: "quality-score" });
+  score.append(
+    node("strong", { text: `${Number(benchmark.metric_value).toFixed(1)} pont` }),
+    node("span", { text: benchmark.source_row_id })
+  );
+  const explanation = node("div", { className: "quality-explanation" });
+  explanation.append(
+    node("p", { className: "positive-reason", text: isFilteredRanking
+      ? `Helyezése a választásaidnak megfelelő mért modellek között: ${row.position}.`
+      : `Helyezése ebben a ${ranking.definition.category} mérésben: ${row.sourcePosition}.` }),
+    node("p", { className: "caution-reason", text: "Ez feladatspecifikus benchmarkeredmény, nem általános „legjobb LLM” minősítés." })
+  );
+  const cost = node("div", { className: "quality-cost" });
+  cost.append(node("small", { text: "Becsült havi standard tokenár" }));
+  if (result.costStatus === "complete") {
+    cost.append(node("strong", { text: formatAdvisorCost(result.totalCostUsd) }), node("span", { text: `Ár ellenőrizve: ${formatDate(result.verifiedAt[0])}` }));
+  } else {
+    cost.append(node("strong", { className: "unavailable-cost", text: "A havi költség jelenleg nem ellenőrizhető." }));
+  }
+  cost.append(node("p", { className: "benchmark-cost-disclaimer", text: "Ez a saját használati profilodra számított standard tokenár-becslés, nem a LiveBenchben mért konfiguráció futtatási költsége." }));
+  if (result.apiKeyLink) cost.append(apiKeyContent(result));
+  const quickstart = quickstartContent(result);
+  if (quickstart) cost.append(quickstart);
+  article.append(identity, score, explanation, cost);
+  if (primary) {
+    const details = node("details", { className: "result-why benchmark-details" });
+    const configuration = benchmark.model_configuration;
+    details.append(
+      node("summary", { text: "Miért ezt látom?" }),
+      node("p", { text: `${formatInteger(profile.runsPerMonth)} kérés / hó, kérésenként ${formatInteger(profile.inputTextTokensPerRun)} input és ${formatInteger(profile.outputTextTokensPerRun)} output token költségfeltételezéssel.` }),
+      node("p", { text: `Mért konfiguráció: ${benchmark.source_row_id}; reasoning effort: ${benchmarkParameterLabel(configuration.reasoning_effort)}; temperature: ${benchmarkParameterLabel(configuration.temperature)}; max output: ${benchmarkParameterLabel(configuration.max_output_tokens)}.` }),
+      node("a", { className: "text-link", text: "Pontos konfiguráció forrása", attrs: { href: benchmark.configuration_source_url, target: "_blank", rel: "noopener noreferrer" } })
+    );
+    article.append(details);
+  }
+  return article;
+}
+
 function advisorCompactPrices(results) {
   const details = node("details", { className: "compact-price-list" });
   details.append(node("summary", { text: `Tokenárak megnyitása (${results.length})` }));
@@ -530,14 +615,14 @@ function advisorCompactPrices(results) {
   return details;
 }
 
-function advisorEvidenceNotice(task, priority, policy, technicalCount) {
+function advisorEvidenceNotice(task, priority, policy, technicalCount, pricedCount) {
   const notice = node("article", { className: "evidence-notice" });
   const required = task.requiredCapabilities.map((key) => CAPABILITY_LABELS[key] ?? key);
   notice.append(
     node("h2", { text: "Ehhez még nincs hiteles sorrend." }),
     node("p", { text: required.length
       ? `${technicalCount} modellnél találtunk hivatalosan dokumentált ${required.join(" és ")} támogatást.`
-      : `${technicalCount} modell fér bele a megadott használati mintába, és rendelkezik ellenőrzött tokenárral.` }),
+      : `${technicalCount} modell fér bele a megadott használati mintába; közülük ${pricedCount} rendelkezik ellenőrzött tokenárral.` }),
     node("p", { text: priority.id === "price" && task.scope === "token_baseline"
       ? "A külön keresési, kép-, fájl- vagy eszközdíjak hiányozhatnak, ezért itt nem nevezünk ki legolcsóbb modellt."
       : policy?.disclosure_hu ?? "A választott sorrendhez még nincs elég független bizonyíték." }),
@@ -578,30 +663,45 @@ function renderAdvisorResults() {
     .filter((item) => item.costStatus === "complete")
     .sort((a, b) => a.costNumerator < b.costNumerator ? -1 : a.costNumerator > b.costNumerator ? 1 : a.model.name.localeCompare(b.model.name, "hu"));
   const policy = recommendationPolicyFor(state.index, priority.id);
+  const qualityRanking = qualityRankingFor(state.index, state.benchmarks, {
+    taskId: task.id,
+    priorityId: priority.id,
+    evaluations: results
+  }, state.asOf);
   const baselineOnly = task.scope === "token_baseline";
   const priceRanked = priority.id === "price" && policy?.ranking_available === true && !baselineOnly;
+  const qualityRanked = qualityRanking.available;
   const visible = priced.slice(0, policy?.result_limit ?? 3);
-  $("#taskHelp").textContent = priceRanked
-    ? "A sorrend kizárólag a teljes, ellenőrzött standard szöveges tokenköltséget követi."
-    : "Először a hivatalosan dokumentált technikai feltételeket ellenőrizzük. Bizonyíték nélkül nem állítunk fel minőségi vagy sebességi sorrendet.";
-  $("#taskResultsHeading").textContent = priceRanked
-    ? "Három ellenőrzött költségjelölt."
-    : "Amit most biztosan tudunk.";
+  $("#taskHelp").textContent = qualityRanked
+    ? "A minőségi sorrend kizárólag az azonos LiveBench-kategória pontosan összekapcsolható konfigurációit követi."
+    : priceRanked
+      ? "A sorrend kizárólag a teljes, ellenőrzött standard szöveges tokenköltséget követi."
+      : "Először a hivatalosan dokumentált technikai feltételeket ellenőrizzük. Bizonyíték nélkül nem állítunk fel minőségi vagy sebességi sorrendet.";
+  $("#taskResultsHeading").textContent = qualityRanked
+    ? "A feladathoz mért modellek."
+    : priceRanked
+      ? "Három ellenőrzött költségjelölt."
+      : "Amit most biztosan tudunk.";
   const list = $("#taskResults");
   clear(list);
   const costNotice = advisorCostNotice(task);
   if (costNotice) list.append(costNotice);
-  if (priceRanked && visible.length) {
+  if (qualityRanked) {
+    list.append(advisorBenchmarkNotice(qualityRanking));
+    qualityRanking.rows.slice(0, policy?.result_limit ?? 3).forEach((row, index) => list.append(advisorQualityResult(row, qualityRanking, profile, { primary: index === 0 })));
+  } else if (priceRanked && visible.length) {
     list.append(advisorPrimaryResult(visible[0], profile));
     const alternatives = node("div", { className: "advisor-alternatives" });
     visible.slice(1).forEach((result, index) => alternatives.append(advisorSecondaryResult(result, index)));
     if (alternatives.childElementCount) list.append(alternatives);
   } else {
-    list.append(advisorEvidenceNotice(task, priority, policy, technical.length));
+    list.append(advisorEvidenceNotice(task, priority, policy, technical.length, priced.length));
     if (priced.length) list.append(advisorCompactPrices(priced));
     else list.append(node("p", { className: "unsupported-result", text: "Ehhez a feladathoz most nincs olyan modell, amelynél a szükséges technikai támogatás és az aktuális tokenár is igazolt." }));
   }
-  state.coverage.task = `${technical.length}/${results.length} modell dokumentált technikai találat`;
+  state.coverage.task = qualityRanked
+    ? `${qualityRanking.measuredCount}/${qualityRanking.totalModelCount} modell pontos LiveBench-méréssel`
+    : `${technical.length}/${results.length} modell dokumentált technikai találat`;
   syncHeaderCoverage();
   const heading = $("#taskResultsHeading");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -660,6 +760,14 @@ async function init() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     state.index = normalizeCatalog(await response.json(), state.asOf);
     if (state.index.isSample) throw new Error("Ez a kiadás csak jóváhagyott production katalógussal indulhat.");
+    try {
+      const benchmarkResponse = await fetch("./data/benchmarks/livebench-2026-06-25.json", { cache: "no-store" });
+      if (!benchmarkResponse.ok) throw new Error(`HTTP ${benchmarkResponse.status}`);
+      state.benchmarks = normalizeBenchmarkDataset(await benchmarkResponse.json(), state.index, state.asOf);
+    } catch (benchmarkError) {
+      state.benchmarks = null;
+      console.warn("A benchmarkadat nem használható; a minőségi rangsor fail-closed állapotban marad.", benchmarkError);
+    }
     populateModels();
     renderAdvisorChoices();
     applyAdvisorAssumption();

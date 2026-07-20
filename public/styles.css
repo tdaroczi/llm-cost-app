@@ -523,6 +523,59 @@ select, input[type="number"] {
 .advisor-secondary-result div > span { color: var(--muted); font-size: 0.8rem; }
 .advisor-secondary-result > p { margin: 0; color: var(--text-soft); font-size: 1.05rem; font-weight: 700; }
 .advisor-secondary-result .api-link { min-height: 44px; color: var(--a); text-decoration: none; }
+.benchmark-notice {
+  max-width: 1040px;
+  margin: 0 auto 18px;
+  padding: 24px 28px;
+  border: 1px solid var(--line-strong);
+  border-left: 5px solid var(--a);
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(123, 240, 194, 0.08), rgba(3, 15, 34, 0.72));
+}
+.benchmark-notice h2 { margin: 0 0 7px; font-size: clamp(1.35rem, 2vw, 1.8rem); }
+.benchmark-notice p { margin: 7px 0; color: var(--text-soft); line-height: 1.5; }
+.benchmark-notice .benchmark-edition { color: var(--a); font-weight: 760; }
+.benchmark-notice .benchmark-caveat { color: #ffe2ad; }
+.benchmark-notice .benchmark-filter-note { color: var(--text); font-weight: 700; }
+.benchmark-notice .benchmark-warning { color: var(--warning); font-weight: 700; }
+.benchmark-notice > small { display: block; margin-top: 10px; color: var(--muted); }
+.benchmark-links { display: flex; flex-wrap: wrap; gap: 4px 22px; margin-top: 8px; }
+.benchmark-links .text-link { min-height: 36px; color: var(--a); font-size: 0.82rem; }
+.advisor-quality-result {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.85fr) minmax(150px, 0.55fr) minmax(240px, 1.05fr) minmax(240px, 0.95fr);
+  align-items: center;
+  gap: 24px;
+  padding: 22px 28px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(3, 15, 34, 0.52);
+}
+.advisor-quality-result.is-primary {
+  padding-block: 28px;
+  border: 1px solid var(--a);
+  border-left-width: 7px;
+  border-radius: 10px 10px 0 0;
+  background: rgba(3, 15, 34, 0.76);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.18);
+}
+.quality-result-identity h2, .quality-result-identity h3 { margin: 0; letter-spacing: -0.025em; }
+.quality-result-identity h2 { font-size: clamp(1.55rem, 2.2vw, 2.05rem); }
+.quality-result-identity h3 { font-size: 1.2rem; }
+.quality-score { display: grid; gap: 6px; }
+.quality-score strong { color: var(--a); font-size: clamp(1.5rem, 2.2vw, 2rem); font-variant-numeric: tabular-nums; }
+.quality-score span { color: var(--muted); font: 0.72rem/1.35 var(--font-mono); overflow-wrap: anywhere; }
+.quality-explanation { padding-right: 20px; border-right: 1px solid var(--line); }
+.quality-explanation p { position: relative; margin: 0; padding-left: 24px; color: var(--text-soft); font-size: 0.86rem; line-height: 1.45; }
+.quality-explanation p + p { margin-top: 10px; }
+.quality-explanation p::before { position: absolute; left: 0; color: var(--a); font-weight: 800; }
+.quality-cost { display: grid; gap: 6px; align-content: center; }
+.quality-cost > small, .quality-cost > span { color: var(--muted); font-size: 0.75rem; }
+.quality-cost > strong { color: var(--text); font-size: 1.12rem; font-variant-numeric: tabular-nums; }
+.quality-cost .unavailable-cost { color: #ffe2ad; font-size: 0.95rem; line-height: 1.35; }
+.benchmark-cost-disclaimer { margin: 4px 0; color: var(--muted); font-size: 0.72rem; line-height: 1.4; }
+.quality-cost .api-link { min-height: 42px; justify-content: center; margin-top: 4px; border: 1px solid var(--a); border-radius: 7px; color: var(--a); padding: 7px 12px; text-decoration: none; }
+.quality-cost .quickstart-link { min-height: 34px; display: inline-flex; align-items: center; justify-content: center; color: var(--a); text-decoration: none; font-size: 0.78rem; font-weight: 700; }
+.benchmark-details .text-link { min-height: 38px; color: var(--a); font-size: 0.82rem; }
 .evidence-notice { max-width: 900px; margin: 0 auto 22px; padding: 28px 30px; border: 1px solid var(--warning); border-radius: 10px; background: linear-gradient(135deg, rgba(255, 194, 95, 0.08), rgba(3, 15, 34, 0.72)); box-shadow: 0 24px 70px rgba(0, 0, 0, 0.18); }
 .evidence-notice h2 { margin: 0 0 12px; font-size: clamp(1.45rem, 2.4vw, 2rem); }
 .evidence-notice p { margin: 8px 0; color: var(--text-soft); line-height: 1.55; }
@@ -685,6 +738,10 @@ select, input[type="number"] {
   .advisor-result-explanation { border-right: 0; }
   .advisor-result-cost { grid-column: 1 / -1; grid-template-columns: 1fr auto; align-items: center; padding-top: 20px; border-top: 1px solid var(--line); }
   .advisor-result-cost .api-link { grid-column: 2; grid-row: 1 / 4; min-width: 240px; margin: 0; }
+  .advisor-quality-result { grid-template-columns: 0.8fr 0.55fr 1.15fr; }
+  .quality-cost { grid-column: 1 / -1; grid-template-columns: minmax(200px, 0.7fr) 1fr auto auto; align-items: center; padding-top: 16px; border-top: 1px solid var(--line); }
+  .quality-cost .api-link { min-width: 190px; margin: 0; }
+  .quality-cost .quickstart-link { min-width: 140px; }
   .result-why { grid-column: 1 / -1; }
 }
 
@@ -718,6 +775,10 @@ select, input[type="number"] {
   .result-why { grid-column: auto; }
   .advisor-secondary-result { grid-template-columns: 1fr auto; gap: 10px 18px; padding-inline: 12px; }
   .advisor-secondary-result .api-link { grid-column: 1 / -1; }
+  .advisor-quality-result { grid-template-columns: 1fr 0.65fr; gap: 16px; padding-inline: 20px; }
+  .quality-explanation { grid-column: 1 / -1; padding: 16px 0; border-block: 1px solid var(--line); border-right: 0; }
+  .quality-cost { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr; padding: 0; border: 0; }
+  .quality-cost .api-link, .quality-cost .quickstart-link { min-width: 0; }
   .compact-price-row { grid-template-columns: minmax(0, 1fr) auto; }
   .compact-price-actions { grid-column: 1 / -1; justify-content: flex-start; }
 }
@@ -772,6 +833,12 @@ select, input[type="number"] {
   .advisor-results-heading > p { font-size: 0.95rem; }
   .result-notice { text-align: left; }
   .advisor-secondary-result { grid-template-columns: 1fr; }
+  .benchmark-notice { padding: 20px 17px; }
+  .benchmark-links { display: grid; grid-template-columns: 1fr; }
+  .advisor-quality-result, .advisor-quality-result.is-primary { grid-template-columns: 1fr; padding: 22px 18px; }
+  .quality-score { padding-block: 4px; }
+  .quality-explanation { grid-column: auto; }
+  .quality-cost { grid-column: auto; }
   .evidence-notice { padding: 22px 18px; }
   .compact-price-row { grid-template-columns: 1fr; gap: 8px; padding: 16px; }
   .compact-price-actions { grid-column: auto; flex-wrap: wrap; }

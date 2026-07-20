@@ -6,11 +6,14 @@ import { dirname, join } from "node:path";
 
 import {
   capabilityFor,
+  benchmarkRecordHealth,
   effectiveFreshness,
   evaluateAllModels,
   evaluateModel,
+  normalizeBenchmarkDataset,
   normalizeCatalog,
-  providerLinkFor
+  providerLinkFor,
+  qualityRankingFor
 } from "../public/core.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -18,10 +21,12 @@ const root = join(here, "..");
 const asOf = "2026-07-20T09:13:14Z";
 const loadJson = async (path) => JSON.parse(await readFile(join(root, path), "utf8"));
 const baseCatalog = await loadJson("public/data/catalog.json");
+const baseBenchmark = await loadJson("public/data/benchmarks/livebench-2026-06-25.json");
 const profileFixture = await loadJson("tests/fixtures/calculation-profiles.json");
 const oracle = await loadJson("tests/fixtures/calculation-results.json");
 const publicHtml = await readFile(join(root, "public/index.html"), "utf8");
 const publicApp = await readFile(join(root, "public/app.js"), "utf8");
+const thirdPartyNotices = await readFile(join(root, "THIRD_PARTY_NOTICES.md"), "utf8");
 
 const toProfile = (item) => ({
   runsPerMonth: item.runs_per_month,
@@ -40,6 +45,15 @@ const toProfile = (item) => ({
 const profileById = new Map(profileFixture.profiles.map((item) => [item.id, toProfile(item)]));
 const defaultProfile = profileById.get("technical-chat-10k");
 const reasonSet = (result) => new Set(result.reasonCodes);
+const taskEvaluations = (index, taskId, date = asOf) => {
+  const task = index.tasks.get(taskId);
+  return evaluateAllModels(index, {
+    runsPerMonth: 600,
+    inputTextTokensPerRun: task.default_input_tokens,
+    outputTextTokensPerRun: task.default_output_tokens,
+    requiredCapabilities: task.required_capabilities
+  }, date);
+};
 
 test("a publikus production katalógus önmagában konzisztens", () => {
   const index = normalizeCatalog(baseCatalog, asOf);
@@ -291,6 +305,171 @@ test("a Gate 5B capability-mátrix teljes, forráshű és pontos modellverzióho
   assert.throws(() => normalizeCatalog(missingCostStatusRaw, asOf), /Hibás capability extra_cost_status/);
 });
 
+test("a Gate 5C LiveBench-adat külön licencelt fájlban, pontos 9/14-es lefedettséggel használható", () => {
+  const catalog = normalizeCatalog(baseCatalog, asOf);
+  const benchmark = normalizeBenchmarkDataset(baseBenchmark, catalog, asOf);
+  assert.equal(benchmark.definitions.size, 2);
+  assert.equal(benchmark.results.size, 18);
+  assert.equal(new Set([...benchmark.results.values()].map((item) => item.model_id)).size, 9);
+  assert.equal(new Set([...benchmark.results.values()].map((item) => catalog.models.get(item.model_id).provider_id)).size, 5);
+  for (const definition of benchmark.definitions.values()) {
+    assert.deepEqual(new Set(definition.coverage.unmeasured_model_ids), new Set([
+      "alibaba-qwen:qwen3.7-max-2026-06-08",
+      "anthropic:claude-fable-5",
+      "google-gemini:gemini-3.1-flash-lite",
+      "mistral:mistral-medium-3-5",
+      "mistral:mistral-small-2603"
+    ]));
+    assert.equal(benchmarkRecordHealth(benchmark, definition, asOf).usable, true);
+  }
+  assert.equal(baseBenchmark.license, "CC-BY-SA-4.0");
+  assert.match(baseBenchmark.modification_notice_hu, /exact modellekhez kapcsolva/);
+  assert.match(thirdPartyNotices, /LiveBench benchmark data/);
+  assert.match(thirdPartyNotices, /CC BY-SA 4\.0/);
+  assert.match(thirdPartyNotices, /Claude Fable 5 was excluded/);
+});
+
+test("a quality sorrend csak coding és reasoning feladatra érhető el, és a top 3 forráshű", () => {
+  const catalog = normalizeCatalog(baseCatalog, asOf);
+  const benchmark = normalizeBenchmarkDataset(baseBenchmark, catalog, asOf);
+  const expected = {
+    coding: ["openai:gpt-5.6-sol", "openai:gpt-5.6-luna", "anthropic:claude-sonnet-5"],
+    reasoning: ["openai:gpt-5.6-sol", "openai:gpt-5.6-terra", "anthropic:claude-opus-4-8"]
+  };
+  for (const [taskId, top] of Object.entries(expected)) {
+    const ranking = qualityRankingFor(catalog, benchmark, { taskId, priorityId: "quality", evaluations: taskEvaluations(catalog, taskId) }, asOf);
+    assert.equal(ranking.available, true, taskId);
+    assert.equal(ranking.measuredCount, 9);
+    assert.equal(ranking.providerCount, 5);
+    assert.equal(ranking.sourceMeasuredCount, 9);
+    assert.equal(ranking.eligibleMeasuredCount, 9);
+    assert.deepEqual(ranking.rows.slice(0, 3).map((row) => row.evaluation.model.id), top);
+    assert.deepEqual(ranking.rows.slice(0, 3).map((row) => row.position), [1, 2, 3]);
+  }
+  for (const task of catalog.tasks.values()) {
+    if (["coding", "reasoning"].includes(task.id)) continue;
+    assert.equal(qualityRankingFor(catalog, benchmark, { taskId: task.id, priorityId: "quality", evaluations: taskEvaluations(catalog, task.id) }, asOf).available, false, task.id);
+  }
+  assert.equal(qualityRankingFor(catalog, benchmark, { taskId: "coding", priorityId: "balanced", evaluations: taskEvaluations(catalog, "coding") }, asOf).available, false);
+  assert.equal(qualityRankingFor(catalog, benchmark, { taskId: "coding", priorityId: "speed", evaluations: taskEvaluations(catalog, "coding") }, asOf).available, false);
+});
+
+test("a benchmarkfrissesség böngészőidőből fail-closed, a check_due pedig láthatóan degraded", () => {
+  const catalog = normalizeCatalog(baseCatalog, asOf);
+  const benchmark = normalizeBenchmarkDataset(baseBenchmark, catalog, asOf);
+  const overdue = "2026-07-28T09:13:14Z";
+  const overdueRanking = qualityRankingFor(catalog, benchmark, { taskId: "coding", priorityId: "quality", evaluations: taskEvaluations(catalog, "coding", overdue) }, overdue);
+  assert.equal(overdueRanking.available, true);
+  assert.equal(overdueRanking.freshnessState, "overdue_degraded");
+  const stale = "2026-08-04T09:13:14Z";
+  assert.equal(qualityRankingFor(catalog, benchmark, { taskId: "coding", priorityId: "quality", evaluations: taskEvaluations(catalog, "coding", stale) }, stale).available, false);
+  const expired = "2026-08-20T09:13:14Z";
+  assert.equal(qualityRankingFor(catalog, benchmark, { taskId: "reasoning", priorityId: "quality", evaluations: taskEvaluations(catalog, "reasoning", expired) }, expired).available, false);
+
+  const oneStaleRaw = structuredClone(baseBenchmark);
+  const oneStale = oneStaleRaw.benchmark_results.find((item) => item.task_id === "coding" && item.model_id === "openai:gpt-5.6-sol");
+  oneStale.freshness.verified_at = "2026-07-01T00:00:00Z";
+  oneStale.freshness.check_due_at = "2026-07-08T00:00:00Z";
+  oneStale.freshness.stale_at = "2026-07-15T00:00:00Z";
+  oneStale.freshness.expires_at = "2026-07-31T00:00:00Z";
+  const oneStaleIndex = normalizeBenchmarkDataset(oneStaleRaw, catalog, asOf);
+  const withoutStaleModel = qualityRankingFor(catalog, oneStaleIndex, { taskId: "coding", priorityId: "quality", evaluations: taskEvaluations(catalog, "coding") }, asOf);
+  assert.equal(withoutStaleModel.available, true);
+  assert.equal(withoutStaleModel.measuredCount, 8);
+  assert.equal(withoutStaleModel.rows[0].evaluation.model.id, "openai:gpt-5.6-luna");
+});
+
+test("exact modell-, konfiguráció- és fallback-eltérés nem normalizálható", () => {
+  const catalog = normalizeCatalog(baseCatalog, asOf);
+  const apiMismatch = structuredClone(baseBenchmark);
+  apiMismatch.benchmark_results[0].api_model_id = "gpt-5.6-sol-not-exact";
+  assert.throws(() => normalizeBenchmarkDataset(apiMismatch, catalog, asOf), /exact modellkapcsolat/);
+
+  const incomplete = structuredClone(baseBenchmark);
+  incomplete.benchmark_results[0].model_configuration.temperature = { status: "unknown", value: null };
+  assert.throws(() => normalizeBenchmarkDataset(incomplete, catalog, asOf), /Hiányos benchmarkkonfiguráció/);
+
+  const fallback = structuredClone(baseBenchmark);
+  const candidate = fallback.benchmark_results[0];
+  candidate.model_id = "anthropic:claude-fable-5";
+  candidate.api_model_id = "claude-fable-5";
+  candidate.source_row_id = "claude-fable-5-max-effort";
+  candidate.model_configuration.source_model_id = "claude-fable-5-max-effort";
+  candidate.model_configuration.api_model_id = "claude-fable-5";
+  candidate.model_configuration.fallback_model_ids = ["claude-opus-4-8"];
+  assert.throws(() => normalizeBenchmarkDataset(fallback, catalog, asOf), /Hiányos benchmarkkonfiguráció/);
+
+  const geminiWithoutTopP = structuredClone(baseBenchmark);
+  const geminiResult = geminiWithoutTopP.benchmark_results.find((item) => item.model_id === "google-gemini:gemini-3.5-flash");
+  delete geminiResult.model_configuration.api_kwargs.top_p;
+  assert.throws(() => normalizeBenchmarkDataset(geminiWithoutTopP, catalog, asOf), /Hiányos benchmarkkonfiguráció/);
+
+  const anthropicWithoutAdaptiveThinking = structuredClone(baseBenchmark);
+  const anthropicResult = anthropicWithoutAdaptiveThinking.benchmark_results.find((item) => item.model_id === "anthropic:claude-opus-4-8");
+  delete anthropicResult.model_configuration.api_kwargs.thinking.type;
+  assert.throws(() => normalizeBenchmarkDataset(anthropicWithoutAdaptiveThinking, catalog, asOf), /Hiányos benchmarkkonfiguráció/);
+
+  const duplicate = structuredClone(baseBenchmark);
+  duplicate.benchmark_results.push({ ...structuredClone(duplicate.benchmark_results[0]), id: `${duplicate.benchmark_results[0].id}:duplicate` });
+  duplicate.benchmark_definitions.find((item) => item.id === duplicate.benchmark_results[0].definition_id).coverage.measured_model_count += 1;
+  assert.throws(() => normalizeBenchmarkDataset(duplicate, catalog, asOf), /benchmark-lefedettség/);
+});
+
+test("a forrás szerinti mérési lefedettség nem csökken a felhasználó technikai szűrésétől", () => {
+  const catalog = normalizeCatalog(baseCatalog, asOf);
+  const benchmark = normalizeBenchmarkDataset(baseBenchmark, catalog, asOf);
+  const evaluations = evaluateAllModels(catalog, {
+    runsPerMonth: 1,
+    inputTextTokensPerRun: 1020000,
+    outputTextTokensPerRun: 1000,
+    requiredCapabilities: []
+  }, asOf);
+  const ranking = qualityRankingFor(catalog, benchmark, { taskId: "coding", priorityId: "quality", evaluations }, asOf);
+  assert.equal(ranking.available, true);
+  assert.equal(ranking.sourceMeasuredCount, 9);
+  assert.equal(ranking.sourceProviderCount, 5);
+  assert.equal(ranking.eligibleMeasuredCount, 4);
+  assert.equal(ranking.eligibleProviderCount, 2);
+  assert.equal(ranking.rows.length, 4);
+  const terra = ranking.rows.find((row) => row.evaluation.model.id === "openai:gpt-5.6-terra");
+  assert.equal(terra.sourcePosition, 5);
+  assert.equal(terra.position, 3);
+});
+
+test("hiányzó, stale vagy expired ár nem tünteti el és nem rendezi át a quality első helyét", () => {
+  const cases = ["missing", "stale", "expired"];
+  for (const priceCase of cases) {
+    const raw = structuredClone(baseCatalog);
+    const solPrices = raw.prices.filter((item) => item.model_id === "openai:gpt-5.6-sol");
+    if (priceCase === "missing") {
+      raw.prices = raw.prices.filter((item) => !(item.model_id === "openai:gpt-5.6-sol" && item.charge_type === "output_text_tokens"));
+    } else {
+      for (const price of solPrices) {
+        price.freshness.verified_at = "2026-07-01T00:00:00Z";
+        price.freshness.check_due_at = "2026-07-05T00:00:00Z";
+        price.freshness.stale_at = priceCase === "stale" ? "2026-07-20T08:00:00Z" : "2026-07-10T00:00:00Z";
+        price.freshness.expires_at = priceCase === "stale" ? "2026-08-01T00:00:00Z" : "2026-07-20T08:00:00Z";
+      }
+    }
+    const catalog = normalizeCatalog(raw, asOf);
+    const benchmark = normalizeBenchmarkDataset(baseBenchmark, catalog, asOf);
+    const ranking = qualityRankingFor(catalog, benchmark, { taskId: "coding", priorityId: "quality", evaluations: taskEvaluations(catalog, "coding") }, asOf);
+    assert.equal(ranking.available, true, priceCase);
+    assert.equal(ranking.rows[0].evaluation.model.id, "openai:gpt-5.6-sol", priceCase);
+    assert.equal(ranking.rows[0].position, 1, priceCase);
+    assert.equal(ranking.rows[0].evaluation.costStatus, "unavailable", priceCase);
+  }
+});
+
+test("hibás benchmarkfájl nem teszi használhatatlanná az alap-katalógust", () => {
+  const catalog = normalizeCatalog(baseCatalog, asOf);
+  const invalid = structuredClone(baseBenchmark);
+  invalid.license = "unknown";
+  assert.throws(() => normalizeBenchmarkDataset(invalid, catalog, asOf), /licence/);
+  assert.equal(catalog.models.size, 14);
+  assert.equal(evaluateModel(catalog, "openai:gpt-5.6-sol", defaultProfile, asOf).costStatus, "complete");
+});
+
 test("az ismeretlen, feltételes, stale vagy kétértelmű capability fail-closed", () => {
   const cases = [
     ["xai:grok-4.3", "provider_web_search"],
@@ -366,6 +545,21 @@ test("az összehasonlító megőrzi a bizonyító mezőket, az ajánló pedig eg
   assert.equal(baseCatalog.tasks.filter((task) => task.cost_scope === "token_baseline").length, 3);
   assert.match(publicApp, /function advisorCostNotice\(task\)/);
   assert.match(publicApp, /Ez ár-összehasonlítás, nem minőségi vagy alkalmassági rangsor/);
+  assert.match(publicApp, /LiveBench-eredmény erre a feladatra/);
+  assert.match(publicApp, /A havi költség jelenleg nem ellenőrizhető/);
+  assert.match(publicApp, /nem a LiveBenchben mért konfiguráció futtatási költsége/);
+  assert.match(publicApp, /CC BY-SA 4\.0 licenc/);
+  assert.match(publicApp, /source\?\.url \?\? definition\.source_url/);
+  assert.match(publicApp, /A választásaidnak megfelelően .* mért modell maradt a rangsorban/);
+  assert.match(publicApp, /Helyezése a választásaidnak megfelelő mért modellek között/);
+  assert.match(publicApp, /Helyezése ebben a .* mérésben: .*sourcePosition/);
+  assert.match(publicApp, /normalizeBenchmarkDataset/);
+  assert.match(publicApp, /qualityRankingFor/);
+  assert.match(publicApp, /data\/benchmarks\/livebench-2026-06-25\.json/);
+  assert.match(publicApp, /state\.benchmarks = null/);
+  assert.match(publicApp, /qualityRanking\.rows\.slice\(0, policy\?\.result_limit \?\? 3\)/);
+  assert.doesNotMatch(publicApp, /quality.*costNumerator|costNumerator.*quality/i);
+  assert.equal(baseCatalog.tasks.find((task) => task.id === "reasoning").label_hu, "Logikai következtetést végzek");
   assert.doesNotMatch(publicHtml, /Három érthető lehetőség/);
   assert.match(publicApp, /scope_label_hu/);
   assert.match(publicApp, /function markCompareDirty\(\)/);
