@@ -4,6 +4,12 @@ const ACTIVE_STATES = new Set(["current", "current_degraded", "overdue_degraded"
 const CAPABILITY_SUPPORT_STATES = new Set(["supported", "unsupported", "conditional", "unknown"]);
 const EXTRA_COST_STATES = new Set(["included", "priced_separately", "unknown", "not_applicable"]);
 const CAPABILITY_KEYS = new Set(["image_input", "function_calling", "structured_output", "provider_web_search", "file_or_pdf_input"]);
+const BENCHMARK_SCHEMA_VERSION = "1.0.0";
+const BENCHMARK_TASKS = new Set(["coding", "reasoning"]);
+const BENCHMARK_ACTIVE_STATES = new Set(["current", "current_degraded", "overdue_degraded"]);
+const BENCHMARK_PARAMETER_STATES = new Set(["set", "not_set_by_benchmark", "not_applicable", "provider_managed"]);
+const BENCHMARK_API_KWARGS_STATES = new Set(["exact_transcription", "source_has_no_api_kwargs"]);
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 export const REASON_LABELS = Object.freeze({
   invalid_profile: "A forgalmi profil hiányos vagy érvénytelen.",
@@ -87,6 +93,164 @@ export function recordHealth(index, record, asOf = index.asOf) {
   return { usable, state, source, reviewProvenanceComplete };
 }
 
+const benchmarkScheduleValid = (freshness) => {
+  const verified = parseTime(freshness?.verified_at);
+  const checkDue = parseTime(freshness?.check_due_at);
+  const stale = parseTime(freshness?.stale_at);
+  const expires = parseTime(freshness?.expires_at);
+  return verified !== null && checkDue - verified === 7 * DAY_MS && stale - verified === 14 * DAY_MS && expires - verified === 30 * DAY_MS;
+};
+
+const apiKwargsLeafPaths = (value, prefix = "") => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return prefix ? [prefix] : [];
+  return Object.entries(value).flatMap(([key, child]) => apiKwargsLeafPaths(child, prefix ? `${prefix}.${key}` : key));
+};
+
+const benchmarkConfigurationStatus = (record) => {
+  const configuration = record?.model_configuration;
+  if (!configuration || configuration.api_model_id !== record.api_model_id || configuration.source_model_id !== record.source_row_id) return "configuration_incomplete";
+  if (configuration.exact_model_mapping !== true || !Array.isArray(configuration.fallback_model_ids) || configuration.fallback_model_ids.length > 0) return "configuration_incomplete";
+  if (typeof configuration.provider_route !== "string" || configuration.provider_route.trim().length === 0) return "configuration_incomplete";
+  for (const key of ["reasoning_effort", "temperature", "max_output_tokens"]) {
+    const parameter = configuration[key];
+    if (!parameter || !BENCHMARK_PARAMETER_STATES.has(parameter.status)) return "configuration_incomplete";
+    if (parameter.status === "set" && (parameter.value === null || parameter.value === undefined || parameter.value === "")) return "configuration_incomplete";
+    if (parameter.status !== "set" && parameter.value !== null) return "configuration_incomplete";
+  }
+  if (!BENCHMARK_API_KWARGS_STATES.has(configuration.api_kwargs_status) || !configuration.api_kwargs || typeof configuration.api_kwargs !== "object" || Array.isArray(configuration.api_kwargs)) return "configuration_incomplete";
+  if (!Array.isArray(configuration.api_kwargs_known_paths) || configuration.api_kwargs_known_paths.some((path) => typeof path !== "string" || path.trim().length === 0)) return "configuration_incomplete";
+  const actualKwargPaths = apiKwargsLeafPaths(configuration.api_kwargs).sort();
+  const declaredKwargPaths = [...configuration.api_kwargs_known_paths].sort();
+  if (JSON.stringify(actualKwargPaths) !== JSON.stringify(declaredKwargPaths)) return "configuration_incomplete";
+  if (configuration.api_kwargs_status === "exact_transcription" && actualKwargPaths.length === 0) return "configuration_incomplete";
+  if (configuration.api_kwargs_status === "source_has_no_api_kwargs" && actualKwargPaths.length > 0) return "configuration_incomplete";
+  if (typeof record.configuration_source_url !== "string" || !record.configuration_source_url.startsWith("https://")) return "configuration_incomplete";
+  if (typeof record.configuration_source_locator !== "string" || record.configuration_source_locator.trim().length === 0) return "configuration_incomplete";
+  return "complete";
+};
+
+export function benchmarkRecordHealth(index, record, asOf = index?.asOf ?? new Date()) {
+  if (!index || !record) return { usable: false, state: "unverified", configurationStatus: "configuration_incomplete" };
+  const state = effectiveFreshness(record, asOf);
+  const source = index.sources.get(record.source_id);
+  const now = asOf instanceof Date ? asOf.getTime() : parseTime(asOf);
+  const reviewedAt = parseTime(record.reviewed_at);
+  const reviewComplete = typeof record.source_locator === "string" && record.source_locator.trim().length > 0 &&
+    typeof record.review_ref === "string" && record.review_ref.trim().length > 0 &&
+    reviewedAt !== null && now !== null && reviewedAt <= now;
+  const sourceComplete = source?.source_type === "independent_benchmark" && source?.source_status === "independent_benchmark_verified";
+  const licenseComplete = record.license === "CC-BY-SA-4.0" && record.license_status === "redistributable_with_attribution_sharealike";
+  const configurationStatus = record.definition_id ? benchmarkConfigurationStatus(record) : "not_applicable";
+  const usable = record.record_status === "record_verified" && reviewComplete && sourceComplete && licenseComplete &&
+    benchmarkScheduleValid(record.freshness) && BENCHMARK_ACTIVE_STATES.has(state) &&
+    (configurationStatus === "not_applicable" || configurationStatus === "complete");
+  return { usable, state, source, reviewComplete, sourceComplete, licenseComplete, configurationStatus };
+}
+
+export function normalizeBenchmarkDataset(raw, catalogIndex, asOf = new Date()) {
+  if (!raw || raw.benchmark_schema_version !== BENCHMARK_SCHEMA_VERSION) throw new Error(`Nem támogatott benchmark_schema_version: ${raw?.benchmark_schema_version ?? "hiányzik"}`);
+  if (raw.license !== "CC-BY-SA-4.0" || raw.license_url !== "https://creativecommons.org/licenses/by-sa/4.0/") throw new Error("A benchmarkadat licence hiányos vagy nem támogatott.");
+  if (typeof raw.attribution !== "string" || !raw.attribution.includes("LiveBench")) throw new Error("Hiányzó LiveBench-attribúció.");
+  if (typeof raw.modification_notice_hu !== "string" || !raw.modification_notice_hu.includes("exact modellekhez kapcsolva")) throw new Error("Hiányzó benchmark-módosítási nyilatkozat.");
+  for (const key of ["sources", "benchmark_definitions", "benchmark_results"]) assertArray(raw[key], key);
+
+  const sources = buildUniqueMap(raw.sources, "benchmark sources");
+  const definitions = buildUniqueMap(raw.benchmark_definitions, "benchmark definitions");
+  const results = buildUniqueMap(raw.benchmark_results, "benchmark results");
+  const resultsByDefinition = new Map();
+
+  for (const definition of definitions.values()) {
+    if (!BENCHMARK_TASKS.has(definition.task_id) || !catalogIndex.tasks.has(definition.task_id)) throw new Error(`Hibás benchmark task: ${definition.id}`);
+    if (!sources.has(definition.source_id)) throw new Error(`Hibás benchmarkforrás: ${definition.id}`);
+    if (!Number.isSafeInteger(definition.sample_size) || definition.sample_size <= 0 || definition.higher_is_better !== true) throw new Error(`Hibás benchmark-definíció: ${definition.id}`);
+    if (!Number.isSafeInteger(definition.coverage?.catalog_model_count) || definition.coverage.catalog_model_count !== catalogIndex.models.size) throw new Error(`Hibás benchmark-lefedettség: ${definition.id}`);
+    if (!Array.isArray(definition.coverage?.unmeasured_model_ids)) throw new Error(`Hiányzó unmeasured lista: ${definition.id}`);
+  }
+
+  for (const result of results.values()) {
+    const definition = definitions.get(result.definition_id);
+    const model = catalogIndex.models.get(result.model_id);
+    if (!definition || !model || !sources.has(result.source_id)) throw new Error(`Hibás benchmarkeredmény-hivatkozás: ${result.id}`);
+    if (result.task_id !== definition.task_id || result.api_model_id !== model.api_model_id) throw new Error(`Hibás exact modellkapcsolat: ${result.id}`);
+    if (typeof result.metric_value !== "string" || !/^\d+(\.\d{1,6})?$/.test(result.metric_value)) throw new Error(`Hibás benchmarkpontszám: ${result.id}`);
+    const derivedStatus = benchmarkConfigurationStatus(result);
+    if (result.configuration_status !== derivedStatus || derivedStatus !== "complete") throw new Error(`Hiányos benchmarkkonfiguráció: ${result.id}`);
+    const items = resultsByDefinition.get(result.definition_id) ?? [];
+    items.push(result);
+    resultsByDefinition.set(result.definition_id, items);
+  }
+
+  for (const definition of definitions.values()) {
+    const items = resultsByDefinition.get(definition.id) ?? [];
+    const modelIds = new Set(items.map((item) => item.model_id));
+    const providers = new Set(items.map((item) => catalogIndex.models.get(item.model_id)?.provider_id));
+    if (items.length !== modelIds.size || items.length !== definition.coverage.measured_model_count || providers.size !== definition.coverage.provider_count) {
+      throw new Error(`A benchmark-lefedettség nem egyezik az eredményrekordokkal: ${definition.id}`);
+    }
+    const unmeasured = [...catalogIndex.models.keys()].filter((modelId) => !modelIds.has(modelId)).sort();
+    if (JSON.stringify(unmeasured) !== JSON.stringify([...definition.coverage.unmeasured_model_ids].sort())) throw new Error(`Hibás unmeasured modelllista: ${definition.id}`);
+  }
+
+  return { raw, asOf, sources, definitions, results, resultsByDefinition };
+}
+
+export function qualityRankingFor(catalogIndex, benchmarkIndex, { taskId, priorityId, evaluations }, asOf = catalogIndex.asOf) {
+  const unavailable = (reasonCode) => ({ available: false, reasonCode, rows: [], measuredCount: 0, providerCount: 0, totalModelCount: catalogIndex.models.size });
+  if (priorityId !== "quality") return unavailable("priority_not_quality");
+  const task = taskFor(catalogIndex, taskId);
+  const policy = recommendationPolicyFor(catalogIndex, priorityId);
+  if (!task || !policy?.ranking_available || !policy.ranking_task_ids?.includes(taskId)) return unavailable("task_not_supported");
+  if (!benchmarkIndex) return unavailable("benchmark_unavailable");
+  const acceptedIds = task.accepted_quality_benchmark_ids ?? [];
+  if (acceptedIds.length !== 1) return unavailable("benchmark_definition_missing");
+  const definition = benchmarkIndex.definitions.get(acceptedIds[0]);
+  const definitionHealth = benchmarkRecordHealth(benchmarkIndex, definition, asOf);
+  if (!definition || !definitionHealth.usable) return unavailable("benchmark_definition_unusable");
+
+  const grouped = new Map();
+  for (const result of benchmarkIndex.resultsByDefinition.get(definition.id) ?? []) {
+    const items = grouped.get(result.model_id) ?? [];
+    items.push(result);
+    grouped.set(result.model_id, items);
+  }
+  const sourceUsableResults = [];
+  for (const [modelId, items] of grouped.entries()) {
+    if (items.length !== 1) continue;
+    const health = benchmarkRecordHealth(benchmarkIndex, items[0], asOf);
+    if (!health.usable) continue;
+    sourceUsableResults.push({ modelId, benchmarkResult: items[0], health });
+  }
+  sourceUsableResults.sort((a, b) => Number(b.benchmarkResult.metric_value) - Number(a.benchmarkResult.metric_value) || catalogIndex.models.get(a.modelId).name.localeCompare(catalogIndex.models.get(b.modelId).name, "hu"));
+  const evaluationByModel = new Map((evaluations ?? []).map((item) => [item.model?.id, item]));
+  const usableResults = [];
+  for (const [sourceIndex, item] of sourceUsableResults.entries()) {
+    const { modelId, benchmarkResult, health } = item;
+    const evaluation = evaluationByModel.get(modelId);
+    if (!evaluation || evaluation.technicalEligibility !== "eligible") continue;
+    usableResults.push({ benchmarkResult, evaluation, health, sourcePosition: sourceIndex + 1 });
+  }
+  usableResults.sort((a, b) => Number(b.benchmarkResult.metric_value) - Number(a.benchmarkResult.metric_value) || a.evaluation.model.name.localeCompare(b.evaluation.model.name, "hu"));
+  const sourceProviderCount = new Set(sourceUsableResults.map((item) => catalogIndex.models.get(item.modelId)?.provider_id)).size;
+  const eligibleProviderCount = new Set(usableResults.map((item) => item.evaluation.model.provider_id)).size;
+  if (usableResults.length < 3 || eligibleProviderCount < 2) return unavailable("benchmark_coverage_insufficient");
+
+  return {
+    available: true,
+    reasonCode: null,
+    definition,
+    freshnessState: definitionHealth.state,
+    measuredCount: sourceUsableResults.length,
+    providerCount: sourceProviderCount,
+    sourceMeasuredCount: sourceUsableResults.length,
+    sourceProviderCount,
+    eligibleMeasuredCount: usableResults.length,
+    eligibleProviderCount,
+    totalModelCount: catalogIndex.models.size,
+    unmeasuredModelIds: [...catalogIndex.models.keys()].filter((modelId) => !sourceUsableResults.some((item) => item.modelId === modelId)),
+    rows: usableResults.map((item, index) => ({ ...item, position: index + 1 }))
+  };
+}
+
 export function normalizeCatalog(raw, asOf = new Date()) {
   if (!raw || raw.schema_version !== SCHEMA_VERSION) throw new Error(`Nem támogatott schema_version: ${raw?.schema_version ?? "hiányzik"}`);
   for (const key of [
@@ -141,10 +305,14 @@ export function normalizeCatalog(raw, asOf = new Date()) {
   for (const task of tasks.values()) {
     if (!Array.isArray(task.required_capabilities)) throw new Error(`Hibás feladat capability-lista: ${task.id}`);
     if (task.required_capabilities.some((key) => !CAPABILITY_KEYS.has(key))) throw new Error(`Ismeretlen feladat capability: ${task.id}`);
+    if (!Array.isArray(task.accepted_quality_benchmark_ids)) throw new Error(`Hibás feladat benchmark-lista: ${task.id}`);
     if (!["standard_text_complete", "token_baseline"].includes(task.cost_scope)) throw new Error(`Hibás feladat költségscope: ${task.id}`);
   }
   for (const policy of recommendationPolicies.values()) {
     if (policiesByPriority.has(policy.priority_id)) throw new Error(`Ismétlődő ajánlási policy: ${policy.priority_id}`);
+    if (policy.priority_id === "quality" && (!Array.isArray(policy.ranking_task_ids) || policy.ranking_task_ids.some((taskId) => !tasks.has(taskId)))) {
+      throw new Error(`Hibás quality policy task-scope: ${policy.id}`);
+    }
     policiesByPriority.set(policy.priority_id, policy);
   }
   for (const link of providerLinks.values()) {

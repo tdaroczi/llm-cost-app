@@ -1,6 +1,6 @@
 # Gate 5C – független minőségi mérés, szűk induló körben
 
-**Állapot:** implementáció előtti, jóváhagyásra váró módszertan
+**Állapot:** jóváhagyott módszertan; helyileg implementálva; production publikálásra még nem jóváhagyott
 
 **Élő ellenőrzés dátuma:** 2026-07-20
 
@@ -17,14 +17,14 @@ A felhasználó számára egyszerű választ akarunk adni, de nem akarunk kital�
 - a forrás, módszertan és újraközlési feltétel ellenőrizhető;
 - a hiányzó modell nem kap mesterségesen rossz pontszámot.
 
-A LiveBench 2026-06-25 kiadásából a jelenlegi 14 modellünk közül **10 modell, 5 szolgáltatótól** kapcsolható össze kellő pontossággal. Ez elég a programozási és logikai következtetési mérés óvatos megjelenítéséhez. Nem elég arra, hogy általánosan kijelentsük, melyik a „legjobb LLM”.
+A LiveBench 2026-06-25 kiadásából a jelenlegi 14 modellünk közül **9 modell, 5 szolgáltatótól** kapcsolható össze kellő pontossággal. A tervezés után végzett konfigurációs újraellenőrzés feltárta, hogy a Claude Fable 5 közzétett futtatása szerveroldali fallbacket enged Claude Opus 4.8-ra, ezért az exact-model szabály alapján ez is kimarad. A fennmaradó kör elég a programozási és logikai következtetési mérés óvatos megjelenítéséhez. Nem elég arra, hogy általánosan kijelentsük, melyik a „legjobb LLM”.
 
 ## Induló GO / NO-GO döntés
 
 | Felhasználói cél | Döntés | Indok |
 |---|---|---|
-| Programozás | **GO – korlátozott minőségi sorrend** | LiveBench Coding, 117 teszteset, 10 pontosan összekapcsolható modell |
-| Logikai következtetés | **GO – korlátozott minőségi sorrend** | LiveBench Reasoning, 202 teszteset, 10 pontosan összekapcsolható modell |
+| Programozás | **GO – korlátozott minőségi sorrend** | LiveBench Coding, 117 teszteset, 9 pontosan összekapcsolható modell |
+| Logikai következtetés | **GO – korlátozott minőségi sorrend** | LiveBench Reasoning, 202 teszteset, 9 pontosan összekapcsolható modell |
 | Szövegírás és átírás | NO-GO | A nyelvi benchmark nem azonos a kreatív, üzleti vagy magyar szöveg minőségével |
 | Hosszú dokumentum feldolgozása | NO-GO | Nincs egységes, aktuális hosszúkontextus-mérés a pontos modellkörre |
 | Adatkinyerés | NO-GO | Nincs megfelelő exact-model extraction benchmark |
@@ -45,8 +45,8 @@ Ha a felhasználó a **Programozás** vagy **Logikai következtetés** feladatho
 1. legfeljebb három eredménykártyát kap;
 2. minden kártyán látszik egy tizedesre kerekítve a független pontszám, közvetlenül mellette a mért konfiguráció, továbbá a becsült havi API-költség és egy rövid magyarázat;
 3. a mérés neve és dátuma egyértelműen megjelenik;
-4. külön mondat jelzi, hogy a 14 nyilvántartott modellből 10-hez van pontosan összekapcsolható eredmény;
-5. a kimaradó négy modellről ezt írjuk: **„Ezek nem feltétlenül rosszabbak; ehhez a kiadáshoz nincs pontosan összehasonlítható mérésük.”**
+4. külön mondat jelzi, hogy a 14 nyilvántartott modellből 9-hez van pontosan összekapcsolható eredmény;
+5. a kimaradó öt modellről ezt írjuk: **„Ezek nem feltétlenül rosszabbak; ehhez a kiadáshoz nincs pontosan összehasonlítható mérésük.”**
 
 Javasolt főcím:
 
@@ -62,15 +62,17 @@ vagy
 
 Javasolt lefedettségi figyelmeztetés:
 
-> A 14 nyilvántartott modellből 10 rendelkezik pontosan összekapcsolható méréssel, 5 szolgáltatótól. A kimaradó modellek nem kaptak rosszabb helyezést: egyszerűen nem szerepelnek ebben a sorrendben.
+> A 14 nyilvántartott modellből 9 rendelkezik pontosan összekapcsolható méréssel, 5 szolgáltatótól. A kimaradó modellek nem kaptak rosszabb helyezést: egyszerűen nem szerepelnek ebben a sorrendben.
 
 A helyezés formája:
 
-> 1. a 10 pontosan összekapcsolható konfiguráció közül
+> 1. a 9 pontosan összekapcsolható konfiguráció közül
 
 Ha a felhasználó választásai vagy valamely kötelező technikai feltétel tovább szűkíti a mezőnyt, a felirat automatikusan erre változik:
 
 > 1. a választásaidnak megfelelő, mért modellek között
+
+A forrás szerinti lefedettség ettől nem változik: a felület továbbra is 9/14 pontosan összekapcsolható mérést mutat, és külön jelzi, hány mért modell maradt a felhasználó technikai feltételei után.
 
 Más feladat vagy más prioritás esetén marad az őszinte állapot:
 
@@ -84,7 +86,7 @@ Más feladat vagy más prioritás esetén marad az őszinte állapot:
 
 **Írhatjuk:**
 
-> A LiveBench 2026-06-25 Coding mérésében, a közzétett Max Effort konfigurációval ez érte el a legmagasabb pontszámot a 10 pontosan összekapcsolható modell között.
+> A LiveBench 2026-06-25 Coding mérésében, a közzétett Max Effort konfigurációval ez érte el a legmagasabb pontszámot a 9 pontosan összekapcsolható modell között.
 
 A „Logikai következtetés” elnevezést használjuk, nem az általános „nehéz problémamegoldás” ígéretét. A benchmark nem bizonyít mindenféle problémamegoldási fölényt.
 
@@ -105,7 +107,6 @@ A benchmark során felhasznált reasoning/thinking tokenek teljes költsége nin
 | GPT-5.6 Luna | `gpt-5.6-luna-max` |
 | Claude Opus 4.8 | `claude-opus-4-8-xhigh-effort` |
 | Claude Sonnet 5 | `claude-sonnet-5-xhigh-effort` |
-| Claude Fable 5 | `claude-fable-5-max-effort` |
 | Gemini 3.5 Flash | `gemini-3.5-flash-high` |
 | Grok 4.3 | `grok-4.3` |
 | DeepSeek V4 Flash | `deepseek-v4-flash` |
@@ -117,8 +118,9 @@ A benchmark során felhasznált reasoning/thinking tokenek teljes költsége nin
 - Mistral Medium 3.5 – nem szerepel a kiadásban;
 - Mistral Small 4 / 2603 – nem szerepel a kiadásban;
 - Qwen3.7 Max `qwen3.7-max-2026-06-08` – a LiveBench az alias modellt mérte, az Alibaba aktuális dokumentációja szerint az alias másik snapshotra mutat; az eredmény ezért nem örökölhető át.
+- Claude Fable 5 – a LiveBench-konfiguráció Claude Opus 4.8 fallbacket enged; futási napló nélkül nem bizonyítható, hogy a pontszám kizárólag a Fable modellhez tartozik.
 
-Ez különösen fontos: a hiányzó négy modell **mérési státusza „nincs adat”**, nem pedig „rosszabb”.
+Ez különösen fontos: a hiányzó öt modell **mérési státusza „nincs adat”**, nem pedig „rosszabb”.
 
 ## Induló eredmények
 
@@ -126,16 +128,15 @@ Ez különösen fontos: a hiányzó négy modell **mérési státusza „nincs a
 
 | Hely | Modellkonfiguráció | Pontszám |
 |---:|---|---:|
-| 1. | Claude Fable 5 Max Effort | 85.9920 |
-| 2. | GPT-5.6 Sol Max Effort | 83.9410 |
-| 3. | GPT-5.6 Luna Max Effort | 82.9150 |
-| 4. | Claude Sonnet 5 xHigh Effort | 80.6800 |
-| 5. | Claude Opus 4.8 xHigh Effort | 79.2715 |
-| 6. | GPT-5.6 Terra Max Effort | 78.2455 |
-| 7. | Gemini 3.5 Flash High | 78.1845 |
-| 8. | DeepSeek V4 Pro | 69.9940 |
-| 9. | Grok 4.3 | 69.9325 |
-| 10. | DeepSeek V4 Flash | 69.2280 |
+| 1. | GPT-5.6 Sol Max Effort | 83.9410 |
+| 2. | GPT-5.6 Luna Max Effort | 82.9150 |
+| 3. | Claude Sonnet 5 xHigh Effort | 80.6800 |
+| 4. | Claude Opus 4.8 xHigh Effort | 79.2715 |
+| 5. | GPT-5.6 Terra Max Effort | 78.2455 |
+| 6. | Gemini 3.5 Flash High | 78.1845 |
+| 7. | DeepSeek V4 Pro | 69.9940 |
+| 8. | Grok 4.3 | 69.9325 |
+| 9. | DeepSeek V4 Flash | 69.2280 |
 
 ### Logikai következtetés – LiveBench Reasoning
 
@@ -144,13 +145,12 @@ Ez különösen fontos: a hiányzó négy modell **mérési státusza „nincs a
 | 1. | GPT-5.6 Sol Max Effort | 91.6538 |
 | 2. | GPT-5.6 Terra Max Effort | 90.6345 |
 | 3. | Claude Opus 4.8 xHigh Effort | 89.7115 |
-| 4. | Claude Fable 5 Max Effort | 89.6538 |
-| 5. | Claude Sonnet 5 xHigh Effort | 88.6923 |
-| 6. | GPT-5.6 Luna Max Effort | 85.6443 |
-| 7. | DeepSeek V4 Pro | 82.6923 |
-| 8. | Gemini 3.5 Flash High | 82.0048 |
-| 9. | Grok 4.3 | 70.8220 |
-| 10. | DeepSeek V4 Flash | 70.5818 |
+| 4. | Claude Sonnet 5 xHigh Effort | 88.6923 |
+| 5. | GPT-5.6 Luna Max Effort | 85.6443 |
+| 6. | DeepSeek V4 Pro | 82.6923 |
+| 7. | Gemini 3.5 Flash High | 82.0048 |
+| 8. | Grok 4.3 | 70.8220 |
+| 9. | DeepSeek V4 Flash | 70.5818 |
 
 Ezek a LiveBench kategóriapontszámai. Nem keverjük őket saját szubjektív ponttal, árponttal vagy titkos súlyozással.
 
@@ -185,7 +185,8 @@ A böngésző a megnyitás pillanatában, új Netlify-build nélkül is ellenőr
 - eredeti LiveBench-sor és modellkonfiguráció azonosítója;
 - API-modellazonosító, exact snapshot-bizonyíték és szolgáltatói útvonal;
 - forrással igazolt request-level reasoning effort;
-- temperature, tokenlimit és más futtatási beállítás pontos értéke vagy explicit `unknown`;
+- temperature, tokenlimit és más futtatási beállítás pontos értéke vagy explicit, forrással igazolt hiánya;
+- a LiveBench konfiguráció teljes `api_kwargs` objektuma, valamint az ismert levélútvonalak listája; a normalizáló ezek pontos egyezéséből vezeti le a teljességet;
 - `configuration_status`: kizárólag `complete` rekord rangsorolható; `configuration_incomplete`, alias-eltérés vagy bizonyítatlan snapshot automatikusan kizárt;
 - kategóriapontszám és helyezés;
 - `sample_size`;
@@ -224,10 +225,10 @@ Ha a licenc vagy a forráskötés később megváltozik vagy nem ellenőrizhető
 
 ## Kötelező tesztek implementáció előtt és után
 
-1. Pontosan 10 modell × 2 kategória = 20 elfogadott eredményrekord van.
+1. Pontosan 9 modell × 2 kategória = 18 elfogadott eredményrekord van.
 2. Mindegyik rekordnak van pontos modellkapcsolata, forrása, konfigurációja, licence és ellenőrzési dátuma.
 3. A Qwen alias/snapshot eltérését a rendszer kifejezetten kizárja.
-4. A négy hiányzó modell `unmeasured`, és soha nem kap utolsó helyezést.
+4. Az öt hiányzó modell `unmeasured`, és soha nem kap utolsó helyezést; a Fable fallbackje külön tesztelt kizárási ok.
 5. A programozási és reasoning top 3 megegyezik az ellenőrzött forrással.
 6. Csak `quality + coding` és `quality + reasoning` készít sorrendet.
 7. Sebesség, kiegyensúlyozott prioritás és a többi nyolc feladat fail-closed marad.
@@ -240,6 +241,8 @@ Ha a licenc vagy a forráskötés később megváltozik vagy nem ellenőrizhető
 14. A látható LiveBench-attribúció, a közvetlen forráslink, a CC BY-SA 4.0 licenclink és a módosítási nyilatkozat automatikus tesztet kap.
 15. A külön CC BY-SA 4.0 benchmarkadat-fájl és a `THIRD_PARTY_NOTICES.md` meglétét és kötelező tartalmát teszt ellenőrzi.
 16. A jelenlegi 120 feladat/prioritás útvonal mindegyike továbbra is érthető, használható eredményt vagy őszinte fallbacket ad.
+17. A forrás szerinti 9/14-es mérési lefedettség nem csökkenhet attól, hogy a felhasználó token- vagy technikai feltételei kevesebb modellt engednek a tényleges rangsorba.
+18. A teljes `api_kwargs` átírásból hiányzó ismert mező – például Gemini `top_p` vagy Anthropic `thinking.type` – automatikusan `configuration_incomplete` állapotot okoz.
 
 ## Költség és üzemeltetés
 
@@ -250,9 +253,9 @@ Ha a licenc vagy a forráskötés később megváltozik vagy nem ellenőrizhető
 - nincs automatikus túlfogyasztás;
 - a statikus Netlify-kiadás marad.
 
-## Implementációs határ
+## Implementációs és publikálási határ
 
-E dokumentum jóváhagyásáig nem változik a rangsorolási logika, az adatmodell és a production oldal. Jóváhagyás után is csak a fenti két korlátozott minőségi út készül el; minden más prioritásnál és feladatnál az alkalmazás őszintén jelzi az összehasonlítható adat hiányát.
+A helyi implementáció kizárólag a fenti két korlátozott minőségi útra készült el; minden más prioritásnál és feladatnál az alkalmazás őszintén jelzi az összehasonlítható adat hiányát. A production oldal, a GitHub alapág és a Netlify kiadás csak külön boss-controlled publikálási jóváhagyás után változhat.
 
 ## Élő, elsődleges források
 
@@ -266,4 +269,4 @@ E dokumentum jóváhagyásáig nem változik a rangsorolási logika, az adatmode
 
 ## Következő döntési pont
 
-**Javaslat:** Gate 5C implementációs GO kizárólag a `quality + coding` és `quality + reasoning` útvonalra, a fenti adat- és felületi korlátokkal. Minden más rangsorolás NO-GO marad addig, amíg nem találunk azonos feltételekkel használható bizonyítékot.
+**Javaslat:** a független implementációs review és a helyi QA sikeres lezárása után külön Gate 5C publikálási döntés kérhető. Minden más rangsorolás NO-GO marad addig, amíg nem találunk azonos feltételekkel használható bizonyítékot.
