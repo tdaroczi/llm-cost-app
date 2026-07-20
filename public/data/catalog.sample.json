@@ -1,7 +1,7 @@
 {
   "schema_version": "2.0.0",
-  "dataset_version": "2026-07-18T08:27:56Z",
-  "generated_at": "2026-07-18T08:27:56Z",
+  "dataset_version": "2026-07-20T05:47:10Z",
+  "generated_at": "2026-07-20T05:47:10Z",
   "proof_only": true,
   "production_publication_approved": false,
   "providers": [
@@ -16,6 +16,18 @@
     {
       "id": "google-gemini",
       "name": "Google Gemini"
+    },
+    {
+      "id": "xai",
+      "name": "xAI"
+    },
+    {
+      "id": "deepseek",
+      "name": "DeepSeek"
+    },
+    {
+      "id": "alibaba-qwen",
+      "name": "Alibaba Cloud Qwen"
     }
   ],
   "provider_links": [
@@ -81,6 +93,72 @@
         "expires_at": "2026-08-17T08:23:24Z",
         "freshness_state": "current",
         "last_refresh_attempt_at": "2026-07-18T08:23:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "link:xai:api-key",
+      "provider_id": "xai",
+      "url": "https://console.x.ai/team/default/api-keys",
+      "access_status": "official_login_required",
+      "source_id": "source:xai:api-key",
+      "source_locator": "SpaceXAI Cloud Console / API keys",
+      "link_type": "api_key",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T05:47:10Z",
+      "review_ref": "review:gate3:dual-live-verification:20260720:link-xai-api-key",
+      "freshness": {
+        "verified_at": "2026-07-20T05:47:10Z",
+        "check_due_at": "2026-07-27T05:47:10Z",
+        "stale_at": "2026-08-03T05:47:10Z",
+        "expires_at": "2026-08-19T05:47:10Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "link:deepseek:api-key",
+      "provider_id": "deepseek",
+      "url": "https://platform.deepseek.com/api_keys",
+      "access_status": "official_login_required",
+      "source_id": "source:deepseek:api-key",
+      "source_locator": "DeepSeek Platform / API keys",
+      "link_type": "api_key",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T05:47:10Z",
+      "review_ref": "review:gate3:dual-live-verification:20260720:link-deepseek-api-key",
+      "freshness": {
+        "verified_at": "2026-07-20T05:47:10Z",
+        "check_due_at": "2026-07-27T05:47:10Z",
+        "stale_at": "2026-08-03T05:47:10Z",
+        "expires_at": "2026-08-19T05:47:10Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "link:qwen:api-key",
+      "provider_id": "alibaba-qwen",
+      "url": "https://www.alibabacloud.com/help/en/model-studio/get-api-key",
+      "access_status": "official_source_page_verified",
+      "source_id": "source:qwen:api-key",
+      "source_locator": "Get an API key / Model Studio console links by region",
+      "link_type": "api_key",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T05:47:10Z",
+      "review_ref": "review:gate3:dual-live-verification:20260720:link-qwen-api-key",
+      "freshness": {
+        "verified_at": "2026-07-20T05:47:10Z",
+        "check_due_at": "2026-07-27T05:47:10Z",
+        "stale_at": "2026-08-03T05:47:10Z",
+        "expires_at": "2026-08-19T05:47:10Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
         "refresh_result": "success_no_change",
         "error_class": null
       }
@@ -248,6 +326,110 @@
         "refresh_result": "success_no_change",
         "error_class": null
       }
+    },
+    {
+      "id": "xai:grok-4.3",
+      "provider_id": "xai",
+      "name": "Grok 4.3",
+      "api_model_id": "grok-4.3",
+      "lifecycle": "unknown",
+      "lifecycle_note_hu": "A hivatalos xAI modelloldal aktuális API-modellként közli, de nem használ a projekt stable címkéjének megfelelő lifecycle megjelölést.",
+      "retirement_at": null,
+      "context_window_tokens": 1000000,
+      "max_output_tokens": null,
+      "source_id": "source:xai:model:grok-4.3",
+      "source_locator": "Grok 4.3 / Model details / Context Window",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T05:47:10Z",
+      "review_ref": "review:gate3:dual-live-verification:20260720:xai-grok-4.3-model",
+      "freshness": {
+        "verified_at": "2026-07-20T05:47:10Z",
+        "check_due_at": "2026-07-27T05:47:10Z",
+        "stale_at": "2026-07-30T05:47:10Z",
+        "expires_at": "2026-08-19T05:47:10Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "deepseek:deepseek-v4-flash",
+      "provider_id": "deepseek",
+      "name": "DeepSeek V4 Flash",
+      "api_model_id": "deepseek-v4-flash",
+      "lifecycle": "unknown",
+      "lifecycle_note_hu": "A hivatalos DeepSeek ár- és modelloldal aktuális modellként közli, de nem használ a projekt stable címkéjének megfelelő lifecycle megjelölést.",
+      "retirement_at": null,
+      "context_window_tokens": 1000000,
+      "max_output_tokens": 384000,
+      "source_id": "source:deepseek:pricing-models",
+      "source_locator": "Models & Pricing / deepseek-v4-flash / Context Length / Max Output",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T05:47:10Z",
+      "review_ref": "review:gate3:dual-live-verification:20260720:deepseek-v4-flash-model",
+      "freshness": {
+        "verified_at": "2026-07-20T05:47:10Z",
+        "check_due_at": "2026-07-27T05:47:10Z",
+        "stale_at": "2026-07-30T05:47:10Z",
+        "expires_at": "2026-08-19T05:47:10Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "deepseek:deepseek-v4-pro",
+      "provider_id": "deepseek",
+      "name": "DeepSeek V4 Pro",
+      "api_model_id": "deepseek-v4-pro",
+      "lifecycle": "unknown",
+      "lifecycle_note_hu": "A hivatalos DeepSeek ár- és modelloldal aktuális modellként közli, de nem használ a projekt stable címkéjének megfelelő lifecycle megjelölést.",
+      "retirement_at": null,
+      "context_window_tokens": 1000000,
+      "max_output_tokens": 384000,
+      "source_id": "source:deepseek:pricing-models",
+      "source_locator": "Models & Pricing / deepseek-v4-pro / Context Length / Max Output",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T05:47:10Z",
+      "review_ref": "review:gate3:dual-live-verification:20260720:deepseek-v4-pro-model",
+      "freshness": {
+        "verified_at": "2026-07-20T05:47:10Z",
+        "check_due_at": "2026-07-27T05:47:10Z",
+        "stale_at": "2026-07-30T05:47:10Z",
+        "expires_at": "2026-08-19T05:47:10Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "alibaba-qwen:qwen3.7-max-2026-06-08",
+      "provider_id": "alibaba-qwen",
+      "name": "Qwen3.7 Max",
+      "api_model_id": "qwen3.7-max-2026-06-08",
+      "lifecycle": "unknown",
+      "lifecycle_note_hu": "A verziózott modellazonosító a hivatalos Alibaba Cloud árlistán szerepel; a forrás nem használ a projekt stable címkéjének megfelelő lifecycle megjelölést.",
+      "retirement_at": null,
+      "context_window_tokens": 1000000,
+      "max_output_tokens": null,
+      "source_id": "source:qwen:pricing",
+      "source_locator": "Germany (Frankfurt) / Global / qwen3.7-max-2026-06-08 / 0 < Input <= 1M",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T05:47:10Z",
+      "review_ref": "review:gate3:dual-live-verification:20260720:qwen3.7-max-model",
+      "freshness": {
+        "verified_at": "2026-07-20T05:47:10Z",
+        "check_due_at": "2026-07-27T05:47:10Z",
+        "stale_at": "2026-07-30T05:47:10Z",
+        "expires_at": "2026-08-19T05:47:10Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
     }
   ],
   "prices": [
@@ -295,15 +477,15 @@
       "source_id": "source:openai:pricing",
       "source_locator": "Flagship models / Standard / Short context / gpt-5.6-terra / Input",
       "record_status": "record_verified",
-      "reviewed_at": "2026-07-18T08:27:56Z",
-      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-openai-gpt-5.6-terra-input",
+      "reviewed_at": "2026-07-20T05:31:11Z",
+      "review_ref": "review:gate2:dual-live-reverification:20260720:price-openai-gpt-5.6-terra-input",
       "freshness": {
-        "verified_at": "2026-07-18T08:24:44Z",
-        "check_due_at": "2026-07-19T08:24:44Z",
-        "stale_at": "2026-07-19T20:24:44Z",
-        "expires_at": "2026-07-21T08:24:44Z",
+        "verified_at": "2026-07-20T05:24:26Z",
+        "check_due_at": "2026-07-21T05:24:26Z",
+        "stale_at": "2026-07-21T17:24:26Z",
+        "expires_at": "2026-07-23T05:24:26Z",
         "freshness_state": "current",
-        "last_refresh_attempt_at": "2026-07-18T08:24:44Z",
+        "last_refresh_attempt_at": "2026-07-20T05:24:26Z",
         "refresh_result": "success_no_change",
         "error_class": null
       }
@@ -352,15 +534,15 @@
       "source_id": "source:openai:pricing",
       "source_locator": "Flagship models / Standard / Short context / gpt-5.6-terra / Output",
       "record_status": "record_verified",
-      "reviewed_at": "2026-07-18T08:27:56Z",
-      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-openai-gpt-5.6-terra-output",
+      "reviewed_at": "2026-07-20T05:31:11Z",
+      "review_ref": "review:gate2:dual-live-reverification:20260720:price-openai-gpt-5.6-terra-output",
       "freshness": {
-        "verified_at": "2026-07-18T08:24:44Z",
-        "check_due_at": "2026-07-19T08:24:44Z",
-        "stale_at": "2026-07-19T20:24:44Z",
-        "expires_at": "2026-07-21T08:24:44Z",
+        "verified_at": "2026-07-20T05:24:26Z",
+        "check_due_at": "2026-07-21T05:24:26Z",
+        "stale_at": "2026-07-21T17:24:26Z",
+        "expires_at": "2026-07-23T05:24:26Z",
         "freshness_state": "current",
-        "last_refresh_attempt_at": "2026-07-18T08:24:44Z",
+        "last_refresh_attempt_at": "2026-07-20T05:24:26Z",
         "refresh_result": "success_no_change",
         "error_class": null
       }
@@ -409,15 +591,15 @@
       "source_id": "source:openai:pricing",
       "source_locator": "Flagship models / Standard / Short context / gpt-5.6-luna / Input",
       "record_status": "record_verified",
-      "reviewed_at": "2026-07-18T08:27:56Z",
-      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-openai-gpt-5.6-luna-input",
+      "reviewed_at": "2026-07-20T05:31:11Z",
+      "review_ref": "review:gate2:dual-live-reverification:20260720:price-openai-gpt-5.6-luna-input",
       "freshness": {
-        "verified_at": "2026-07-18T08:24:44Z",
-        "check_due_at": "2026-07-19T08:24:44Z",
-        "stale_at": "2026-07-19T20:24:44Z",
-        "expires_at": "2026-07-21T08:24:44Z",
+        "verified_at": "2026-07-20T05:24:26Z",
+        "check_due_at": "2026-07-21T05:24:26Z",
+        "stale_at": "2026-07-21T17:24:26Z",
+        "expires_at": "2026-07-23T05:24:26Z",
         "freshness_state": "current",
-        "last_refresh_attempt_at": "2026-07-18T08:24:44Z",
+        "last_refresh_attempt_at": "2026-07-20T05:24:26Z",
         "refresh_result": "success_no_change",
         "error_class": null
       }
@@ -466,15 +648,15 @@
       "source_id": "source:openai:pricing",
       "source_locator": "Flagship models / Standard / Short context / gpt-5.6-luna / Output",
       "record_status": "record_verified",
-      "reviewed_at": "2026-07-18T08:27:56Z",
-      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-openai-gpt-5.6-luna-output",
+      "reviewed_at": "2026-07-20T05:31:11Z",
+      "review_ref": "review:gate2:dual-live-reverification:20260720:price-openai-gpt-5.6-luna-output",
       "freshness": {
-        "verified_at": "2026-07-18T08:24:44Z",
-        "check_due_at": "2026-07-19T08:24:44Z",
-        "stale_at": "2026-07-19T20:24:44Z",
-        "expires_at": "2026-07-21T08:24:44Z",
+        "verified_at": "2026-07-20T05:24:26Z",
+        "check_due_at": "2026-07-21T05:24:26Z",
+        "stale_at": "2026-07-21T17:24:26Z",
+        "expires_at": "2026-07-23T05:24:26Z",
         "freshness_state": "current",
-        "last_refresh_attempt_at": "2026-07-18T08:24:44Z",
+        "last_refresh_attempt_at": "2026-07-20T05:24:26Z",
         "refresh_result": "success_no_change",
         "error_class": null
       }
@@ -524,15 +706,15 @@
       "source_id": "source:anthropic:pricing",
       "source_locator": "Model pricing / Claude Opus 4.8 / Base Input Tokens",
       "record_status": "record_verified",
-      "reviewed_at": "2026-07-18T08:27:56Z",
-      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-anthropic-claude-opus-4-8-input",
+      "reviewed_at": "2026-07-20T05:31:11Z",
+      "review_ref": "review:gate2:dual-live-reverification:20260720:price-anthropic-claude-opus-4-8-input",
       "freshness": {
-        "verified_at": "2026-07-18T08:24:08Z",
-        "check_due_at": "2026-07-19T08:24:08Z",
-        "stale_at": "2026-07-19T20:24:08Z",
-        "expires_at": "2026-07-21T08:24:08Z",
+        "verified_at": "2026-07-20T05:24:26Z",
+        "check_due_at": "2026-07-21T05:24:26Z",
+        "stale_at": "2026-07-21T17:24:26Z",
+        "expires_at": "2026-07-23T05:24:26Z",
         "freshness_state": "current",
-        "last_refresh_attempt_at": "2026-07-18T08:24:08Z",
+        "last_refresh_attempt_at": "2026-07-20T05:24:26Z",
         "refresh_result": "success_no_change",
         "error_class": null
       }
@@ -582,15 +764,15 @@
       "source_id": "source:anthropic:pricing",
       "source_locator": "Model pricing / Claude Opus 4.8 / Output Tokens",
       "record_status": "record_verified",
-      "reviewed_at": "2026-07-18T08:27:56Z",
-      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-anthropic-claude-opus-4-8-output",
+      "reviewed_at": "2026-07-20T05:31:11Z",
+      "review_ref": "review:gate2:dual-live-reverification:20260720:price-anthropic-claude-opus-4-8-output",
       "freshness": {
-        "verified_at": "2026-07-18T08:24:08Z",
-        "check_due_at": "2026-07-19T08:24:08Z",
-        "stale_at": "2026-07-19T20:24:08Z",
-        "expires_at": "2026-07-21T08:24:08Z",
+        "verified_at": "2026-07-20T05:24:26Z",
+        "check_due_at": "2026-07-21T05:24:26Z",
+        "stale_at": "2026-07-21T17:24:26Z",
+        "expires_at": "2026-07-23T05:24:26Z",
         "freshness_state": "current",
-        "last_refresh_attempt_at": "2026-07-18T08:24:08Z",
+        "last_refresh_attempt_at": "2026-07-20T05:24:26Z",
         "refresh_result": "success_no_change",
         "error_class": null
       }
@@ -645,15 +827,15 @@
       "source_id": "source:anthropic:pricing",
       "source_locator": "Model pricing / Claude Sonnet 5 through August 31, 2026 / Base Input Tokens",
       "record_status": "record_verified",
-      "reviewed_at": "2026-07-18T08:27:56Z",
-      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-anthropic-claude-sonnet-5-input",
+      "reviewed_at": "2026-07-20T05:31:11Z",
+      "review_ref": "review:gate2:dual-live-reverification:20260720:price-anthropic-claude-sonnet-5-input",
       "freshness": {
-        "verified_at": "2026-07-18T08:24:08Z",
-        "check_due_at": "2026-07-19T08:24:08Z",
-        "stale_at": "2026-07-19T20:24:08Z",
-        "expires_at": "2026-07-21T08:24:08Z",
+        "verified_at": "2026-07-20T05:24:26Z",
+        "check_due_at": "2026-07-21T05:24:26Z",
+        "stale_at": "2026-07-21T17:24:26Z",
+        "expires_at": "2026-07-23T05:24:26Z",
         "freshness_state": "current",
-        "last_refresh_attempt_at": "2026-07-18T08:24:08Z",
+        "last_refresh_attempt_at": "2026-07-20T05:24:26Z",
         "refresh_result": "success_no_change",
         "error_class": null
       }
@@ -708,15 +890,15 @@
       "source_id": "source:anthropic:pricing",
       "source_locator": "Model pricing / Claude Sonnet 5 through August 31, 2026 / Output Tokens",
       "record_status": "record_verified",
-      "reviewed_at": "2026-07-18T08:27:56Z",
-      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-anthropic-claude-sonnet-5-output",
+      "reviewed_at": "2026-07-20T05:31:11Z",
+      "review_ref": "review:gate2:dual-live-reverification:20260720:price-anthropic-claude-sonnet-5-output",
       "freshness": {
-        "verified_at": "2026-07-18T08:24:08Z",
-        "check_due_at": "2026-07-19T08:24:08Z",
-        "stale_at": "2026-07-19T20:24:08Z",
-        "expires_at": "2026-07-21T08:24:08Z",
+        "verified_at": "2026-07-20T05:24:26Z",
+        "check_due_at": "2026-07-21T05:24:26Z",
+        "stale_at": "2026-07-21T17:24:26Z",
+        "expires_at": "2026-07-23T05:24:26Z",
         "freshness_state": "current",
-        "last_refresh_attempt_at": "2026-07-18T08:24:08Z",
+        "last_refresh_attempt_at": "2026-07-20T05:24:26Z",
         "refresh_result": "success_no_change",
         "error_class": null
       }
@@ -765,15 +947,15 @@
       "source_id": "source:gemini:pricing",
       "source_locator": "Gemini 3.5 Flash / Standard / Paid Tier / Input price",
       "record_status": "record_verified",
-      "reviewed_at": "2026-07-18T08:27:56Z",
-      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-gemini-gemini-3.5-flash-input",
+      "reviewed_at": "2026-07-20T05:31:11Z",
+      "review_ref": "review:gate2:dual-live-reverification:20260720:price-gemini-gemini-3.5-flash-input",
       "freshness": {
-        "verified_at": "2026-07-18T08:23:24Z",
-        "check_due_at": "2026-07-19T08:23:24Z",
-        "stale_at": "2026-07-19T20:23:24Z",
-        "expires_at": "2026-07-21T08:23:24Z",
+        "verified_at": "2026-07-20T05:24:26Z",
+        "check_due_at": "2026-07-21T05:24:26Z",
+        "stale_at": "2026-07-21T17:24:26Z",
+        "expires_at": "2026-07-23T05:24:26Z",
         "freshness_state": "current",
-        "last_refresh_attempt_at": "2026-07-18T08:23:24Z",
+        "last_refresh_attempt_at": "2026-07-20T05:24:26Z",
         "refresh_result": "success_no_change",
         "error_class": null
       }
@@ -823,15 +1005,15 @@
       "source_id": "source:gemini:pricing",
       "source_locator": "Gemini 3.5 Flash / Standard / Paid Tier / Output price including thinking tokens",
       "record_status": "record_verified",
-      "reviewed_at": "2026-07-18T08:27:56Z",
-      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-gemini-gemini-3.5-flash-output",
+      "reviewed_at": "2026-07-20T05:31:11Z",
+      "review_ref": "review:gate2:dual-live-reverification:20260720:price-gemini-gemini-3.5-flash-output",
       "freshness": {
-        "verified_at": "2026-07-18T08:23:24Z",
-        "check_due_at": "2026-07-19T08:23:24Z",
-        "stale_at": "2026-07-19T20:23:24Z",
-        "expires_at": "2026-07-21T08:23:24Z",
+        "verified_at": "2026-07-20T05:24:26Z",
+        "check_due_at": "2026-07-21T05:24:26Z",
+        "stale_at": "2026-07-21T17:24:26Z",
+        "expires_at": "2026-07-23T05:24:26Z",
         "freshness_state": "current",
-        "last_refresh_attempt_at": "2026-07-18T08:23:24Z",
+        "last_refresh_attempt_at": "2026-07-20T05:24:26Z",
         "refresh_result": "success_no_change",
         "error_class": null
       }
@@ -880,15 +1062,15 @@
       "source_id": "source:gemini:pricing",
       "source_locator": "Gemini 3.1 Flash-Lite / Standard / Paid Tier / Input price text",
       "record_status": "record_verified",
-      "reviewed_at": "2026-07-18T08:27:56Z",
-      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-gemini-gemini-3.1-flash-lite-input",
+      "reviewed_at": "2026-07-20T05:31:11Z",
+      "review_ref": "review:gate2:dual-live-reverification:20260720:price-gemini-gemini-3.1-flash-lite-input",
       "freshness": {
-        "verified_at": "2026-07-18T08:23:24Z",
-        "check_due_at": "2026-07-19T08:23:24Z",
-        "stale_at": "2026-07-19T20:23:24Z",
-        "expires_at": "2026-07-21T08:23:24Z",
+        "verified_at": "2026-07-20T05:24:26Z",
+        "check_due_at": "2026-07-21T05:24:26Z",
+        "stale_at": "2026-07-21T17:24:26Z",
+        "expires_at": "2026-07-23T05:24:26Z",
         "freshness_state": "current",
-        "last_refresh_attempt_at": "2026-07-18T08:23:24Z",
+        "last_refresh_attempt_at": "2026-07-20T05:24:26Z",
         "refresh_result": "success_no_change",
         "error_class": null
       }
@@ -938,15 +1120,413 @@
       "source_id": "source:gemini:pricing",
       "source_locator": "Gemini 3.1 Flash-Lite / Standard / Paid Tier / Output price including thinking tokens",
       "record_status": "record_verified",
-      "reviewed_at": "2026-07-18T08:27:56Z",
-      "review_ref": "review:gate2b:director-manual-crosscheck:001:price-gemini-gemini-3.1-flash-lite-output",
+      "reviewed_at": "2026-07-20T05:31:11Z",
+      "review_ref": "review:gate2:dual-live-reverification:20260720:price-gemini-gemini-3.1-flash-lite-output",
       "freshness": {
-        "verified_at": "2026-07-18T08:23:24Z",
-        "check_due_at": "2026-07-19T08:23:24Z",
-        "stale_at": "2026-07-19T20:23:24Z",
-        "expires_at": "2026-07-21T08:23:24Z",
+        "verified_at": "2026-07-20T05:24:26Z",
+        "check_due_at": "2026-07-21T05:24:26Z",
+        "stale_at": "2026-07-21T17:24:26Z",
+        "expires_at": "2026-07-23T05:24:26Z",
         "freshness_state": "current",
-        "last_refresh_attempt_at": "2026-07-18T08:23:24Z",
+        "last_refresh_attempt_at": "2026-07-20T05:24:26Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:xai:grok-4.3:input",
+      "model_id": "xai:grok-4.3",
+      "charge_type": "input_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "1.250000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 200000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "xai-direct-standard-short-context"
+        },
+        "scope_label_hu": "xAI közvetlen API · standard · legfeljebb 200 000 input token",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cached_input",
+          "batch",
+          "priority",
+          "tools",
+          "web_search",
+          "image",
+          "audio"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T05:47:10Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:xai:pricing",
+      "source_locator": "Language Models / grok-4.3 / Standard / Short context / Input",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T05:47:10Z",
+      "review_ref": "review:gate3:dual-live-verification:20260720:price-xai-grok-4.3-input",
+      "freshness": {
+        "verified_at": "2026-07-20T05:47:10Z",
+        "check_due_at": "2026-07-21T05:47:10Z",
+        "stale_at": "2026-07-21T17:47:10Z",
+        "expires_at": "2026-07-23T05:47:10Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:xai:grok-4.3:output",
+      "model_id": "xai:grok-4.3",
+      "charge_type": "output_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "2.500000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 200000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "xai-direct-standard-short-context"
+        },
+        "scope_label_hu": "xAI közvetlen API · standard · legfeljebb 200 000 input token",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cached_input",
+          "batch",
+          "priority",
+          "tools",
+          "web_search",
+          "image",
+          "audio"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T05:47:10Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:xai:pricing",
+      "source_locator": "Language Models / grok-4.3 / Standard / Short context / Output",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T05:47:10Z",
+      "review_ref": "review:gate3:dual-live-verification:20260720:price-xai-grok-4.3-output",
+      "freshness": {
+        "verified_at": "2026-07-20T05:47:10Z",
+        "check_due_at": "2026-07-21T05:47:10Z",
+        "stale_at": "2026-07-21T17:47:10Z",
+        "expires_at": "2026-07-23T05:47:10Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:deepseek:deepseek-v4-flash:input",
+      "model_id": "deepseek:deepseek-v4-flash",
+      "charge_type": "input_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "0.140000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 1000000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "deepseek-direct-cache-miss"
+        },
+        "scope_label_hu": "DeepSeek közvetlen API · cache nélküli standard kérés",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cache_hit",
+          "cached_input",
+          "batch",
+          "tools"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T05:47:10Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:deepseek:pricing-models",
+      "source_locator": "Models & Pricing / deepseek-v4-flash / Cache Miss Input",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T05:47:10Z",
+      "review_ref": "review:gate3:dual-live-verification:20260720:price-deepseek-v4-flash-input",
+      "freshness": {
+        "verified_at": "2026-07-20T05:47:10Z",
+        "check_due_at": "2026-07-21T05:47:10Z",
+        "stale_at": "2026-07-21T17:47:10Z",
+        "expires_at": "2026-07-23T05:47:10Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:deepseek:deepseek-v4-flash:output",
+      "model_id": "deepseek:deepseek-v4-flash",
+      "charge_type": "output_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "0.280000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 1000000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "deepseek-direct-cache-miss"
+        },
+        "scope_label_hu": "DeepSeek közvetlen API · cache nélküli standard kérés",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cache_hit",
+          "cached_input",
+          "batch",
+          "tools"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T05:47:10Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:deepseek:pricing-models",
+      "source_locator": "Models & Pricing / deepseek-v4-flash / Output",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T05:47:10Z",
+      "review_ref": "review:gate3:dual-live-verification:20260720:price-deepseek-v4-flash-output",
+      "freshness": {
+        "verified_at": "2026-07-20T05:47:10Z",
+        "check_due_at": "2026-07-21T05:47:10Z",
+        "stale_at": "2026-07-21T17:47:10Z",
+        "expires_at": "2026-07-23T05:47:10Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:deepseek:deepseek-v4-pro:input",
+      "model_id": "deepseek:deepseek-v4-pro",
+      "charge_type": "input_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "0.435000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 1000000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "deepseek-direct-cache-miss"
+        },
+        "scope_label_hu": "DeepSeek közvetlen API · cache nélküli standard kérés",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cache_hit",
+          "cached_input",
+          "batch",
+          "tools"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T05:47:10Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:deepseek:pricing-models",
+      "source_locator": "Models & Pricing / deepseek-v4-pro / Cache Miss Input",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T05:47:10Z",
+      "review_ref": "review:gate3:dual-live-verification:20260720:price-deepseek-v4-pro-input",
+      "freshness": {
+        "verified_at": "2026-07-20T05:47:10Z",
+        "check_due_at": "2026-07-21T05:47:10Z",
+        "stale_at": "2026-07-21T17:47:10Z",
+        "expires_at": "2026-07-23T05:47:10Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:deepseek:deepseek-v4-pro:output",
+      "model_id": "deepseek:deepseek-v4-pro",
+      "charge_type": "output_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "0.870000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 1000000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "deepseek-direct-cache-miss"
+        },
+        "scope_label_hu": "DeepSeek közvetlen API · cache nélküli standard kérés",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cache_hit",
+          "cached_input",
+          "batch",
+          "tools"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T05:47:10Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:deepseek:pricing-models",
+      "source_locator": "Models & Pricing / deepseek-v4-pro / Output",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T05:47:10Z",
+      "review_ref": "review:gate3:dual-live-verification:20260720:price-deepseek-v4-pro-output",
+      "freshness": {
+        "verified_at": "2026-07-20T05:47:10Z",
+        "check_due_at": "2026-07-21T05:47:10Z",
+        "stale_at": "2026-07-21T17:47:10Z",
+        "expires_at": "2026-07-23T05:47:10Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:qwen:qwen3.7-max-2026-06-08:input",
+      "model_id": "alibaba-qwen:qwen3.7-max-2026-06-08",
+      "charge_type": "input_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "1.650000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 1000000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "eu-central-1-frankfurt-global-deployment"
+        },
+        "scope_label_hu": "Szolgáltatási régió: Frankfurt · feldolgozási hatókör: Global",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cached_input",
+          "batch",
+          "promotional_discount",
+          "tools"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T05:47:10Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:qwen:pricing",
+      "source_locator": "Germany (Frankfurt) / Global / qwen3.7-max-2026-06-08 / 0 < Input <= 1M / Input",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T05:47:10Z",
+      "review_ref": "review:gate3:dual-live-verification:20260720:price-qwen3.7-max-input",
+      "freshness": {
+        "verified_at": "2026-07-20T05:47:10Z",
+        "check_due_at": "2026-07-21T05:47:10Z",
+        "stale_at": "2026-07-21T17:47:10Z",
+        "expires_at": "2026-07-23T05:47:10Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:qwen:qwen3.7-max-2026-06-08:output",
+      "model_id": "alibaba-qwen:qwen3.7-max-2026-06-08",
+      "charge_type": "output_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "4.951000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 1000000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "eu-central-1-frankfurt-global-deployment"
+        },
+        "scope_label_hu": "Szolgáltatási régió: Frankfurt · feldolgozási hatókör: Global",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cached_input",
+          "batch",
+          "promotional_discount",
+          "tools"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T05:47:10Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:qwen:pricing",
+      "source_locator": "Germany (Frankfurt) / Global / qwen3.7-max-2026-06-08 / 0 < Input <= 1M / Output",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T05:47:10Z",
+      "review_ref": "review:gate3:dual-live-verification:20260720:price-qwen3.7-max-output",
+      "freshness": {
+        "verified_at": "2026-07-20T05:47:10Z",
+        "check_due_at": "2026-07-21T05:47:10Z",
+        "stale_at": "2026-07-21T17:47:10Z",
+        "expires_at": "2026-07-23T05:47:10Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
         "refresh_result": "success_no_change",
         "error_class": null
       }
@@ -979,7 +1559,7 @@
       "title": "OpenAI API pricing",
       "publisher": "OpenAI",
       "url": "https://developers.openai.com/api/docs/pricing",
-      "retrieved_at": "2026-07-18T08:24:44Z"
+      "retrieved_at": "2026-07-20T05:24:26Z"
     },
     {
       "id": "source:openai:api-key",
@@ -1006,7 +1586,7 @@
       "title": "Claude API pricing",
       "publisher": "Anthropic",
       "url": "https://platform.claude.com/docs/en/about-claude/pricing",
-      "retrieved_at": "2026-07-18T08:24:08Z"
+      "retrieved_at": "2026-07-20T05:24:26Z"
     },
     {
       "id": "source:anthropic:lifecycle",
@@ -1051,7 +1631,7 @@
       "title": "Gemini Developer API pricing",
       "publisher": "Google",
       "url": "https://ai.google.dev/gemini-api/docs/pricing",
-      "retrieved_at": "2026-07-18T08:23:24Z"
+      "retrieved_at": "2026-07-20T05:24:26Z"
     },
     {
       "id": "source:gemini:api-key",
@@ -1061,6 +1641,69 @@
       "publisher": "Google",
       "url": "https://ai.google.dev/gemini-api/docs/api-key",
       "retrieved_at": "2026-07-18T08:23:24Z"
+    },
+    {
+      "id": "source:xai:model:grok-4.3",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "Grok 4.3",
+      "publisher": "xAI",
+      "url": "https://docs.x.ai/developers/models/grok-4.3",
+      "retrieved_at": "2026-07-20T05:47:10Z"
+    },
+    {
+      "id": "source:xai:pricing",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "xAI API Pricing",
+      "publisher": "xAI",
+      "url": "https://docs.x.ai/developers/pricing",
+      "retrieved_at": "2026-07-20T05:47:10Z"
+    },
+    {
+      "id": "source:xai:api-key",
+      "source_type": "official_provider_page",
+      "source_status": "official_login_required",
+      "title": "SpaceXAI Cloud Console API keys",
+      "publisher": "xAI",
+      "url": "https://console.x.ai/team/default/api-keys",
+      "retrieved_at": "2026-07-20T05:47:10Z"
+    },
+    {
+      "id": "source:deepseek:pricing-models",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "DeepSeek Models & Pricing",
+      "publisher": "DeepSeek",
+      "url": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "retrieved_at": "2026-07-20T05:47:10Z"
+    },
+    {
+      "id": "source:deepseek:api-key",
+      "source_type": "official_provider_page",
+      "source_status": "official_login_required",
+      "title": "DeepSeek Platform API keys",
+      "publisher": "DeepSeek",
+      "url": "https://platform.deepseek.com/api_keys",
+      "retrieved_at": "2026-07-20T05:47:10Z"
+    },
+    {
+      "id": "source:qwen:pricing",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "Alibaba Cloud Model Studio pricing",
+      "publisher": "Alibaba Cloud",
+      "url": "https://www.alibabacloud.com/help/en/model-studio/model-pricing",
+      "retrieved_at": "2026-07-20T05:47:10Z"
+    },
+    {
+      "id": "source:qwen:api-key",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "Get an Alibaba Cloud Model Studio API key",
+      "publisher": "Alibaba Cloud",
+      "url": "https://www.alibabacloud.com/help/en/model-studio/get-api-key",
+      "retrieved_at": "2026-07-20T05:47:10Z"
     }
   ]
 }

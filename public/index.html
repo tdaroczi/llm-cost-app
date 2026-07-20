@@ -5,19 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Ellenőrizhető, forrásolt LLM API-költség összehasonlítás mintaadatokon.">
     <title>LLM Observatory</title>
-    <link rel="stylesheet" href="./styles.css?v=ux-option-3">
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles.css?v=gate-2-prototype">
   </head>
   <body>
     <a class="skip-link" href="#main">Ugrás a tartalomra</a>
     <header class="app-header">
-      <a class="brand" href="#compare" aria-label="LLM Observatory – kezdőlap">LLM Observatory</a>
-      <nav class="mode-switch" aria-label="Alkalmazásmód">
-        <a href="#compare" data-route-link="compare">Modelleket hasonlítok</a>
-        <a href="#task" data-route-link="task">Feladathoz keresek</a>
+      <a class="brand" href="#task" aria-label="LLM Observatory – modellválasztó">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2v28M2 16h28M6.1 6.1l19.8 19.8M25.9 6.1 6.1 25.9"/><circle cx="16" cy="16" r="6"/><path d="m16 7 2.7 6.3L25 16l-6.3 2.7L16 25l-2.7-6.3L7 16l6.3-2.7L16 7Z"/></svg>
+        <span><strong>LLM</strong> Observatory</span>
+      </a>
+      <nav class="quiet-nav" aria-label="Alkalmazásmód">
+        <a href="#task" data-route-link="task">Modellt választok</a>
+        <a href="#compare" data-route-link="compare">Két modellt hasonlítok</a>
       </nav>
       <div class="header-status">
-        <span class="sample-badge">Mintaadat</span>
-        <span id="headerCoverage">Adatok betöltése…</span>
+        <span>API-költségek, nem előfizetések</span>
+        <span class="sr-only" id="headerCoverage">Adatok betöltése…</span>
       </div>
     </header>
 
@@ -90,70 +94,74 @@
         </footer>
       </section>
 
-      <section class="route" id="taskRoute" data-route="task" aria-labelledby="taskTitle" hidden>
-        <div class="page-shell">
-          <div class="hero-copy">
-            <p class="eyebrow">Feladatból költségprofil · ugyanazok az ellenőrzött adatok</p>
-            <h1 id="taskTitle">Mondd meg, mire használod.<br>Mutatjuk a számítható modelleket.</h1>
-          </div>
+      <section class="route advisor-route" id="taskRoute" data-route="task" aria-labelledby="taskTitle" hidden>
+        <div class="compass-field" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="advisor-shell">
+          <section id="advisorFlow">
+            <header class="advisor-hero">
+              <p class="mobile-step" id="mobileStep">1 / 3</p>
+              <h1 id="taskTitle" tabindex="-1">Melyik LLM illik a munkádhoz?</h1>
+              <p>Három egyszerű válasz. Három érthető lehetőség.</p>
+            </header>
 
-          <section class="control-panel task-control-panel" aria-label="Feladatprofil beállításai">
-            <label class="preset-selector" for="taskPreset">
-              <span>Milyen munkára keresel modellt?</span>
-              <select id="taskPreset">
-                <option value="technical-chat-10k">Technikai asszisztenshez hasonló forgalom</option>
-                <option value="document-analysis-2500">Dokumentumelemzéshez hasonló forgalom</option>
-              </select>
-            </label>
-            <button class="primary-action" id="taskButton" type="button" aria-describedby="taskHelp">Költségek megmutatása</button>
-            <p class="form-help" id="taskHelp">A sorrend kizárólag a teljes, ellenőrzött havi költséget követi.</p>
+            <ol class="flow-progress" aria-label="Háromlépéses modellválasztás">
+              <li class="is-current" data-progress-step="1"><span>1</span><strong>Mit csinálsz?</strong></li>
+              <li data-progress-step="2"><span>2</span><strong>Mi számít?</strong></li>
+              <li data-progress-step="3"><span>3</span><strong>Mennyit használnád?</strong></li>
+            </ol>
 
-            <div class="profile-summary" aria-label="Aktív feladatprofil">
-              <span>Használati profil:</span>
-              <strong id="taskProfileName">Technikai asszisztenshez hasonló forgalom</strong>
-              <strong><span id="taskRunsSummary">10 000</span> futás / hó</strong>
-              <strong><span id="taskInputSummary">8 000</span> input token / futás</strong>
-              <strong><span id="taskOutputSummary">2 000</span> output token / futás</strong>
-            </div>
+            <form class="advisor-form" id="advisorForm">
+              <fieldset class="advisor-step" data-advisor-step="1">
+                <legend>Mit szeretnél csinálni?</legend>
+                <div class="choice-grid task-choice-grid" id="taskChoices"></div>
+              </fieldset>
 
-            <details class="advanced-settings" id="taskSettings">
-              <summary>Speciális beállítások</summary>
-              <div class="profile-form task-form">
-                <label for="taskRuns">Futás / hó<input id="taskRuns" type="number" min="1" step="1" value="10000" inputmode="numeric"></label>
-                <label for="taskInput">Input token / futás<input id="taskInput" type="number" min="0" step="1" value="8000" inputmode="numeric"></label>
-                <label for="taskOutput">Output token / futás<input id="taskOutput" type="number" min="0" step="1" value="2000" inputmode="numeric"></label>
+              <fieldset class="advisor-step" data-advisor-step="2" hidden>
+                <legend>Mi a legfontosabb?</legend>
+                <p class="step-help">Ha nem tudod, semmi gond. A kiegyensúlyozott út az alapbeállítás.</p>
+                <div class="choice-grid priority-choice-grid" id="priorityChoices"></div>
+              </fieldset>
+
+              <fieldset class="advisor-step" data-advisor-step="3" hidden>
+                <legend>Körülbelül mennyit használnád?</legend>
+                <p class="step-help" id="usageSummary">A mintaszámítást a választott feladathoz igazítjuk.</p>
+                <div class="choice-grid usage-choice-grid" id="usageChoices"></div>
+                <details class="assumption-details" id="taskSettings">
+                  <summary>Pontosítom a használatot</summary>
+                  <div class="assumption-form">
+                    <label for="taskRuns">Kérések havonta<input id="taskRuns" type="number" min="1" step="1" value="600" inputmode="numeric"></label>
+                    <label for="taskInput">Beküldött szöveg hossza<input id="taskInput" type="number" min="0" step="1" value="800" inputmode="numeric"><small>token / kérés</small></label>
+                    <label for="taskOutput">Válasz hossza<input id="taskOutput" type="number" min="0" step="1" value="400" inputmode="numeric"><small>token / kérés</small></label>
+                  </div>
+                </details>
+              </fieldset>
+
+              <div class="advisor-actions">
+                <button class="secondary-action" id="advisorBack" type="button" hidden>Vissza</button>
+                <button class="primary-action advisor-next" id="advisorNext" type="button">Tovább <span aria-hidden="true">→</span></button>
               </div>
-              <div class="requirement-toggles">
-                <label><input id="taskPreview" type="checkbox"> Preview modell is jöhet</label>
-                <label><input id="taskStable" type="checkbox"> Csak dokumentált stable modell</label>
-                <label><input id="taskTool" type="checkbox"> Tool calling kötelező</label>
-              </div>
-            </details>
+              <a class="compare-shortcut" href="#compare">Inkább két modellt hasonlítok össze <span aria-hidden="true">→</span></a>
+            </form>
           </section>
 
-          <p class="refresh-notice" id="taskDirty" role="status" hidden>A feladatprofil megváltozott. Indíts új számítást a friss eredményhez.</p>
-
-          <section class="result-canvas task-canvas" id="taskCanvas" aria-labelledby="taskResultsHeading">
-            <header class="result-heading">
-              <div>
-                <p class="eyebrow">Legfeljebb három azonnali találat</p>
-                <h2 id="taskResultsHeading" tabindex="-1">A profilhoz számítható modellek</h2>
-              </div>
-              <p class="coverage" id="taskCoverage">Nincs még számítás</p>
+          <section class="advisor-results" id="advisorResults" aria-labelledby="taskResultsHeading" hidden>
+            <header class="advisor-results-heading">
+              <h1 id="taskResultsHeading" tabindex="-1">Ezt a három lehetőséget nézd meg.</h1>
+              <p>A válaszaid alapján. Röviden, érthetően.</p>
             </header>
-            <div class="model-result-grid task-results" id="taskResults"></div>
-            <details class="technical-details" id="taskMore">
-              <summary id="taskMoreSummary">További modellek és kizárási okok</summary>
-              <div class="model-result-grid task-results more-results" id="additionalTaskResults"></div>
-              <div class="excluded-results" id="excludedResults"></div>
-            </details>
+            <div class="answer-summary" id="answerSummary" aria-label="A megadott válaszok"></div>
+            <p class="result-notice" id="taskHelp" role="status"></p>
+            <div id="taskResults"></div>
+            <div class="advisor-result-actions">
+              <button class="secondary-action" id="modifyAnswers" type="button">Válaszok módosítása</button>
+              <a class="secondary-action" href="#compare">Két modellt hasonlítok össze</a>
+            </div>
           </section>
         </div>
 
-        <footer class="trust-strip">
-          <span><strong>Mintaadat</strong> · a profil nem minőségi benchmark</span>
-          <span>Ismeretlen képesség nem teljesít kötelező feltételt</span>
-          <details><summary>Módszertan</summary><p>A sorrend csak a teljes, current és ellenőrzött USD költséget követi. Ha egy szükséges adat hiányzik vagy lejárt, a modell nem kerül a számítható találatok közé.</p></details>
+        <footer class="advisor-trust">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.6 2.8 8.3 7 10 4.2-1.7 7-5.4 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-5"/></svg>
+          <span><strong>Mintaadat</strong> · Csak ellenőrzött API-adatból számolunk.</span>
         </footer>
       </section>
 
@@ -164,6 +172,6 @@
       <p class="sr-only" id="liveRegion" aria-live="polite"></p>
     </main>
 
-    <script type="module" src="./app.js?v=ux-option-3"></script>
+    <script type="module" src="./app.js?v=gate-2-prototype"></script>
   </body>
 </html>
