@@ -1,6 +1,9 @@
-const SCHEMA_VERSION = "2.0.0";
+const SCHEMA_VERSION = "2.1.0";
 const OFFICIAL_SOURCE_STATES = new Set(["official_source_page_verified", "official_login_required"]);
 const ACTIVE_STATES = new Set(["current", "current_degraded", "overdue_degraded"]);
+const CAPABILITY_SUPPORT_STATES = new Set(["supported", "unsupported", "conditional", "unknown"]);
+const EXTRA_COST_STATES = new Set(["included", "priced_separately", "unknown", "not_applicable"]);
+const CAPABILITY_KEYS = new Set(["image_input", "function_calling", "structured_output", "provider_web_search", "file_or_pdf_input"]);
 
 export const REASON_LABELS = Object.freeze({
   invalid_profile: "A forgalmi profil hiányos vagy érvénytelen.",
@@ -86,17 +89,33 @@ export function recordHealth(index, record, asOf = index.asOf) {
 
 export function normalizeCatalog(raw, asOf = new Date()) {
   if (!raw || raw.schema_version !== SCHEMA_VERSION) throw new Error(`Nem támogatott schema_version: ${raw?.schema_version ?? "hiányzik"}`);
-  for (const key of ["providers", "provider_links", "models", "prices", "capabilities", "sources"]) assertArray(raw[key], key);
+  for (const key of [
+    "providers",
+    "provider_links",
+    "models",
+    "prices",
+    "capabilities",
+    "tasks",
+    "recommendation_policies",
+    "benchmark_definitions",
+    "benchmark_results",
+    "sources"
+  ]) assertArray(raw[key], key);
 
   const providers = buildUniqueMap(raw.providers, "providers");
   const providerLinks = buildUniqueMap(raw.provider_links, "provider_links");
   const models = buildUniqueMap(raw.models, "models");
   const prices = buildUniqueMap(raw.prices, "prices");
   const capabilities = buildUniqueMap(raw.capabilities, "capabilities");
+  const tasks = buildUniqueMap(raw.tasks, "tasks");
+  const recommendationPolicies = buildUniqueMap(raw.recommendation_policies, "recommendation_policies");
+  const benchmarkDefinitions = buildUniqueMap(raw.benchmark_definitions, "benchmark_definitions");
+  const benchmarkResults = buildUniqueMap(raw.benchmark_results, "benchmark_results");
   const sources = buildUniqueMap(raw.sources, "sources");
   const pricesByModel = new Map();
   const capabilitiesByModel = new Map();
   const linksByProvider = new Map();
+  const policiesByPriority = new Map();
 
   for (const model of models.values()) {
     if (!providers.has(model.provider_id) || !sources.has(model.source_id)) throw new Error(`Hibás modellhivatkozás: ${model.id}`);
@@ -109,9 +128,24 @@ export function normalizeCatalog(raw, asOf = new Date()) {
   }
   for (const capability of capabilities.values()) {
     if (!models.has(capability.model_id) || !sources.has(capability.source_id)) throw new Error(`Hibás capability hivatkozás: ${capability.id}`);
+    if (!CAPABILITY_KEYS.has(capability.capability)) throw new Error(`Ismeretlen capability kulcs: ${capability.id}`);
+    if (!CAPABILITY_SUPPORT_STATES.has(capability.support)) throw new Error(`Hibás capability support: ${capability.id}`);
+    if (!EXTRA_COST_STATES.has(capability.extra_cost_status)) throw new Error(`Hibás capability extra_cost_status: ${capability.id}`);
+    if (typeof capability.source_url !== "string" || capability.source_url !== sources.get(capability.source_id)?.url) {
+      throw new Error(`Hibás capability forrás-URL: ${capability.id}`);
+    }
     const items = capabilitiesByModel.get(capability.model_id) ?? [];
     items.push(capability);
     capabilitiesByModel.set(capability.model_id, items);
+  }
+  for (const task of tasks.values()) {
+    if (!Array.isArray(task.required_capabilities)) throw new Error(`Hibás feladat capability-lista: ${task.id}`);
+    if (task.required_capabilities.some((key) => !CAPABILITY_KEYS.has(key))) throw new Error(`Ismeretlen feladat capability: ${task.id}`);
+    if (!["standard_text_complete", "token_baseline"].includes(task.cost_scope)) throw new Error(`Hibás feladat költségscope: ${task.id}`);
+  }
+  for (const policy of recommendationPolicies.values()) {
+    if (policiesByPriority.has(policy.priority_id)) throw new Error(`Ismétlődő ajánlási policy: ${policy.priority_id}`);
+    policiesByPriority.set(policy.priority_id, policy);
   }
   for (const link of providerLinks.values()) {
     if (!providers.has(link.provider_id) || !sources.has(link.source_id)) throw new Error(`Hibás provider-link hivatkozás: ${link.id}`);
@@ -128,10 +162,15 @@ export function normalizeCatalog(raw, asOf = new Date()) {
     models,
     prices,
     capabilities,
+    tasks,
+    recommendationPolicies,
+    benchmarkDefinitions,
+    benchmarkResults,
     sources,
     pricesByModel,
     capabilitiesByModel,
     linksByProvider,
+    policiesByPriority,
     isSample: raw.proof_only === true || raw.production_publication_approved !== true
   };
 }
@@ -256,6 +295,16 @@ export function providerLinkFor(index, providerId, linkType = "api_key", asOf = 
   return link;
 }
 
+export function taskFor(index, taskId) {
+  const task = index.tasks.get(taskId);
+  return task?.status === "active" ? task : null;
+}
+
+export function recommendationPolicyFor(index, priorityId) {
+  const policy = index.policiesByPriority.get(priorityId);
+  return policy?.status === "active" ? policy : null;
+}
+
 export function evaluateModel(index, modelId, profileInput, asOf = index.asOf) {
   const { profile, valid } = normalizeProfile(profileInput);
   const reasons = [];
@@ -279,8 +328,31 @@ export function evaluateModel(index, modelId, profileInput, asOf = index.asOf) {
     const capability = capabilityFor(index, modelId, key, asOf);
     const met = capability.support === "supported";
     if (!met) reasons.push(reason("missing_capability", `${key}: nincs használható hivatalos támogatási rekord.`));
-    return { key, met, support: capability.support, state: capability.state };
+    return {
+      key,
+      met,
+      support: capability.support,
+      state: capability.state,
+      evidenceId: capability.record?.id ?? null,
+      apiRoute: capability.record?.api_route ?? null,
+      conditionsHu: capability.record?.conditions_hu ?? null,
+      extraCostStatus: capability.record?.extra_cost_status ?? "unknown",
+      verifiedAt: capability.record?.freshness?.verified_at ?? null
+    };
   });
+
+  const technicalReasonCodes = new Set([
+    "invalid_profile",
+    "model_not_found",
+    "model_record_unusable",
+    "lifecycle_excluded",
+    "stable_not_documented",
+    "context_limit",
+    "output_limit",
+    "missing_capability"
+  ]);
+  const technicalEligibility = reasons.some((item) => technicalReasonCodes.has(item.code)) ? "excluded" : "eligible";
+  const capabilityEvidenceIds = requirements.map((item) => item.evidenceId).filter(Boolean);
 
   if (profile.cachedInputTextTokensPerRun > 0) reasons.push(reason("unsupported_cache"));
   const inputPrice = selectPrice(index, modelId, "input_text_tokens", profile, asOf, reasons);
@@ -295,9 +367,13 @@ export function evaluateModel(index, modelId, profileInput, asOf = index.asOf) {
       reasons,
       reasonCodes: reasons.map((item) => item.code),
       requirements,
+      technicalEligibility,
+      capabilityEvidenceIds,
       inputPrice,
       outputPrice,
-      apiKeyLink: providerLinkFor(index, model.provider_id, "api_key", asOf)
+      apiKeyLink: providerLinkFor(index, model.provider_id, "api_key", asOf),
+      apiQuickstartLink: providerLinkFor(index, model.provider_id, "quickstart", asOf),
+      derivedFrom: [model.id, ...capabilityEvidenceIds, inputPrice?.id, outputPrice?.id].filter(Boolean)
     };
   }
 
@@ -315,6 +391,8 @@ export function evaluateModel(index, modelId, profileInput, asOf = index.asOf) {
     reasons,
     reasonCodes: [],
     requirements,
+    technicalEligibility,
+    capabilityEvidenceIds,
     monthlyInputTokens: monthlyInput.toString(),
     monthlyOutputTokens: monthlyOutput.toString(),
     inputCostUsd: fixedUsd(inputNumerator),
@@ -325,7 +403,9 @@ export function evaluateModel(index, modelId, profileInput, asOf = index.asOf) {
     verifiedAt: [inputPrice.freshness.verified_at, outputPrice.freshness.verified_at],
     inputPrice,
     outputPrice,
-    apiKeyLink: providerLinkFor(index, model.provider_id, "api_key", asOf)
+    apiKeyLink: providerLinkFor(index, model.provider_id, "api_key", asOf),
+    apiQuickstartLink: providerLinkFor(index, model.provider_id, "quickstart", asOf),
+    derivedFrom: [model.id, ...capabilityEvidenceIds, inputPrice.id, outputPrice.id]
   };
 }
 

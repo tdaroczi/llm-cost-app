@@ -15,7 +15,7 @@ import {
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
-const asOf = "2026-07-20T06:31:53Z";
+const asOf = "2026-07-20T09:13:14Z";
 const loadJson = async (path) => JSON.parse(await readFile(join(root, path), "utf8"));
 const baseCatalog = await loadJson("public/data/catalog.json");
 const profileFixture = await loadJson("tests/fixtures/calculation-profiles.json");
@@ -174,9 +174,10 @@ test("kontextusársáv, preview, stabilitás, cache és tool igény külön kiz�
   const imageScope = evaluateModel(index, "openai:gpt-5.6-terra", { ...defaultProfile, inputModality: "image" }, asOf);
   assert.ok(reasonSet(imageScope).has("price_scope"));
 
-  const tool = evaluateModel(index, "openai:gpt-5.6-terra", { ...defaultProfile, requiredCapabilities: ["tool_calling"] }, asOf);
-  assert.ok(reasonSet(tool).has("missing_capability"));
-  assert.deepEqual(capabilityFor(index, "openai:gpt-5.6-terra", "tool_calling", asOf), { support: "unknown", state: "unverified", record: null });
+  const tool = evaluateModel(index, "openai:gpt-5.6-terra", { ...defaultProfile, requiredCapabilities: ["function_calling"] }, asOf);
+  assert.equal(tool.technicalEligibility, "eligible");
+  assert.equal(tool.requirements[0].support, "supported");
+  assert.match(tool.requirements[0].evidenceId, /^capability:/);
 });
 
 test("API-kulcs CTA csak egyetlen current, ellenőrzött HTTPS provider-linkből készül", () => {
@@ -261,21 +262,110 @@ test("a Gate 4 production katalógus négy új modellje teljes, útvonalhoz köt
   assert.ok(fableInputPrice.conditions.excluded_components.includes("inference_geo_us"));
 });
 
-test("az összehasonlító megőrzi a bizonyító mezőket, az ajánló pedig minden feladatnál ad használható áreredményt", () => {
+test("a Gate 5B capability-mátrix teljes, forráshű és pontos modellverzióhoz kötött", () => {
+  const index = normalizeCatalog(baseCatalog, asOf);
+  const capabilityKeys = ["image_input", "function_calling", "structured_output", "provider_web_search", "file_or_pdf_input"];
+  assert.equal(index.capabilities.size, index.models.size * capabilityKeys.length);
+  for (const model of index.models.values()) {
+    for (const key of capabilityKeys) {
+      const matches = (index.capabilitiesByModel.get(model.id) ?? []).filter((item) => item.capability === key);
+      assert.equal(matches.length, 1, `${model.id} / ${key}`);
+      assert.equal(matches[0].source_url, index.sources.get(matches[0].source_id).url);
+      assert.equal(matches[0].freshness.verified_at, asOf);
+      assert.ok(["included", "priced_separately", "unknown", "not_applicable"].includes(matches[0].extra_cost_status));
+    }
+  }
+  const grokWebSearch = capabilityFor(index, "xai:grok-4.3", "provider_web_search", asOf);
+  assert.equal(grokWebSearch.support, "unknown");
+  assert.equal(grokWebSearch.record.source_id, "source:xai:model:grok-4.3");
+  assert.match(grokWebSearch.record.source_locator, /exact-model page reviewed/i);
+  assert.equal(capabilityFor(index, "alibaba-qwen:qwen3.7-max-2026-06-08", "structured_output", asOf).support, "conditional");
+  assert.equal(capabilityFor(index, "deepseek:deepseek-v4-flash", "image_input", asOf).support, "unknown");
+
+  const typoRaw = structuredClone(baseCatalog);
+  typoRaw.tasks[0].required_capabilities = ["invented_capability"];
+  assert.throws(() => normalizeCatalog(typoRaw, asOf), /Ismeretlen feladat capability/);
+
+  const missingCostStatusRaw = structuredClone(baseCatalog);
+  delete missingCostStatusRaw.capabilities[0].extra_cost_status;
+  assert.throws(() => normalizeCatalog(missingCostStatusRaw, asOf), /Hibás capability extra_cost_status/);
+});
+
+test("az ismeretlen, feltételes, stale vagy kétértelmű capability fail-closed", () => {
+  const cases = [
+    ["xai:grok-4.3", "provider_web_search"],
+    ["deepseek:deepseek-v4-flash", "image_input"],
+    ["alibaba-qwen:qwen3.7-max-2026-06-08", "structured_output"]
+  ];
+  const index = normalizeCatalog(baseCatalog, asOf);
+  for (const [modelId, capability] of cases) {
+    const result = evaluateModel(index, modelId, { ...defaultProfile, requiredCapabilities: [capability] }, asOf);
+    assert.equal(result.technicalEligibility, "excluded");
+    assert.ok(reasonSet(result).has("missing_capability"));
+  }
+
+  const staleRaw = structuredClone(baseCatalog);
+  const stale = staleRaw.capabilities.find((item) => item.model_id === "openai:gpt-5.6-sol" && item.capability === "image_input");
+  stale.freshness.stale_at = "2026-07-20T08:00:00Z";
+  stale.freshness.expires_at = "2026-08-19T09:13:14Z";
+  assert.ok(reasonSet(evaluateModel(normalizeCatalog(staleRaw, asOf), stale.model_id, { ...defaultProfile, requiredCapabilities: [stale.capability] }, asOf)).has("missing_capability"));
+
+  const duplicateRaw = structuredClone(baseCatalog);
+  const original = duplicateRaw.capabilities.find((item) => item.model_id === "openai:gpt-5.6-sol" && item.capability === "image_input");
+  duplicateRaw.capabilities.push({ ...structuredClone(original), id: `${original.id}:duplicate` });
+  assert.equal(capabilityFor(normalizeCatalog(duplicateRaw, asOf), original.model_id, original.capability, asOf).state, "quarantined");
+});
+
+test("mind a 120 feladat-prioritás-használat útvonal ad őszinte és használható eredményt", () => {
+  const index = normalizeCatalog(baseCatalog, asOf);
+  const usageRuns = [150, 600, 30000];
+  let pathCount = 0;
+  for (const task of index.tasks.values()) {
+    for (const policy of index.recommendationPolicies.values()) {
+      for (const runsPerMonth of usageRuns) {
+        pathCount += 1;
+        const results = evaluateAllModels(index, {
+          runsPerMonth,
+          inputTextTokensPerRun: task.default_input_tokens,
+          outputTextTokensPerRun: task.default_output_tokens,
+          requiredCapabilities: task.required_capabilities
+        }, asOf);
+        const technical = results.filter((item) => item.technicalEligibility === "eligible");
+        const priced = technical.filter((item) => item.costStatus === "complete");
+        assert.ok(technical.length > 0, `${task.id} / ${policy.priority_id} / ${runsPerMonth}: technikai találat`);
+        assert.ok(priced.length > 0, `${task.id} / ${policy.priority_id} / ${runsPerMonth}: tokenár`);
+        if (policy.ranking_available && task.cost_scope === "standard_text_complete") assert.ok(priced.length >= 3);
+      }
+    }
+  }
+  assert.equal(pathCount, 120);
+});
+
+test("minden szolgáltatóhoz van ellenőrzött API-kulcs- és bekötési útvonal", () => {
+  const index = normalizeCatalog(baseCatalog, asOf);
+  for (const provider of index.providers.values()) {
+    assert.ok(providerLinkFor(index, provider.id, "api_key", asOf)?.url.startsWith("https://"), provider.id);
+    assert.ok(providerLinkFor(index, provider.id, "quickstart", asOf)?.url.startsWith("https://"), provider.id);
+  }
+});
+
+test("az összehasonlító megőrzi a bizonyító mezőket, az ajánló pedig egyszerű és bizonyítékalapú marad", () => {
   for (const label of ["Modell és szolgáltató", "Havi becsült költség", "Ár állapota", "Kontextus", "API-kulcs"]) {
     assert.match(publicApp, new RegExp(`\\"${label}\\"`));
   }
   assert.match(publicApp, /modelResultCard\(resultA, profile, "A", "a"\)/);
   assert.match(publicApp, /const results = evaluateAllModels\(state\.index, profile, state\.asOf\)/);
-  assert.match(publicApp, /filter\(\(item\) => item\.costStatus === "complete"\)/);
-  assert.match(publicApp, /const priceRanked = priority\.id === "price"/);
+  assert.match(publicApp, /technicalEligibility === "eligible"/);
+  assert.match(publicApp, /recommendationPolicyFor\(state\.index, priority\.id\)/);
+  assert.match(publicApp, /Tokenárak megnyitása/);
+  assert.match(publicApp, /A technikai támogatás nem ugyanaz/);
+  assert.match(publicApp, /Bekötési útmutató/);
+  assert.doesNotMatch(publicApp, /advisor-unranked-grid/);
+  assert.doesNotMatch(publicApp, /TASK_OPTIONS/);
   assert.doesNotMatch(publicApp, /renderUnsupportedTask/);
-  assert.doesNotMatch(publicApp, /Ehhez még nincs teljes költség/);
-  assert.equal((publicApp.match(/scope: "token_baseline"/g) ?? []).length, 3);
+  assert.equal(baseCatalog.tasks.filter((task) => task.cost_scope === "token_baseline").length, 3);
   assert.match(publicApp, /function advisorCostNotice\(task\)/);
   assert.match(publicApp, /Ez ár-összehasonlítás, nem minőségi vagy alkalmassági rangsor/);
-  assert.match(publicApp, /A külön díjak nincsenek benne/);
-  assert.match(publicApp, /Becsült havi szöveges tokenköltség/);
   assert.doesNotMatch(publicHtml, /Három érthető lehetőség/);
   assert.match(publicApp, /scope_label_hu/);
   assert.match(publicApp, /function markCompareDirty\(\)/);

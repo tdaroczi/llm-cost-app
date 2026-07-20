@@ -6,22 +6,10 @@ import {
   formatUsd,
   normalizeCatalog,
   normalizeProfile,
-  providerLinkFor,
-  recordHealth
+  recommendationPolicyFor,
+  recordHealth,
+  taskFor
 } from "./core.mjs";
-
-const TASK_OPTIONS = Object.freeze([
-  { id: "writing", label: "Szöveget írok vagy átírok", icon: "write", input: 1200, output: 800, scope: "text" },
-  { id: "coding", label: "Programozok", icon: "code", input: 4000, output: 1500, scope: "text" },
-  { id: "reasoning", label: "Nehéz problémát oldok meg", icon: "reason", input: 3500, output: 1800, scope: "text" },
-  { id: "documents", label: "Hosszú dokumentumot dolgozok fel", icon: "document", input: 30000, output: 1500, scope: "text" },
-  { id: "extraction", label: "Adatot szeretnék kinyerni", icon: "database", input: 3500, output: 600, scope: "text" },
-  { id: "assistant", label: "Asszisztenst készítek", icon: "user", input: 800, output: 400, scope: "text" },
-  { id: "translation", label: "Fordítok vagy több nyelven dolgozom", icon: "globe", input: 1800, output: 1800, scope: "text" },
-  { id: "vision", label: "Képet vagy dokumentumoldalt értelmezek", icon: "image", input: 1500, output: 500, scope: "token_baseline", excludedCost: "A kép- vagy dokumentumfeldolgozás esetleges külön díja nincs benne." },
-  { id: "automation", label: "Automatizmust építek", icon: "gear", input: 2500, output: 800, scope: "token_baseline", excludedCost: "A keresés, a fájlok és az eszközhívások esetleges külön díja nincs benne." },
-  { id: "research", label: "Internetes kutatást végzek", icon: "search", input: 3000, output: 900, scope: "token_baseline", excludedCost: "A webes keresés és a külső adatforrások esetleges külön díja nincs benne." }
-]);
 
 const PRIORITY_OPTIONS = Object.freeze([
   { id: "balanced", label: "Nem tudom – mutasd a kiegyensúlyozottat", detail: "Jó alapbeállítás, ha nem szeretnél technikai döntést hozni." },
@@ -35,6 +23,14 @@ const USAGE_OPTIONS = Object.freeze([
   { id: "regular", label: "Rendszeresen használnám", detail: "Például napi 20 kérés", runs: 600 },
   { id: "volume", label: "Nagy forgalomra kell", detail: "Például napi 1000 kérés", runs: 30000 }
 ]);
+
+const CAPABILITY_LABELS = Object.freeze({
+  image_input: "képbemenet",
+  function_calling: "funkcióhívás",
+  structured_output: "strukturált válasz",
+  provider_web_search: "szolgáltatói webes keresés",
+  file_or_pdf_input: "fájl- vagy PDF-bemenet"
+});
 
 const ICON_PATHS = Object.freeze({
   write: ["M4 20h4L19 9l-4-4L4 16v4Z", "m13 7 4 4"],
@@ -113,10 +109,12 @@ function compareProfile() {
 }
 
 function taskProfile() {
+  const task = currentTask();
   return baseProfile({
     runsPerMonth: $("#taskRuns").value,
     inputTextTokensPerRun: $("#taskInput").value,
-    outputTextTokensPerRun: $("#taskOutput").value
+    outputTextTokensPerRun: $("#taskOutput").value,
+    requiredCapabilities: task?.requiredCapabilities ?? []
   });
 }
 
@@ -263,6 +261,15 @@ function apiKeyContent(result) {
   });
 }
 
+function quickstartContent(result) {
+  if (!result.apiQuickstartLink) return null;
+  return node("a", {
+    className: "quickstart-link",
+    text: "Bekötési útmutató",
+    attrs: { href: result.apiQuickstartLink.url, target: "_blank", rel: "noopener noreferrer" }
+  });
+}
+
 function modelResultCard(result, profile, marker, tone = "neutral") {
   const provider = state.index.providers.get(result.model.provider_id);
   const card = node("article", { className: `model-result tone-${tone}` });
@@ -290,13 +297,23 @@ function sourceAnchor(source, label = "Hivatalos árforrás") {
 function provenanceCard(result, marker) {
   const card = node("article", { className: "provenance-card" });
   card.append(node("h3", { text: `${marker} · ${result.model.name}` }));
-  const tool = capabilityFor(state.index, result.model.id, "tool_calling", state.asOf);
+  const capabilities = Object.entries(CAPABILITY_LABELS).map(([key, label]) => {
+    const evidence = capabilityFor(state.index, result.model.id, key, state.asOf);
+    const support = {
+      supported: "támogatott",
+      unsupported: "nem támogatott",
+      conditional: "feltételes",
+      unknown: "nem igazolt"
+    }[evidence.support] ?? "nem igazolt";
+    const verified = evidence.record?.freshness?.verified_at;
+    return [`Képesség · ${label}`, `${support}${verified ? ` · ellenőrizve: ${formatDate(verified)}` : ""}`];
+  });
   const list = node("dl", { className: "provenance-list" });
   const facts = [
     ["API ID", result.model.api_model_id],
     ["Dataset", state.index.raw.dataset_version],
     ["Lifecycle", result.model.lifecycle],
-    ["Tool calling", tool.support === "unknown" ? "nincs igazolt rekord" : tool.support],
+    ...capabilities,
     ["Modell ellenőrizve", formatDate(result.model.freshness?.verified_at)],
     ["Input ár", result.inputPrice ? `${result.inputPrice.amount} USD / 1M token` : "nem használható"],
     ["Output ár", result.outputPrice ? `${result.outputPrice.amount} USD / 1M token` : "nem használható"],
@@ -367,13 +384,33 @@ function renderAdvisorChoices() {
   clear(taskChoices);
   clear(priorityChoices);
   clear(usageChoices);
-  TASK_OPTIONS.forEach((item) => taskChoices.append(choiceOption(item, "advisorTask", item.id === state.advisor.taskId, { icon: item.icon })));
+  taskOptions().forEach((item) => taskChoices.append(choiceOption(item, "advisorTask", item.id === state.advisor.taskId, { icon: item.icon })));
   PRIORITY_OPTIONS.forEach((item) => priorityChoices.append(choiceOption(item, "advisorPriority", item.id === state.advisor.priorityId)));
   USAGE_OPTIONS.forEach((item) => usageChoices.append(choiceOption(item, "advisorUsage", item.id === state.advisor.usageId)));
 }
 
+function taskOptions() {
+  if (!state.index) return [];
+  return [...state.index.tasks.values()]
+    .filter((task) => task.status === "active")
+    .sort((a, b) => a.display_order - b.display_order)
+    .map((task) => ({
+      id: task.id,
+      label: task.label_hu,
+      icon: task.icon,
+      input: task.default_input_tokens,
+      output: task.default_output_tokens,
+      scope: task.cost_scope,
+      excludedCost: task.excluded_cost_hu,
+      requiredCapabilities: task.required_capabilities,
+      methodologyNote: task.methodology_note_hu
+    }));
+}
+
 function currentTask() {
-  return TASK_OPTIONS.find((item) => item.id === state.advisor.taskId) ?? null;
+  const record = taskFor(state.index, state.advisor.taskId);
+  if (!record) return null;
+  return taskOptions().find((item) => item.id === record.id) ?? null;
 }
 
 function currentPriority() {
@@ -424,34 +461,38 @@ function showAdvisorStep(step) {
 
 const formatAdvisorCost = (value) => `${new Intl.NumberFormat("hu-HU", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value))} USD / hó`;
 
-function advisorPrimaryResult(result, profile, priceRanked, baselineOnly = false) {
+function advisorPrimaryResult(result, profile) {
   const provider = state.index.providers.get(result.model.provider_id);
   const article = node("article", { className: "advisor-primary-result" });
   const identity = node("div", { className: "advisor-result-identity" });
   identity.append(
-    node("p", { className: "result-label", text: priceRanked ? "Ár szerint első" : "Ár szerint összehasonlítható" }),
+    node("p", { className: "result-label", text: "Ellenőrzött tokenár alapján első" }),
     node("h2", { text: result.model.name }),
     node("p", { className: "provider-name", text: provider?.name ?? result.model.provider_id })
   );
+  const capabilityLabels = result.requirements.filter((item) => item.met).map((item) => CAPABILITY_LABELS[item.key] ?? item.key);
   const explanation = node("div", { className: "advisor-result-explanation" });
   explanation.append(
-    node("p", { className: "positive-reason", text: priceRanked
-      ? baselineOnly
-        ? "Ebben a mintában ennek a legalacsonyabb az ellenőrzött standard szöveges tokenköltsége. A külön díjak nincsenek benne."
-        : "Ebben a mintában ennek a legalacsonyabb a teljes, ellenőrzött standard szöveges API-költsége."
-      : "A standard szöveges API-költsége teljes és ellenőrzött." }),
-    node("p", { className: "caution-reason", text: "A minőség és a sebesség még nincs feladatspecifikusan, függetlenül rangsorolva." })
+    node("p", { className: "positive-reason", text: capabilityLabels.length
+      ? `A gyártó dokumentációja szerint támogatja ezt: ${capabilityLabels.join(", ")}.`
+      : "Ehhez a feladathoz nincs a standard szöveges API-n felüli technikai követelmény." }),
+    node("p", { className: "caution-reason", text: "Ez költségsorrend. A minőséget és a sebességet még nem rangsoroljuk bizonyíték nélkül." })
   );
   const cost = node("div", { className: "advisor-result-cost" });
   cost.append(
-    node("small", { text: baselineOnly ? "Becsült havi szöveges tokenköltség" : "Becsült havi API-költség" }),
+    node("small", { text: "Becsült havi API-költség" }),
     node("strong", { text: formatAdvisorCost(result.totalCostUsd) }),
     node("span", { text: `Ellenőrizve: ${formatDate(result.verifiedAt[0])}` })
   );
   if (result.apiKeyLink) cost.append(apiKeyContent(result));
+  const quickstart = quickstartContent(result);
+  if (quickstart) cost.append(quickstart);
   const details = node("details", { className: "result-why" });
   details.append(node("summary", { text: "Miért ezt látom?" }));
   details.append(node("p", { text: `${formatInteger(profile.runsPerMonth)} kérés / hó, kérésenként ${formatInteger(profile.inputTextTokensPerRun)} input és ${formatInteger(profile.outputTextTokensPerRun)} output token mintafeltételezéssel.` }));
+  if (result.requirements.length) {
+    details.append(node("p", { text: `Technikai bizonyíték: ${result.requirements.map((item) => `${CAPABILITY_LABELS[item.key] ?? item.key} · ${formatDate(item.verifiedAt)}`).join("; ")}.` }));
+  }
   if (result.inputPrice?.conditions?.scope_label_hu) details.append(node("p", { text: `Az ár feltétele: ${result.inputPrice.conditions.scope_label_hu}.` }));
   article.append(identity, explanation, cost, details);
   return article;
@@ -461,7 +502,7 @@ function advisorSecondaryResult(result, index) {
   const provider = state.index.providers.get(result.model.provider_id);
   const article = node("article", { className: "advisor-secondary-result" });
   const identity = node("div");
-  identity.append(node("p", { className: "result-label", text: index === 0 ? "Következő számítható ár" : "További számítható ár" }));
+  identity.append(node("p", { className: "result-label", text: index === 0 ? "Második ellenőrzött tokenár" : "Harmadik ellenőrzött tokenár" }));
   identity.append(node("h3", { text: result.model.name }), node("span", { text: provider?.name ?? result.model.provider_id }));
   const summary = node("p", { text: formatAdvisorCost(result.totalCostUsd) });
   article.append(identity, summary);
@@ -469,17 +510,40 @@ function advisorSecondaryResult(result, index) {
   return article;
 }
 
-function advisorUnrankedResult(result) {
-  const provider = state.index.providers.get(result.model.provider_id);
-  const article = node("article", { className: "advisor-unranked-result" });
-  const identity = node("div");
-  identity.append(
-    node("h3", { text: result.model.name }),
-    node("span", { text: provider?.name ?? result.model.provider_id })
+function advisorCompactPrices(results) {
+  const details = node("details", { className: "compact-price-list" });
+  details.append(node("summary", { text: `Tokenárak megnyitása (${results.length})` }));
+  const rows = node("div", { className: "compact-price-rows" });
+  results.forEach((result) => {
+    const provider = state.index.providers.get(result.model.provider_id);
+    const row = node("article", { className: "compact-price-row" });
+    const identity = node("div");
+    identity.append(node("strong", { text: result.model.name }), node("small", { text: provider?.name ?? result.model.provider_id }));
+    const actions = node("div", { className: "compact-price-actions" });
+    if (result.apiKeyLink) actions.append(apiKeyContent(result));
+    const quickstart = quickstartContent(result);
+    if (quickstart) actions.append(quickstart);
+    row.append(identity, node("span", { text: formatAdvisorCost(result.totalCostUsd) }), actions);
+    rows.append(row);
+  });
+  details.append(rows);
+  return details;
+}
+
+function advisorEvidenceNotice(task, priority, policy, technicalCount) {
+  const notice = node("article", { className: "evidence-notice" });
+  const required = task.requiredCapabilities.map((key) => CAPABILITY_LABELS[key] ?? key);
+  notice.append(
+    node("h2", { text: "Ehhez még nincs hiteles sorrend." }),
+    node("p", { text: required.length
+      ? `${technicalCount} modellnél találtunk hivatalosan dokumentált ${required.join(" és ")} támogatást.`
+      : `${technicalCount} modell fér bele a megadott használati mintába, és rendelkezik ellenőrzött tokenárral.` }),
+    node("p", { text: priority.id === "price" && task.scope === "token_baseline"
+      ? "A külön keresési, kép-, fájl- vagy eszközdíjak hiányozhatnak, ezért itt nem nevezünk ki legolcsóbb modellt."
+      : policy?.disclosure_hu ?? "A választott sorrendhez még nincs elég független bizonyíték." }),
+    node("strong", { text: "A technikai támogatás nem ugyanaz, mint hogy ez a legjobb modell a feladatra." })
   );
-  article.append(identity, node("strong", { text: formatAdvisorCost(result.totalCostUsd) }));
-  if (result.apiKeyLink) article.append(apiKeyContent(result));
-  return article;
+  return notice;
 }
 
 function advisorCostNotice(task) {
@@ -509,45 +573,35 @@ function renderAdvisorResults() {
     return;
   }
   const results = evaluateAllModels(state.index, profile, state.asOf);
-  const eligible = results.filter((item) => item.costStatus === "complete");
-  const priceRanked = priority.id === "price";
-  const visible = priceRanked
-    ? [...eligible]
-        .sort((a, b) => a.costNumerator < b.costNumerator ? -1 : a.costNumerator > b.costNumerator ? 1 : a.model.name.localeCompare(b.model.name, "hu"))
-        .slice(0, 3)
-    : [...eligible].sort((a, b) => a.model.name.localeCompare(b.model.name, "hu"));
+  const technical = results.filter((item) => item.technicalEligibility === "eligible");
+  const priced = technical
+    .filter((item) => item.costStatus === "complete")
+    .sort((a, b) => a.costNumerator < b.costNumerator ? -1 : a.costNumerator > b.costNumerator ? 1 : a.model.name.localeCompare(b.model.name, "hu"));
+  const policy = recommendationPolicyFor(state.index, priority.id);
   const baselineOnly = task.scope === "token_baseline";
-  $("#taskHelp").textContent = baselineOnly
-    ? `A számok csak a standard szöveges tokenek becsült havi díját mutatják. ${task.excludedCost}`
-    : priceRanked
-      ? "A sorrend csak a teljes, ellenőrzött API-költséget követi. Ez nem minőségi rangsor."
-      : "A választott szempont szerint még nincs független rangsor. Az alábbi árak tájékoztató összehasonlításra valók, sorrend nélkül.";
+  const priceRanked = priority.id === "price" && policy?.ranking_available === true && !baselineOnly;
+  const visible = priced.slice(0, policy?.result_limit ?? 3);
+  $("#taskHelp").textContent = priceRanked
+    ? "A sorrend kizárólag a teljes, ellenőrzött standard szöveges tokenköltséget követi."
+    : "Először a hivatalosan dokumentált technikai feltételeket ellenőrizzük. Bizonyíték nélkül nem állítunk fel minőségi vagy sebességi sorrendet.";
   $("#taskResultsHeading").textContent = priceRanked
-    ? "Ezt a három lehetőséget nézd meg."
-    : baselineOnly
-      ? "Ezeknek a tokenára összehasonlítható."
-      : "Ezeknek az ára összehasonlítható.";
+    ? "Három ellenőrzött költségjelölt."
+    : "Amit most biztosan tudunk.";
   const list = $("#taskResults");
   clear(list);
   const costNotice = advisorCostNotice(task);
   if (costNotice) list.append(costNotice);
-  if (visible.length) {
-    if (priceRanked) {
-      list.append(advisorPrimaryResult(visible[0], profile, true, baselineOnly));
-      const alternatives = node("div", { className: "advisor-alternatives" });
-      visible.slice(1).forEach((result, index) => alternatives.append(advisorSecondaryResult(result, index)));
-      if (alternatives.childElementCount) list.append(alternatives);
-    } else {
-      const neutral = node("div", { className: "advisor-unranked-grid" });
-      visible.forEach((result) => neutral.append(advisorUnrankedResult(result)));
-      list.append(neutral);
-    }
+  if (priceRanked && visible.length) {
+    list.append(advisorPrimaryResult(visible[0], profile));
+    const alternatives = node("div", { className: "advisor-alternatives" });
+    visible.slice(1).forEach((result, index) => alternatives.append(advisorSecondaryResult(result, index)));
+    if (alternatives.childElementCount) list.append(alternatives);
   } else {
-    list.append(node("p", { className: "unsupported-result", text: "Ehhez a mintahasználathoz most nincs aktuális és ellenőrzött tokenárú modell." }));
+    list.append(advisorEvidenceNotice(task, priority, policy, technical.length));
+    if (priced.length) list.append(advisorCompactPrices(priced));
+    else list.append(node("p", { className: "unsupported-result", text: "Ehhez a feladathoz most nincs olyan modell, amelynél a szükséges technikai támogatás és az aktuális tokenár is igazolt." }));
   }
-  state.coverage.task = baselineOnly
-    ? `${eligible.length}/${results.length} modell ellenőrzött tokenárral`
-    : `${eligible.length}/${results.length} modell teljes költséggel`;
+  state.coverage.task = `${technical.length}/${results.length} modell dokumentált technikai találat`;
   syncHeaderCoverage();
   const heading = $("#taskResultsHeading");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

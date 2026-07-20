@@ -13,19 +13,23 @@ Magyar nyelvű, build nélküli statikus alkalmazás LLM API-költségek átlát
 - három egyszerű kérdésből induló, magyar nyelvű modellválasztót ad;
 - tíz emberi feladatot, négy prioritást és három érthető használati szintet kezel;
 - a használati feltételezést megmutatja, a tokenrészleteket csak opcionálisan nyitja ki;
+- öt technikai képességet ellenőriz pontos modellverzióra: képbemenet, funkcióhívás, strukturált válasz, szolgáltatói webes keresés, valamint fájl- vagy PDF-bemenet;
+- feladatnál csak olyan modellt tart technikai találatnak, amelynél minden szükséges képesség hivatalosan dokumentált és aktuális;
 - standard szöveges feladatnál teljes, ellenőrzött USD-költség alapján hasonlít;
-- keresésnél, képnél vagy eszközhasználatnál csak korlátozott standard szöveges tokenár-összehasonlítást ad, és külön jelzi, hogy a keresés, fájl, kép vagy eszközhívás esetleges díja nincs benne;
+- keresésnél, képnél vagy eszközhasználatnál külön jelzi, hogy a keresés, fájl, kép vagy eszközhívás esetleges díja nincs benne, ezért nem nevez ki legolcsóbb modellt;
+- minőségi, sebességi vagy „kiegyensúlyozott” sorrend helyett egy rövid bizonyítékhiány-jelzést és egy összecsukható tokenárlistát mutat;
 - rekordszinten mutatja a forrást, az ellenőrzés idejét és a frissességi állapotot;
 - csak teljes, használható input- és outputárból számol;
 - ellenőrzött szolgáltatói rekordból ad kattintható API-kulcs linket;
+- mind a hét szolgáltatóhoz kattintható hivatalos bekötési útmutatót ad;
 - ugyanazt a `evaluateModel` motort használja mindkét felhasználói úton;
 - hét szolgáltató tizennégy, teljes költséggel összehasonlítható modelljét tartalmazza, köztük OpenAI, Anthropic, Google, xAI, DeepSeek, Alibaba Cloud Qwen és Mistral modelleket.
 
 ## Fontos korlát
 
-A production katalógus tizennégy, teljes input- és outputköltséggel összehasonlítható modellt tartalmaz. Capability- és quickstart-rekordot még nem tartalmaz; emiatt a tool calling állapota ismeretlen, quickstart link pedig nem jelenik meg.
+A production katalógus tizennégy, teljes input- és outputköltséggel összehasonlítható modellt, hetven capability-rekordot és hét hivatalos bekötési útvonalat tartalmaz. Az `unknown`, `conditional`, stale, karanténba tett vagy hiányzó capability nem teljesíthet kötelező technikai feltételt.
 
-Az alkalmazás nem ad benchmark- vagy minőségi pontszámot, nem nevez ki győztest, és nem állít bizonyítatlan feladatspecifikus alkalmasságot. Lejárt, stale, karanténba tett vagy hiányos ár nem vehet részt a számításban.
+Az alkalmazás továbbra sem ad benchmark- vagy minőségi pontszámot, nem nevez ki minőségi vagy sebességi győztest, és nem állít bizonyítatlan feladatspecifikus alkalmasságot. A technikai támogatás nem bizonyítja, hogy egy modell a legjobb az adott munkára. Lejárt, stale, karanténba tett vagy hiányos ár nem vehet részt a számításban.
 
 ## Helyi futtatás
 
