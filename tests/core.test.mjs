@@ -261,7 +261,7 @@ test("a Gate 4 production katalógus négy új modellje teljes, útvonalhoz köt
   assert.ok(fableInputPrice.conditions.excluded_components.includes("inference_geo_us"));
 });
 
-test("az összehasonlító megőrzi a bizonyító mezőket, az ajánló pedig egyszerű és fail-closed marad", () => {
+test("az összehasonlító megőrzi a bizonyító mezőket, az ajánló pedig minden feladatnál ad használható áreredményt", () => {
   for (const label of ["Modell és szolgáltató", "Havi becsült költség", "Ár állapota", "Kontextus", "API-kulcs"]) {
     assert.match(publicApp, new RegExp(`\\"${label}\\"`));
   }
@@ -269,8 +269,14 @@ test("az összehasonlító megőrzi a bizonyító mezőket, az ajánló pedig eg
   assert.match(publicApp, /const results = evaluateAllModels\(state\.index, profile, state\.asOf\)/);
   assert.match(publicApp, /filter\(\(item\) => item\.costStatus === "complete"\)/);
   assert.match(publicApp, /const priceRanked = priority\.id === "price"/);
-  assert.match(publicApp, /if \(task\.scope !== "text"\)/);
-  assert.match(publicApp, /scope: "additional_costs"/);
+  assert.doesNotMatch(publicApp, /renderUnsupportedTask/);
+  assert.doesNotMatch(publicApp, /Ehhez még nincs teljes költség/);
+  assert.equal((publicApp.match(/scope: "token_baseline"/g) ?? []).length, 3);
+  assert.match(publicApp, /function advisorCostNotice\(task\)/);
+  assert.match(publicApp, /Ez ár-összehasonlítás, nem minőségi vagy alkalmassági rangsor/);
+  assert.match(publicApp, /A külön díjak nincsenek benne/);
+  assert.match(publicApp, /Becsült havi szöveges tokenköltség/);
+  assert.doesNotMatch(publicHtml, /Három érthető lehetőség/);
   assert.match(publicApp, /scope_label_hu/);
   assert.match(publicApp, /function markCompareDirty\(\)/);
   assert.match(publicHtml, /id="compareDirty" role="status" hidden/);

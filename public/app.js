@@ -18,15 +18,15 @@ const TASK_OPTIONS = Object.freeze([
   { id: "extraction", label: "Adatot szeretnék kinyerni", icon: "database", input: 3500, output: 600, scope: "text" },
   { id: "assistant", label: "Asszisztenst készítek", icon: "user", input: 800, output: 400, scope: "text" },
   { id: "translation", label: "Fordítok vagy több nyelven dolgozom", icon: "globe", input: 1800, output: 1800, scope: "text" },
-  { id: "vision", label: "Képet vagy dokumentumoldalt értelmezek", icon: "image", input: 0, output: 0, scope: "additional_costs" },
-  { id: "automation", label: "Automatizmust építek", icon: "gear", input: 0, output: 0, scope: "additional_costs" },
-  { id: "research", label: "Internetes kutatást végzek", icon: "search", input: 0, output: 0, scope: "additional_costs" }
+  { id: "vision", label: "Képet vagy dokumentumoldalt értelmezek", icon: "image", input: 1500, output: 500, scope: "token_baseline", excludedCost: "A kép- vagy dokumentumfeldolgozás esetleges külön díja nincs benne." },
+  { id: "automation", label: "Automatizmust építek", icon: "gear", input: 2500, output: 800, scope: "token_baseline", excludedCost: "A keresés, a fájlok és az eszközhívások esetleges külön díja nincs benne." },
+  { id: "research", label: "Internetes kutatást végzek", icon: "search", input: 3000, output: 900, scope: "token_baseline", excludedCost: "A webes keresés és a külső adatforrások esetleges külön díja nincs benne." }
 ]);
 
 const PRIORITY_OPTIONS = Object.freeze([
   { id: "balanced", label: "Nem tudom – mutasd a kiegyensúlyozottat", detail: "Jó alapbeállítás, ha nem szeretnél technikai döntést hozni." },
   { id: "quality", label: "A lehető legjobb eredmény", detail: "Csak független minőségi bizonyítékkal rangsorolható." },
-  { id: "price", label: "A lehető legalacsonyabb ár", detail: "A teljes, ellenőrzött havi API-költség alapján." },
+  { id: "price", label: "A lehető legalacsonyabb ár", detail: "Az ellenőrzött standard szöveges tokenköltség alapján; külön díjak nélkül." },
   { id: "speed", label: "A lehető leggyorsabb válasz", detail: "Csak független sebességméréssel rangsorolható." }
 ]);
 
@@ -424,7 +424,7 @@ function showAdvisorStep(step) {
 
 const formatAdvisorCost = (value) => `${new Intl.NumberFormat("hu-HU", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value))} USD / hó`;
 
-function advisorPrimaryResult(result, profile, priceRanked) {
+function advisorPrimaryResult(result, profile, priceRanked, baselineOnly = false) {
   const provider = state.index.providers.get(result.model.provider_id);
   const article = node("article", { className: "advisor-primary-result" });
   const identity = node("div", { className: "advisor-result-identity" });
@@ -435,12 +435,16 @@ function advisorPrimaryResult(result, profile, priceRanked) {
   );
   const explanation = node("div", { className: "advisor-result-explanation" });
   explanation.append(
-    node("p", { className: "positive-reason", text: priceRanked ? "Ebben a mintában ennek a legalacsonyabb a teljes, ellenőrzött standard szöveges API-költsége." : "A standard szöveges API-költsége teljes és ellenőrzött." }),
+    node("p", { className: "positive-reason", text: priceRanked
+      ? baselineOnly
+        ? "Ebben a mintában ennek a legalacsonyabb az ellenőrzött standard szöveges tokenköltsége. A külön díjak nincsenek benne."
+        : "Ebben a mintában ennek a legalacsonyabb a teljes, ellenőrzött standard szöveges API-költsége."
+      : "A standard szöveges API-költsége teljes és ellenőrzött." }),
     node("p", { className: "caution-reason", text: "A minőség és a sebesség még nincs feladatspecifikusan, függetlenül rangsorolva." })
   );
   const cost = node("div", { className: "advisor-result-cost" });
   cost.append(
-    node("small", { text: "Becsült havi API-költség" }),
+    node("small", { text: baselineOnly ? "Becsült havi szöveges tokenköltség" : "Becsült havi API-költség" }),
     node("strong", { text: formatAdvisorCost(result.totalCostUsd) }),
     node("span", { text: `Ellenőrizve: ${formatDate(result.verifiedAt[0])}` })
   );
@@ -478,17 +482,15 @@ function advisorUnrankedResult(result) {
   return article;
 }
 
-function renderUnsupportedTask(task) {
-  const list = $("#taskResults");
-  clear(list);
-  const message = node("article", { className: "unsupported-result" });
-  message.append(
-    node("h2", { text: "Ehhez még nem mutatunk félkész rangsort." }),
-    node("p", { text: `${task.label}: a standard tokenáron felül keresési, kép-, fájl- vagy eszközhasználati díj is felmerülhet. A teljes költség még nem ellenőrzött minden modellnél.` }),
-    node("strong", { text: "Amíg a teljes költség nem számítható, egyetlen modell sem kerülhet az ajánlható találatok közé." })
+function advisorCostNotice(task) {
+  if (task.scope !== "token_baseline") return null;
+  const notice = node("article", { className: "baseline-notice" });
+  notice.append(
+    node("strong", { text: "Mit mutat ez a becslés?" }),
+    node("p", { text: `A standard szöveges tokenek becsült havi díját. ${task.excludedCost}` }),
+    node("p", { text: "Ez ár-összehasonlítás, nem minőségi vagy alkalmassági rangsor." })
   );
-  list.append(message);
-  state.coverage.task = "A teljes költség még nem ellenőrzött";
+  return notice;
 }
 
 function renderAdvisorResults() {
@@ -501,46 +503,51 @@ function renderAdvisorResults() {
   $("#advisorFlow").hidden = true;
   $("#advisorResults").hidden = false;
 
-  if (task.scope !== "text") {
-    $("#taskResultsHeading").textContent = "Ehhez még nincs teljes költség.";
-    $("#taskHelp").textContent = "A teljes API-költség ennél a feladatnál még nem számítható megbízhatóan.";
-    renderUnsupportedTask(task);
-  } else {
-    const profile = taskProfile();
-    if (!normalizeProfile(profile).valid) {
-      $("#taskHelp").textContent = "A használati feltételezés hibás. Kérlek módosítsd a megadott mennyiségeket.";
-      return;
-    }
-    const results = evaluateAllModels(state.index, profile, state.asOf);
-    const eligible = results.filter((item) => item.costStatus === "complete");
-    const priceRanked = priority.id === "price";
-    const visible = priceRanked
-      ? [...eligible]
-          .sort((a, b) => a.costNumerator < b.costNumerator ? -1 : a.costNumerator > b.costNumerator ? 1 : a.model.name.localeCompare(b.model.name, "hu"))
-          .slice(0, 3)
-      : [...eligible].sort((a, b) => a.model.name.localeCompare(b.model.name, "hu"));
-    $("#taskHelp").textContent = priceRanked
+  const profile = taskProfile();
+  if (!normalizeProfile(profile).valid) {
+    $("#taskHelp").textContent = "A használati feltételezés hibás. Kérlek módosítsd a megadott mennyiségeket.";
+    return;
+  }
+  const results = evaluateAllModels(state.index, profile, state.asOf);
+  const eligible = results.filter((item) => item.costStatus === "complete");
+  const priceRanked = priority.id === "price";
+  const visible = priceRanked
+    ? [...eligible]
+        .sort((a, b) => a.costNumerator < b.costNumerator ? -1 : a.costNumerator > b.costNumerator ? 1 : a.model.name.localeCompare(b.model.name, "hu"))
+        .slice(0, 3)
+    : [...eligible].sort((a, b) => a.model.name.localeCompare(b.model.name, "hu"));
+  const baselineOnly = task.scope === "token_baseline";
+  $("#taskHelp").textContent = baselineOnly
+    ? `A számok csak a standard szöveges tokenek becsült havi díját mutatják. ${task.excludedCost}`
+    : priceRanked
       ? "A sorrend csak a teljes, ellenőrzött API-költséget követi. Ez nem minőségi rangsor."
       : "A választott szempont szerint még nincs független rangsor. Az alábbi árak tájékoztató összehasonlításra valók, sorrend nélkül.";
-    $("#taskResultsHeading").textContent = priceRanked ? "Ezt a három lehetőséget nézd meg." : "Ezeknek az ára összehasonlítható.";
-    const list = $("#taskResults");
-    clear(list);
-    if (visible.length) {
-      if (priceRanked) {
-        list.append(advisorPrimaryResult(visible[0], profile, true));
-        const alternatives = node("div", { className: "advisor-alternatives" });
-        visible.slice(1).forEach((result, index) => alternatives.append(advisorSecondaryResult(result, index)));
-        if (alternatives.childElementCount) list.append(alternatives);
-      } else {
-        const neutral = node("div", { className: "advisor-unranked-grid" });
-        visible.forEach((result) => neutral.append(advisorUnrankedResult(result)));
-        list.append(neutral);
-      }
+  $("#taskResultsHeading").textContent = priceRanked
+    ? "Ezt a három lehetőséget nézd meg."
+    : baselineOnly
+      ? "Ezeknek a tokenára összehasonlítható."
+      : "Ezeknek az ára összehasonlítható.";
+  const list = $("#taskResults");
+  clear(list);
+  const costNotice = advisorCostNotice(task);
+  if (costNotice) list.append(costNotice);
+  if (visible.length) {
+    if (priceRanked) {
+      list.append(advisorPrimaryResult(visible[0], profile, true, baselineOnly));
+      const alternatives = node("div", { className: "advisor-alternatives" });
+      visible.slice(1).forEach((result, index) => alternatives.append(advisorSecondaryResult(result, index)));
+      if (alternatives.childElementCount) list.append(alternatives);
     } else {
-      list.append(node("p", { className: "unsupported-result", text: "Ehhez a mintahasználathoz most nincs teljes, aktuális és ellenőrzött költségű modell." }));
+      const neutral = node("div", { className: "advisor-unranked-grid" });
+      visible.forEach((result) => neutral.append(advisorUnrankedResult(result)));
+      list.append(neutral);
     }
-    state.coverage.task = `${eligible.length}/${results.length} modell teljes költséggel`;
+  } else {
+    list.append(node("p", { className: "unsupported-result", text: "Ehhez a mintahasználathoz most nincs aktuális és ellenőrzött tokenárú modell." }));
   }
+  state.coverage.task = baselineOnly
+    ? `${eligible.length}/${results.length} modell ellenőrzött tokenárral`
+    : `${eligible.length}/${results.length} modell teljes költséggel`;
   syncHeaderCoverage();
   const heading = $("#taskResultsHeading");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
