@@ -10,11 +10,16 @@ Magyar nyelvű, build nélküli statikus prototípus LLM API-költségek átlát
 ## Mit tud az alkalmazás?
 
 - két modellt ugyanazzal a tokenforgalmi profillal hasonlít össze;
-- feladatjellegű forgalmi mintából indulva műszaki feltételek és teljes USD-költség alapján szűr;
+- három egyszerű kérdésből induló, magyar nyelvű modellválasztó prototípust ad;
+- tíz emberi feladatot, négy prioritást és három érthető használati szintet kezel;
+- a használati feltételezést megmutatja, a tokenrészleteket csak opcionálisan nyitja ki;
+- standard szöveges feladatnál teljes, ellenőrzött USD-költség alapján hasonlít;
+- keresésnél, képnél vagy eszközhasználatnál letiltja a rangsort, amíg a plusz költség nem teljes;
 - rekordszinten mutatja a forrást, az ellenőrzés idejét és a frissességi állapotot;
 - csak teljes, használható input- és outputárból számol;
 - ellenőrzött szolgáltatói rekordból ad kattintható API-kulcs linket;
 - ugyanazt a `evaluateModel` motort használja mindkét felhasználói úton.
+- hat szolgáltató tíz, teljes költséggel összehasonlítható modelljét tartalmazza, köztük xAI Grok, DeepSeek és Alibaba Cloud Qwen modelleket;
 
 ## Fontos korlát
 
@@ -30,7 +35,7 @@ A projekt gyökeréből:
 python3 -m http.server 4173 --bind 127.0.0.1 --directory public
 ```
 
-Ezután nyisd meg: `http://127.0.0.1:4173/#compare`.
+Ezután nyisd meg: `http://127.0.0.1:4173/#task`.
 
 Nincs npm-függőség, build lépés, backend, adatbázis vagy futásidejű LLM-hívás.
 

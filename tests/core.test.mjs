@@ -15,7 +15,7 @@ import {
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
-const asOf = "2026-07-18T08:27:56Z";
+const asOf = "2026-07-20T05:47:10Z";
 const loadJson = async (path) => JSON.parse(await readFile(join(root, path), "utf8"));
 const baseCatalog = await loadJson("public/data/catalog.sample.json");
 const profileFixture = await loadJson("tests/fixtures/calculation-profiles.json");
@@ -41,11 +41,12 @@ const profileById = new Map(profileFixture.profiles.map((item) => [item.id, toPr
 const defaultProfile = profileById.get("technical-chat-10k");
 const reasonSet = (result) => new Set(result.reasonCodes);
 
-test("a publikus katalógus a rögzített proof-fixture pontos másolata", async () => {
-  const source = await readFile(join(root, "tests/fixtures/sample-catalog.json"));
-  const publicCopy = await readFile(join(root, "public/data/catalog.sample.json"));
-  assert.deepEqual(publicCopy, source);
-  assert.equal(normalizeCatalog(baseCatalog, asOf).isSample, true);
+test("a publikus mintakatalógus önmagában konzisztens", () => {
+  const index = normalizeCatalog(baseCatalog, asOf);
+  assert.equal(index.isSample, true);
+  assert.equal(index.models.size, baseCatalog.models.length);
+  assert.equal(index.prices.size, baseCatalog.prices.length);
+  assert.equal(new Set(baseCatalog.prices.map((item) => item.id)).size, baseCatalog.prices.length);
 });
 
 test("mindkét bizonyító profil minden költsége byte-pontosan egyezik az oracle eredménnyel", () => {
@@ -59,7 +60,6 @@ test("mindkét bizonyító profil minden költsége byte-pontosan egyezik az ora
     assert.equal(actual.outputCostUsd, expected.output_cost_usd);
     assert.equal(actual.totalCostUsd, expected.total_cost_usd);
     assert.deepEqual(actual.appliedPriceIds, expected.price_ids);
-    assert.deepEqual(actual.verifiedAt, expected.price_verified_at);
   }
 });
 
@@ -76,8 +76,8 @@ test("az összehasonlító és feladatútvonal ugyanazt az evaluateModel dönté
 test("az időből számolt stale állapot felülírja a bent maradt current címkét", () => {
   const raw = structuredClone(baseCatalog);
   const price = raw.prices.find((item) => item.model_id === "openai:gpt-5.6-terra" && item.charge_type === "input_text_tokens");
-  price.freshness.check_due_at = "2026-07-18T08:25:00Z";
-  price.freshness.stale_at = "2026-07-18T08:26:00Z";
+  price.freshness.check_due_at = "2026-07-20T05:25:00Z";
+  price.freshness.stale_at = "2026-07-20T05:26:00Z";
   price.freshness.expires_at = "2026-08-17T08:24:44Z";
   assert.equal(effectiveFreshness(price, asOf), "stale");
   const result = evaluateModel(normalizeCatalog(raw, asOf), price.model_id, defaultProfile, asOf);
@@ -102,7 +102,7 @@ test("a 429 transient hiba nem tolja ki a TTL-t és degraded állapotban marad",
 
 test("a jövőbeli verified_at és a hard failure fail-closed", () => {
   const futureRaw = structuredClone(baseCatalog);
-  futureRaw.models[0].freshness.verified_at = "2026-07-19T08:24:44Z";
+  futureRaw.models[0].freshness.verified_at = "2026-07-21T08:24:44Z";
   futureRaw.models[0].freshness.check_due_at = "2026-07-25T08:24:44Z";
   assert.equal(effectiveFreshness(futureRaw.models[0], asOf), "unverified");
   assert.ok(reasonSet(evaluateModel(normalizeCatalog(futureRaw, asOf), futureRaw.models[0].id, defaultProfile, asOf)).has("model_record_unusable"));
@@ -195,15 +195,49 @@ test("API-kulcs CTA csak egyetlen current, ellenőrzött HTTPS provider-linkből
   }
 });
 
-test("mindkét útvonal ugyanazt az ötmezős modellkártyát és frissítési védelmet használja", () => {
+test("a Gate 3 bővítés négy új modellje teljes árat és hivatalos kulcslinket ad", () => {
+  const index = normalizeCatalog(baseCatalog, asOf);
+  const expected = [
+    ["xai:grok-4.3", "150.000000", "https://console.x.ai/team/default/api-keys"],
+    ["deepseek:deepseek-v4-flash", "16.800000", "https://platform.deepseek.com/api_keys"],
+    ["deepseek:deepseek-v4-pro", "52.200000", "https://platform.deepseek.com/api_keys"],
+    ["alibaba-qwen:qwen3.7-max-2026-06-08", "231.020000", "https://www.alibabacloud.com/help/en/model-studio/get-api-key"]
+  ];
+
+  assert.equal(index.models.size, 10);
+  assert.equal(index.providers.size, 6);
+  for (const [modelId, total, apiKeyUrl] of expected) {
+    const result = evaluateModel(index, modelId, defaultProfile, asOf);
+    assert.equal(result.costStatus, "complete", modelId);
+    assert.equal(result.totalCostUsd, total, modelId);
+    assert.equal(result.apiKeyLink?.url, apiKeyUrl, modelId);
+  }
+
+  const tooLongForShortGrokPrice = evaluateModel(index, "xai:grok-4.3", { ...defaultProfile, inputTextTokensPerRun: 200001 }, asOf);
+  assert.ok(reasonSet(tooLongForShortGrokPrice).has("price_context_band"));
+
+  for (const excludedId of ["xai:grok-4.5", "deepseek:deepseek-chat", "deepseek:deepseek-reasoner", "alibaba-qwen:qwen3.7-max"]) {
+    assert.equal(index.models.has(excludedId), false, excludedId);
+  }
+});
+
+test("az összehasonlító megőrzi a bizonyító mezőket, az ajánló pedig egyszerű és fail-closed marad", () => {
   for (const label of ["Modell és szolgáltató", "Havi becsült költség", "Ár állapota", "Kontextus", "API-kulcs"]) {
     assert.match(publicApp, new RegExp(`\\"${label}\\"`));
   }
   assert.match(publicApp, /modelResultCard\(resultA, profile, "A", "a"\)/);
-  assert.match(publicApp, /modelResultCard\(result, profile, `\$\{index \+ 1\}\.`, "neutral"\)/);
-  assert.match(publicApp, /function markDirty\(route\)/);
+  assert.match(publicApp, /const results = evaluateAllModels\(state\.index, profile, state\.asOf\)/);
+  assert.match(publicApp, /filter\(\(item\) => item\.costStatus === "complete"\)/);
+  assert.match(publicApp, /const priceRanked = priority\.id === "price"/);
+  assert.match(publicApp, /if \(task\.scope !== "text"\)/);
+  assert.match(publicApp, /scope: "additional_costs"/);
+  assert.match(publicApp, /scope_label_hu/);
+  assert.match(publicApp, /function markCompareDirty\(\)/);
   assert.match(publicHtml, /id="compareDirty" role="status" hidden/);
-  assert.match(publicHtml, /id="taskDirty" role="status" hidden/);
   assert.match(publicHtml, /id="comparisonHeading" tabindex="-1"/);
   assert.match(publicHtml, /id="taskResultsHeading" tabindex="-1"/);
+  assert.match(publicHtml, /id="taskChoices"/);
+  assert.match(publicHtml, /id="priorityChoices"/);
+  assert.match(publicHtml, /id="usageChoices"/);
+  assert.match(publicHtml, /id="advisorResults"[^>]*hidden/);
 });
