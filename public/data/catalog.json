@@ -1,9 +1,9 @@
 {
   "schema_version": "2.0.0",
-  "dataset_version": "2026-07-20T05:47:10Z",
-  "generated_at": "2026-07-20T05:47:10Z",
-  "proof_only": true,
-  "production_publication_approved": false,
+  "dataset_version": "2026-07-20T06:45:58Z",
+  "generated_at": "2026-07-20T06:45:58Z",
+  "proof_only": false,
+  "production_publication_approved": true,
   "providers": [
     {
       "id": "openai",
@@ -28,6 +28,10 @@
     {
       "id": "alibaba-qwen",
       "name": "Alibaba Cloud Qwen"
+    },
+    {
+      "id": "mistral",
+      "name": "Mistral AI"
     }
   ],
   "provider_links": [
@@ -159,6 +163,28 @@
         "expires_at": "2026-08-19T05:47:10Z",
         "freshness_state": "current",
         "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "link:mistral:api-key",
+      "provider_id": "mistral",
+      "url": "https://docs.mistral.ai/getting-started/quickstarts/studio/activate-and-generate-api-key",
+      "access_status": "official_source_page_verified",
+      "source_id": "source:mistral:api-key",
+      "source_locator": "La Plateforme quickstart / Generate an API key",
+      "link_type": "api_key",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T06:31:53Z",
+      "review_ref": "review:gate4:dual-live-verification:20260720:link-mistral-api-key",
+      "freshness": {
+        "verified_at": "2026-07-20T06:28:24Z",
+        "check_due_at": "2026-07-27T06:28:24Z",
+        "stale_at": "2026-08-03T06:28:24Z",
+        "expires_at": "2026-08-19T06:28:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T06:28:24Z",
         "refresh_result": "success_no_change",
         "error_class": null
       }
@@ -427,6 +453,115 @@
         "expires_at": "2026-08-19T05:47:10Z",
         "freshness_state": "current",
         "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "openai:gpt-5.6-sol",
+      "provider_id": "openai",
+      "name": "GPT-5.6 Sol",
+      "api_model_id": "gpt-5.6-sol",
+      "lifecycle": "unknown",
+      "lifecycle_note_hu": "A hivatalos oldal aktuális frontier modellként közli, de nem ad a projekt enumjára közvetlenül leképezhető lifecycle címkét.",
+      "retirement_at": null,
+      "context_window_tokens": 1050000,
+      "max_output_tokens": 128000,
+      "source_id": "source:openai:model:sol",
+      "source_locator": "Model header; API ID; context window; max output tokens",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T06:31:53Z",
+      "review_ref": "review:gate4:dual-live-verification:20260720:openai-sol-model",
+      "freshness": {
+        "verified_at": "2026-07-20T06:28:24Z",
+        "check_due_at": "2026-07-27T06:28:24Z",
+        "stale_at": "2026-07-30T06:28:24Z",
+        "expires_at": "2026-08-19T06:28:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T06:28:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "anthropic:claude-fable-5",
+      "provider_id": "anthropic",
+      "name": "Claude Fable 5",
+      "api_model_id": "claude-fable-5",
+      "lifecycle": "unknown",
+      "official_lifecycle_label": "General availability",
+      "lifecycle_note_hu": "Az Anthropic általánosan elérhető modellként közli; ezt a projekt nem térképezi automatikusan stable értékre.",
+      "usage_note_hu": "A modell 30 napos adatmegőrzést igényel, ezért ZDR-beállítású szervezetben nem érhető el. Az output előtti biztonsági visszautasításért az Anthropic nem számláz.",
+      "retirement_at": null,
+      "context_window_tokens": 1000000,
+      "max_output_tokens": 128000,
+      "source_id": "source:anthropic:model:fable-5",
+      "supporting_source_ids": ["source:anthropic:pricing", "source:anthropic:data-residency"],
+      "source_locator": "Claude Fable 5 / General availability; model ID; context and output limits",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T06:31:53Z",
+      "review_ref": "review:gate4:dual-live-verification:20260720:anthropic-fable-5-model",
+      "freshness": {
+        "verified_at": "2026-07-20T06:28:24Z",
+        "check_due_at": "2026-07-27T06:28:24Z",
+        "stale_at": "2026-07-30T06:28:24Z",
+        "expires_at": "2026-08-19T06:28:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T06:28:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "mistral:mistral-medium-3-5",
+      "provider_id": "mistral",
+      "name": "Mistral Medium 3.5",
+      "api_model_id": "mistral-medium-3-5",
+      "lifecycle": "unknown",
+      "official_lifecycle_label": "v26.04",
+      "lifecycle_note_hu": "A hivatalos modellkártya aktuális v26.04 modellként közli, de nem használ a projekt stable címkéjének megfelelő lifecycle megjelölést.",
+      "retirement_at": null,
+      "context_window_tokens": 256000,
+      "max_output_tokens": null,
+      "source_id": "source:mistral:model:medium-3-5",
+      "source_locator": "Model overview / API name; context window; pricing",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T06:31:53Z",
+      "review_ref": "review:gate4:dual-live-verification:20260720:mistral-medium-3-5-model",
+      "freshness": {
+        "verified_at": "2026-07-20T06:28:24Z",
+        "check_due_at": "2026-07-27T06:28:24Z",
+        "stale_at": "2026-07-30T06:28:24Z",
+        "expires_at": "2026-08-19T06:28:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T06:28:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "mistral:mistral-small-2603",
+      "provider_id": "mistral",
+      "name": "Mistral Small 4",
+      "api_model_id": "mistral-small-2603",
+      "lifecycle": "unknown",
+      "official_lifecycle_label": "v26.03",
+      "lifecycle_note_hu": "A hivatalos modellkártya aktuális v26.03 modellként közli, de nem használ a projekt stable címkéjének megfelelő lifecycle megjelölést.",
+      "retirement_at": null,
+      "context_window_tokens": 256000,
+      "max_output_tokens": null,
+      "source_id": "source:mistral:model:small-4",
+      "source_locator": "Model overview / API name; context window; pricing",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T06:31:53Z",
+      "review_ref": "review:gate4:dual-live-verification:20260720:mistral-small-4-model",
+      "freshness": {
+        "verified_at": "2026-07-20T06:28:24Z",
+        "check_due_at": "2026-07-27T06:28:24Z",
+        "stale_at": "2026-07-30T06:28:24Z",
+        "expires_at": "2026-08-19T06:28:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T06:28:24Z",
         "refresh_result": "success_no_change",
         "error_class": null
       }
@@ -1530,6 +1665,460 @@
         "refresh_result": "success_no_change",
         "error_class": null
       }
+    },
+    {
+      "id": "price:openai:gpt-5.6-sol:input",
+      "model_id": "openai:gpt-5.6-sol",
+      "charge_type": "input_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "5.000000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 272000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "default_non_data_residency_endpoint"
+        },
+        "scope_label_hu": "OpenAI közvetlen API · standard · legfeljebb 272 000 input token",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cached_input",
+          "cache_write",
+          "cache_storage",
+          "batch",
+          "flex",
+          "priority",
+          "fast",
+          "tools",
+          "web_search",
+          "grounding",
+          "image",
+          "audio",
+          "video"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T06:28:24Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:openai:pricing",
+      "source_locator": "Flagship models / Standard / Short context / gpt-5.6-sol / Input",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T06:31:53Z",
+      "review_ref": "review:gate4:dual-live-verification:20260720:price-openai-gpt-5.6-sol-input",
+      "freshness": {
+        "verified_at": "2026-07-20T06:28:24Z",
+        "check_due_at": "2026-07-21T06:28:24Z",
+        "stale_at": "2026-07-21T18:28:24Z",
+        "expires_at": "2026-07-23T06:28:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T06:28:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:openai:gpt-5.6-sol:output",
+      "model_id": "openai:gpt-5.6-sol",
+      "charge_type": "output_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "30.000000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 272000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "default_non_data_residency_endpoint"
+        },
+        "scope_label_hu": "OpenAI közvetlen API · standard · legfeljebb 272 000 input token",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "cached_input",
+          "cache_write",
+          "cache_storage",
+          "batch",
+          "flex",
+          "priority",
+          "fast",
+          "tools",
+          "web_search",
+          "grounding",
+          "image",
+          "audio",
+          "video"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T06:28:24Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:openai:pricing",
+      "source_locator": "Flagship models / Standard / Short context / gpt-5.6-sol / Output",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T06:31:53Z",
+      "review_ref": "review:gate4:dual-live-verification:20260720:price-openai-gpt-5.6-sol-output",
+      "freshness": {
+        "verified_at": "2026-07-20T06:28:24Z",
+        "check_due_at": "2026-07-21T06:28:24Z",
+        "stale_at": "2026-07-21T18:28:24Z",
+        "expires_at": "2026-07-23T06:28:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T06:28:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:anthropic:claude-fable-5:input",
+      "model_id": "anthropic:claude-fable-5",
+      "charge_type": "input_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "10.000000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 1000000
+        },
+        "region_pricing": {
+          "kind": "inference_geo",
+          "value": "global",
+          "multiplier": "1.0"
+        },
+        "scope_label_hu": "Claude API · globális útvonal · standard · cache nélkül",
+        "account_tier": "standard_paid",
+        "availability_note_hu": "30 napos adatmegőrzést igényel; ZDR-beállítású szervezetben nem érhető el.",
+        "billing_note_hu": "Az output előtti biztonsági visszautasításért az Anthropic nem számláz.",
+        "additional_price_components": [],
+        "excluded_components": [
+          "inference_geo_us",
+          "cached_input",
+          "cache_write",
+          "cache_storage",
+          "batch",
+          "priority",
+          "tools",
+          "web_search",
+          "image",
+          "audio",
+          "video"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T06:28:24Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:anthropic:pricing",
+      "source_locator": "Model pricing / Claude Fable 5 / Base Input Tokens; inference_geo global",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T06:31:53Z",
+      "review_ref": "review:gate4:dual-live-verification:20260720:price-anthropic-claude-fable-5-input",
+      "freshness": {
+        "verified_at": "2026-07-20T06:28:24Z",
+        "check_due_at": "2026-07-21T06:28:24Z",
+        "stale_at": "2026-07-21T18:28:24Z",
+        "expires_at": "2026-07-23T06:28:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T06:28:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:anthropic:claude-fable-5:output",
+      "model_id": "anthropic:claude-fable-5",
+      "charge_type": "output_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "50.000000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 1000000
+        },
+        "region_pricing": {
+          "kind": "inference_geo",
+          "value": "global",
+          "multiplier": "1.0"
+        },
+        "scope_label_hu": "Claude API · globális útvonal · standard · cache nélkül",
+        "account_tier": "standard_paid",
+        "availability_note_hu": "30 napos adatmegőrzést igényel; ZDR-beállítású szervezetben nem érhető el.",
+        "billing_note_hu": "Az output előtti biztonsági visszautasításért az Anthropic nem számláz.",
+        "additional_price_components": [],
+        "excluded_components": [
+          "inference_geo_us",
+          "cached_input",
+          "cache_write",
+          "cache_storage",
+          "batch",
+          "priority",
+          "tools",
+          "web_search",
+          "image",
+          "audio",
+          "video"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T06:28:24Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:anthropic:pricing",
+      "source_locator": "Model pricing / Claude Fable 5 / Output Tokens; inference_geo global",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T06:31:53Z",
+      "review_ref": "review:gate4:dual-live-verification:20260720:price-anthropic-claude-fable-5-output",
+      "freshness": {
+        "verified_at": "2026-07-20T06:28:24Z",
+        "check_due_at": "2026-07-21T06:28:24Z",
+        "stale_at": "2026-07-21T18:28:24Z",
+        "expires_at": "2026-07-23T06:28:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T06:28:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:mistral:mistral-medium-3-5:input",
+      "model_id": "mistral:mistral-medium-3-5",
+      "charge_type": "input_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "1.500000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 256000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "api.mistral.ai-global-endpoint"
+        },
+        "scope_label_hu": "api.mistral.ai · globális végpont · standard · cache nélkül",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "eu_regional_inference_1.1x",
+          "cached_input",
+          "batch",
+          "priority",
+          "tools",
+          "web_search",
+          "image",
+          "audio",
+          "video"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T06:28:24Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:mistral:model:medium-3-5",
+      "supporting_source_ids": ["source:mistral:regional-inference", "source:mistral:pricing"],
+      "source_locator": "Model card / Pricing; regional inference / global endpoint",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T06:31:53Z",
+      "review_ref": "review:gate4:dual-live-verification:20260720:price-mistral-medium-3-5-input",
+      "freshness": {
+        "verified_at": "2026-07-20T06:28:24Z",
+        "check_due_at": "2026-07-21T06:28:24Z",
+        "stale_at": "2026-07-21T18:28:24Z",
+        "expires_at": "2026-07-23T06:28:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T06:28:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:mistral:mistral-medium-3-5:output",
+      "model_id": "mistral:mistral-medium-3-5",
+      "charge_type": "output_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "7.500000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 256000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "api.mistral.ai-global-endpoint"
+        },
+        "scope_label_hu": "api.mistral.ai · globális végpont · standard · cache nélkül",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "eu_regional_inference_1.1x",
+          "cached_input",
+          "batch",
+          "priority",
+          "tools",
+          "web_search",
+          "image",
+          "audio",
+          "video"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T06:28:24Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:mistral:model:medium-3-5",
+      "supporting_source_ids": ["source:mistral:regional-inference", "source:mistral:pricing"],
+      "source_locator": "Model card / Pricing; regional inference / global endpoint",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T06:31:53Z",
+      "review_ref": "review:gate4:dual-live-verification:20260720:price-mistral-medium-3-5-output",
+      "freshness": {
+        "verified_at": "2026-07-20T06:28:24Z",
+        "check_due_at": "2026-07-21T06:28:24Z",
+        "stale_at": "2026-07-21T18:28:24Z",
+        "expires_at": "2026-07-23T06:28:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T06:28:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:mistral:mistral-small-2603:input",
+      "model_id": "mistral:mistral-small-2603",
+      "charge_type": "input_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "0.150000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 256000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "api.mistral.ai-global-endpoint"
+        },
+        "scope_label_hu": "api.mistral.ai · globális végpont · standard · cache nélkül",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "eu_regional_inference_1.1x",
+          "cached_input",
+          "batch",
+          "priority",
+          "tools",
+          "web_search",
+          "image",
+          "audio",
+          "video"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T06:28:24Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:mistral:model:small-4",
+      "supporting_source_ids": ["source:mistral:regional-inference", "source:mistral:pricing"],
+      "source_locator": "Model card / Pricing; regional inference / global endpoint",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T06:31:53Z",
+      "review_ref": "review:gate4:dual-live-verification:20260720:price-mistral-small-4-input",
+      "freshness": {
+        "verified_at": "2026-07-20T06:28:24Z",
+        "check_due_at": "2026-07-21T06:28:24Z",
+        "stale_at": "2026-07-21T18:28:24Z",
+        "expires_at": "2026-07-23T06:28:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T06:28:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:mistral:mistral-small-2603:output",
+      "model_id": "mistral:mistral-small-2603",
+      "charge_type": "output_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "0.600000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "max_input_tokens": 256000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "api.mistral.ai-global-endpoint"
+        },
+        "scope_label_hu": "api.mistral.ai · globális végpont · standard · cache nélkül",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": [
+          "eu_regional_inference_1.1x",
+          "cached_input",
+          "batch",
+          "priority",
+          "tools",
+          "web_search",
+          "image",
+          "audio",
+          "video"
+        ]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T06:28:24Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:mistral:model:small-4",
+      "supporting_source_ids": ["source:mistral:regional-inference", "source:mistral:pricing"],
+      "source_locator": "Model card / Pricing; regional inference / global endpoint",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T06:31:53Z",
+      "review_ref": "review:gate4:dual-live-verification:20260720:price-mistral-small-4-output",
+      "freshness": {
+        "verified_at": "2026-07-20T06:28:24Z",
+        "check_due_at": "2026-07-21T06:28:24Z",
+        "stale_at": "2026-07-21T18:28:24Z",
+        "expires_at": "2026-07-23T06:28:24Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T06:28:24Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
     }
   ],
   "capabilities": [],
@@ -1704,6 +2293,78 @@
       "publisher": "Alibaba Cloud",
       "url": "https://www.alibabacloud.com/help/en/model-studio/get-api-key",
       "retrieved_at": "2026-07-20T05:47:10Z"
+    },
+    {
+      "id": "source:openai:model:sol",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "GPT-5.6 Sol Model",
+      "publisher": "OpenAI",
+      "url": "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
+      "retrieved_at": "2026-07-20T06:28:24Z"
+    },
+    {
+      "id": "source:anthropic:model:fable-5",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "Introducing Claude Fable 5 and Claude Mythos 5",
+      "publisher": "Anthropic",
+      "url": "https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5",
+      "retrieved_at": "2026-07-20T06:28:24Z"
+    },
+    {
+      "id": "source:anthropic:data-residency",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "Claude data residency",
+      "publisher": "Anthropic",
+      "url": "https://platform.claude.com/docs/en/manage-claude/data-residency",
+      "retrieved_at": "2026-07-20T06:31:53Z"
+    },
+    {
+      "id": "source:mistral:model:medium-3-5",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "Mistral Medium 3.5 model card",
+      "publisher": "Mistral AI",
+      "url": "https://docs.mistral.ai/models/model-cards/mistral-medium-3-5-26-04",
+      "retrieved_at": "2026-07-20T06:28:24Z"
+    },
+    {
+      "id": "source:mistral:model:small-4",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "Mistral Small 4 model card",
+      "publisher": "Mistral AI",
+      "url": "https://docs.mistral.ai/models/model-cards/mistral-small-4-0-26-03",
+      "retrieved_at": "2026-07-20T06:28:24Z"
+    },
+    {
+      "id": "source:mistral:pricing",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "Mistral API pricing",
+      "publisher": "Mistral AI",
+      "url": "https://mistral.ai/pricing/api/",
+      "retrieved_at": "2026-07-20T06:31:53Z"
+    },
+    {
+      "id": "source:mistral:regional-inference",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "Mistral regional inference",
+      "publisher": "Mistral AI",
+      "url": "https://docs.mistral.ai/studio-api/regional-inference",
+      "retrieved_at": "2026-07-20T06:31:53Z"
+    },
+    {
+      "id": "source:mistral:api-key",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "Activate payments and generate an API key",
+      "publisher": "Mistral AI",
+      "url": "https://docs.mistral.ai/getting-started/quickstarts/studio/activate-and-generate-api-key",
+      "retrieved_at": "2026-07-20T06:28:24Z"
     }
   ]
 }

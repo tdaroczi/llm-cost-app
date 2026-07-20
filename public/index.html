@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Ellenőrizhető, forrásolt LLM API-költség összehasonlítás mintaadatokon.">
+    <meta name="description" content="Ellenőrizhető, forrásolt LLM API-költség összehasonlítás ellenőrzött adatokon.">
     <title>LLM Observatory</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="./styles.css?v=gate-2-prototype">
+    <link rel="stylesheet" href="./styles.css?v=gate-4-production">
   </head>
   <body>
     <a class="skip-link" href="#main">Ugrás a tartalomra</a>
@@ -88,7 +88,7 @@
         </div>
 
         <footer class="trust-strip">
-          <span><strong>Mintaadat</strong> · nem teljes production katalógus</span>
+          <span><strong>Ellenőrzött katalógus</strong> · 14 összehasonlítható modell</span>
           <span>Lejárt ár nem használható</span>
           <details><summary>Módszertan</summary><p>Csak current, rekordszinten ellenőrzött direct standard text input/output ár számolhat. Nincs benchmark vagy minőségi pontszám.</p></details>
         </footer>
@@ -161,17 +161,17 @@
 
         <footer class="advisor-trust">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.6 2.8 8.3 7 10 4.2-1.7 7-5.4 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-5"/></svg>
-          <span><strong>Mintaadat</strong> · Csak ellenőrzött API-adatból számolunk.</span>
+          <span><strong>Ellenőrzött katalógus</strong> · Csak igazolt API-adatból számolunk.</span>
         </footer>
       </section>
 
       <section class="load-error" id="loadError" hidden aria-labelledby="loadErrorTitle">
-        <h1 id="loadErrorTitle">A mintaadat nem tölthető be</h1>
+        <h1 id="loadErrorTitle">A katalógus nem tölthető be</h1>
         <p id="loadErrorMessage">A katalógus biztonsági okból leállt.</p>
       </section>
       <p class="sr-only" id="liveRegion" aria-live="polite"></p>
     </main>
 
-    <script type="module" src="./app.js?v=gate-2-prototype"></script>
+    <script type="module" src="./app.js?v=gate-4-production"></script>
   </body>
 </html>

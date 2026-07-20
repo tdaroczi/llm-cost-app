@@ -15,9 +15,9 @@ import {
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
-const asOf = "2026-07-20T05:47:10Z";
+const asOf = "2026-07-20T06:31:53Z";
 const loadJson = async (path) => JSON.parse(await readFile(join(root, path), "utf8"));
-const baseCatalog = await loadJson("public/data/catalog.sample.json");
+const baseCatalog = await loadJson("public/data/catalog.json");
 const profileFixture = await loadJson("tests/fixtures/calculation-profiles.json");
 const oracle = await loadJson("tests/fixtures/calculation-results.json");
 const publicHtml = await readFile(join(root, "public/index.html"), "utf8");
@@ -41,12 +41,17 @@ const profileById = new Map(profileFixture.profiles.map((item) => [item.id, toPr
 const defaultProfile = profileById.get("technical-chat-10k");
 const reasonSet = (result) => new Set(result.reasonCodes);
 
-test("a publikus mintakatalógus önmagában konzisztens", () => {
+test("a publikus production katalógus önmagában konzisztens", () => {
   const index = normalizeCatalog(baseCatalog, asOf);
-  assert.equal(index.isSample, true);
+  assert.equal(baseCatalog.proof_only, false);
+  assert.equal(baseCatalog.production_publication_approved, true);
+  assert.equal(index.isSample, false);
   assert.equal(index.models.size, baseCatalog.models.length);
   assert.equal(index.prices.size, baseCatalog.prices.length);
   assert.equal(new Set(baseCatalog.prices.map((item) => item.id)).size, baseCatalog.prices.length);
+  assert.match(publicHtml, /Ellenőrzött katalógus/);
+  assert.doesNotMatch(publicHtml, /mintaadat/i);
+  assert.match(publicApp, /csak jóváhagyott production katalógussal indulhat/);
 });
 
 test("mindkét bizonyító profil minden költsége byte-pontosan egyezik az oracle eredménnyel", () => {
@@ -204,8 +209,8 @@ test("a Gate 3 bővítés négy új modellje teljes árat és hivatalos kulcslin
     ["alibaba-qwen:qwen3.7-max-2026-06-08", "231.020000", "https://www.alibabacloud.com/help/en/model-studio/get-api-key"]
   ];
 
-  assert.equal(index.models.size, 10);
-  assert.equal(index.providers.size, 6);
+  assert.equal(index.models.size, 14);
+  assert.equal(index.providers.size, 7);
   for (const [modelId, total, apiKeyUrl] of expected) {
     const result = evaluateModel(index, modelId, defaultProfile, asOf);
     assert.equal(result.costStatus, "complete", modelId);
@@ -219,6 +224,41 @@ test("a Gate 3 bővítés négy új modellje teljes árat és hivatalos kulcslin
   for (const excludedId of ["xai:grok-4.5", "deepseek:deepseek-chat", "deepseek:deepseek-reasoner", "alibaba-qwen:qwen3.7-max"]) {
     assert.equal(index.models.has(excludedId), false, excludedId);
   }
+});
+
+test("a Gate 4 production katalógus négy új modellje teljes, útvonalhoz kötött árat és hivatalos kulcslinket ad", () => {
+  const index = normalizeCatalog(baseCatalog, asOf);
+  const expected = [
+    ["openai:gpt-5.6-sol", "1000.000000", "https://platform.openai.com/api-keys"],
+    ["anthropic:claude-fable-5", "1800.000000", "https://platform.claude.com/settings/keys"],
+    ["mistral:mistral-medium-3-5", "270.000000", "https://docs.mistral.ai/getting-started/quickstarts/studio/activate-and-generate-api-key"],
+    ["mistral:mistral-small-2603", "24.000000", "https://docs.mistral.ai/getting-started/quickstarts/studio/activate-and-generate-api-key"]
+  ];
+
+  for (const [modelId, total, apiKeyUrl] of expected) {
+    const result = evaluateModel(index, modelId, defaultProfile, asOf);
+    assert.equal(result.costStatus, "complete", modelId);
+    assert.equal(result.totalCostUsd, total, modelId);
+    assert.equal(result.apiKeyLink?.url, apiKeyUrl, modelId);
+  }
+
+  const tooLongForSolShortPrice = evaluateModel(index, "openai:gpt-5.6-sol", { ...defaultProfile, inputTextTokensPerRun: 272001 }, asOf);
+  assert.ok(reasonSet(tooLongForSolShortPrice).has("price_context_band"));
+
+  const overMistralCombinedContext = evaluateModel(index, "mistral:mistral-medium-3-5", {
+    ...defaultProfile,
+    inputTextTokensPerRun: 255000,
+    outputTextTokensPerRun: 2000
+  }, asOf);
+  assert.ok(reasonSet(overMistralCombinedContext).has("context_limit"));
+
+  const mistralInputPrice = baseCatalog.prices.find((item) => item.id === "price:mistral:mistral-medium-3-5:input");
+  assert.equal(mistralInputPrice.conditions.region_pricing.route, "api.mistral.ai-global-endpoint");
+  assert.ok(mistralInputPrice.conditions.excluded_components.includes("eu_regional_inference_1.1x"));
+
+  const fableInputPrice = baseCatalog.prices.find((item) => item.id === "price:anthropic:claude-fable-5:input");
+  assert.equal(fableInputPrice.conditions.region_pricing.value, "global");
+  assert.ok(fableInputPrice.conditions.excluded_components.includes("inference_geo_us"));
 });
 
 test("az összehasonlító megőrzi a bizonyító mezőket, az ajánló pedig egyszerű és fail-closed marad", () => {
