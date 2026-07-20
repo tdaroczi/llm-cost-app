@@ -14,7 +14,7 @@ Magyar nyelvű, build nélküli statikus alkalmazás LLM API-költségek átlát
 - tíz emberi feladatot, négy prioritást és három érthető használati szintet kezel;
 - a használati feltételezést megmutatja, a tokenrészleteket csak opcionálisan nyitja ki;
 - standard szöveges feladatnál teljes, ellenőrzött USD-költség alapján hasonlít;
-- keresésnél, képnél vagy eszközhasználatnál letiltja a rangsort, amíg a plusz költség nem teljes;
+- keresésnél, képnél vagy eszközhasználatnál csak korlátozott standard szöveges tokenár-összehasonlítást ad, és külön jelzi, hogy a keresés, fájl, kép vagy eszközhívás esetleges díja nincs benne;
 - rekordszinten mutatja a forrást, az ellenőrzés idejét és a frissességi állapotot;
 - csak teljes, használható input- és outputárból számol;
 - ellenőrzött szolgáltatói rekordból ad kattintható API-kulcs linket;
