@@ -543,6 +543,9 @@ select, input[type="number"] {
 .advisor-unranked-result div > span { color: var(--muted); font-size: 0.8rem; }
 .advisor-unranked-result > strong { color: var(--text-soft); font-size: 1rem; font-variant-numeric: tabular-nums; }
 .advisor-unranked-result .api-link { grid-column: 1 / -1; min-height: 40px; color: var(--a); text-decoration: none; }
+.baseline-notice { max-width: 920px; margin: 0 auto 24px; padding: 18px 22px; border: 1px solid var(--warning); border-radius: 9px; background: rgba(255, 194, 95, 0.055); }
+.baseline-notice strong { color: #ffe2ad; }
+.baseline-notice p { margin: 7px 0 0; color: var(--text-soft); font-size: 0.9rem; }
 .unsupported-result { max-width: 880px; margin: 40px auto; padding: 28px; border: 1px solid var(--warning); border-radius: 10px; background: rgba(255, 194, 95, 0.055); }
 .unsupported-result h2 { margin-bottom: 12px; }
 .unsupported-result p { color: var(--text-soft); }
