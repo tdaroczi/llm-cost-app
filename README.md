@@ -1,6 +1,6 @@
 # LLM Observatory
 
-Magyar nyelvű, build nélküli statikus prototípus LLM API-költségek átlátható összehasonlítására.
+Magyar nyelvű, build nélküli statikus alkalmazás LLM API-költségek átlátható összehasonlítására.
 
 ## Élő változat
 
@@ -10,7 +10,7 @@ Magyar nyelvű, build nélküli statikus prototípus LLM API-költségek átlát
 ## Mit tud az alkalmazás?
 
 - két modellt ugyanazzal a tokenforgalmi profillal hasonlít össze;
-- három egyszerű kérdésből induló, magyar nyelvű modellválasztó prototípust ad;
+- három egyszerű kérdésből induló, magyar nyelvű modellválasztót ad;
 - tíz emberi feladatot, négy prioritást és három érthető használati szintet kezel;
 - a használati feltételezést megmutatja, a tokenrészleteket csak opcionálisan nyitja ki;
 - standard szöveges feladatnál teljes, ellenőrzött USD-költség alapján hasonlít;
@@ -18,12 +18,12 @@ Magyar nyelvű, build nélküli statikus prototípus LLM API-költségek átlát
 - rekordszinten mutatja a forrást, az ellenőrzés idejét és a frissességi állapotot;
 - csak teljes, használható input- és outputárból számol;
 - ellenőrzött szolgáltatói rekordból ad kattintható API-kulcs linket;
-- ugyanazt a `evaluateModel` motort használja mindkét felhasználói úton.
-- hat szolgáltató tíz, teljes költséggel összehasonlítható modelljét tartalmazza, köztük xAI Grok, DeepSeek és Alibaba Cloud Qwen modelleket;
+- ugyanazt a `evaluateModel` motort használja mindkét felhasználói úton;
+- hét szolgáltató tizennégy, teljes költséggel összehasonlítható modelljét tartalmazza, köztük OpenAI, Anthropic, Google, xAI, DeepSeek, Alibaba Cloud Qwen és Mistral modelleket.
 
 ## Fontos korlát
 
-A jelenlegi katalógus `proof_only` mintaadat. Nem production adatkiadás, ezért az alkalmazás minden nézetben **Mintaadat** jelzést mutat. A proof nem tartalmaz capability- és quickstart-rekordot; emiatt a tool calling állapota ismeretlen, quickstart link pedig nem jelenik meg.
+A production katalógus tizennégy, teljes input- és outputköltséggel összehasonlítható modellt tartalmaz. Capability- és quickstart-rekordot még nem tartalmaz; emiatt a tool calling állapota ismeretlen, quickstart link pedig nem jelenik meg.
 
 Az alkalmazás nem ad benchmark- vagy minőségi pontszámot, nem nevez ki győztest, és nem állít bizonyítatlan feladatspecifikus alkalmasságot. Lejárt, stale, karanténba tett vagy hiányos ár nem vehet részt a számításban.
 

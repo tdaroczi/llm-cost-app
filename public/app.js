@@ -595,10 +595,10 @@ function bindEvents() {
 
 async function init() {
   try {
-    const response = await fetch("./data/catalog.sample.json", { cache: "no-store" });
+    const response = await fetch("./data/catalog.json", { cache: "no-store" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     state.index = normalizeCatalog(await response.json(), state.asOf);
-    if (!state.index.isSample) throw new Error("Ez a build kizárólag proof_only mintaadattal indulhat.");
+    if (state.index.isSample) throw new Error("Ez a kiadás csak jóváhagyott production katalógussal indulhat.");
     populateModels();
     renderAdvisorChoices();
     applyAdvisorAssumption();
