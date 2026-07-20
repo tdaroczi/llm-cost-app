@@ -11,7 +11,7 @@ import {
   recommendationPolicyFor,
   recordHealth,
   taskFor
-} from "./core.mjs";
+} from "./core.mjs?v=gate-5d";
 
 const PRIORITY_OPTIONS = Object.freeze([
   { id: "balanced", label: "Nem tudom – mutasd a kiegyensúlyozottat", detail: "Jó alapbeállítás, ha nem szeretnél technikai döntést hozni." },

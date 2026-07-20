@@ -18,7 +18,7 @@ import {
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
-const asOf = "2026-07-20T09:13:14Z";
+const asOf = "2026-07-20T17:52:25Z";
 const loadJson = async (path) => JSON.parse(await readFile(join(root, path), "utf8"));
 const baseCatalog = await loadJson("public/data/catalog.json");
 const baseBenchmark = await loadJson("public/data/benchmarks/livebench-2026-06-25.json");
@@ -215,7 +215,7 @@ test("API-kulcs CTA csak egyetlen current, ellenőrzött HTTPS provider-linkből
   }
 });
 
-test("a Gate 3 bővítés négy új modellje teljes árat és hivatalos kulcslinket ad", () => {
+test("a Gate 3 bővítés négy modellje továbbra is teljes árat és hivatalos kulcslinket ad", () => {
   const index = normalizeCatalog(baseCatalog, asOf);
   const expected = [
     ["xai:grok-4.3", "150.000000", "https://console.x.ai/team/default/api-keys"],
@@ -224,7 +224,7 @@ test("a Gate 3 bővítés négy új modellje teljes árat és hivatalos kulcslin
     ["alibaba-qwen:qwen3.7-max-2026-06-08", "231.020000", "https://www.alibabacloud.com/help/en/model-studio/get-api-key"]
   ];
 
-  assert.equal(index.models.size, 14);
+  assert.equal(index.models.size, 15);
   assert.equal(index.providers.size, 7);
   for (const [modelId, total, apiKeyUrl] of expected) {
     const result = evaluateModel(index, modelId, defaultProfile, asOf);
@@ -236,9 +236,95 @@ test("a Gate 3 bővítés négy új modellje teljes árat és hivatalos kulcslin
   const tooLongForShortGrokPrice = evaluateModel(index, "xai:grok-4.3", { ...defaultProfile, inputTextTokensPerRun: 200001 }, asOf);
   assert.ok(reasonSet(tooLongForShortGrokPrice).has("price_context_band"));
 
-  for (const excludedId of ["xai:grok-4.5", "deepseek:deepseek-chat", "deepseek:deepseek-reasoner", "alibaba-qwen:qwen3.7-max"]) {
+  for (const excludedId of ["xai:grok-4.5-latest", "deepseek:deepseek-chat", "deepseek:deepseek-reasoner", "alibaba-qwen:qwen3.7-max"]) {
     assert.equal(index.models.has(excludedId), false, excludedId);
   }
+});
+
+test("a Gate 5D Grok 4.5 rekordja rövid, hosszú és cache-es ársávban is pontos", () => {
+  const index = normalizeCatalog(baseCatalog, asOf);
+  const model = index.models.get("xai:grok-4.5");
+  assert.equal(model.api_model_id, "grok-4.5");
+  assert.equal(model.context_window_tokens, 500000);
+  assert.equal(index.models.has("xai:grok-4.3"), true);
+  assert.equal(providerLinkFor(index, "xai", "api_key", asOf)?.url, "https://console.x.ai/team/default/api-keys");
+  assert.equal(providerLinkFor(index, "xai", "quickstart", asOf)?.url, "https://docs.x.ai/developers/quickstart");
+
+  const defaultCost = evaluateModel(index, model.id, defaultProfile, asOf);
+  assert.equal(defaultCost.costStatus, "complete");
+  assert.equal(defaultCost.totalCostUsd, "280.000000");
+  assert.deepEqual(defaultCost.appliedPriceIds, [
+    "price:xai:grok-4.5:input:short",
+    "price:xai:grok-4.5:output:short"
+  ]);
+
+  const atThreshold = evaluateModel(index, model.id, {
+    ...defaultProfile,
+    runsPerMonth: 1,
+    inputTextTokensPerRun: 200000,
+    outputTextTokensPerRun: 1000
+  }, asOf);
+  assert.equal(atThreshold.totalCostUsd, "0.406000");
+  assert.deepEqual(atThreshold.appliedPriceIds, [
+    "price:xai:grok-4.5:input:short",
+    "price:xai:grok-4.5:output:short"
+  ]);
+
+  const cachedShortContext = evaluateModel(index, model.id, {
+    ...defaultProfile,
+    runsPerMonth: 1,
+    inputTextTokensPerRun: 1000,
+    cachedInputTextTokensPerRun: 1000,
+    outputTextTokensPerRun: 1000
+  }, asOf);
+  assert.equal(cachedShortContext.totalCostUsd, "0.008300");
+  assert.deepEqual(cachedShortContext.appliedPriceIds, [
+    "price:xai:grok-4.5:input:short",
+    "price:xai:grok-4.5:cached-input:short",
+    "price:xai:grok-4.5:output:short"
+  ]);
+
+  const overThreshold = evaluateModel(index, model.id, {
+    ...defaultProfile,
+    runsPerMonth: 1,
+    inputTextTokensPerRun: 200001,
+    outputTextTokensPerRun: 1000
+  }, asOf);
+  assert.equal(overThreshold.totalCostUsd, "0.812004");
+  assert.deepEqual(overThreshold.appliedPriceIds, [
+    "price:xai:grok-4.5:input:long",
+    "price:xai:grok-4.5:output:long"
+  ]);
+
+  const cachedLongContext = evaluateModel(index, model.id, {
+    ...defaultProfile,
+    runsPerMonth: 1,
+    inputTextTokensPerRun: 100000,
+    cachedInputTextTokensPerRun: 100001,
+    outputTextTokensPerRun: 1000
+  }, asOf);
+  assert.equal(cachedLongContext.totalCostUsd, "0.472001");
+  assert.equal(cachedLongContext.cachedInputCostUsd, "0.060001");
+  assert.deepEqual(cachedLongContext.appliedPriceIds, [
+    "price:xai:grok-4.5:input:long",
+    "price:xai:grok-4.5:cached-input:long",
+    "price:xai:grok-4.5:output:long"
+  ]);
+
+  assert.equal(capabilityFor(index, model.id, "image_input", asOf).support, "supported");
+  assert.equal(capabilityFor(index, model.id, "function_calling", asOf).support, "supported");
+  assert.equal(capabilityFor(index, model.id, "structured_output", asOf).support, "supported");
+  assert.equal(capabilityFor(index, model.id, "provider_web_search", asOf).support, "unknown");
+  assert.equal(capabilityFor(index, model.id, "file_or_pdf_input", asOf).support, "unknown");
+});
+
+test("az átfedő Grok 4.5 ársáv fail-closed kétértelmű marad", () => {
+  const raw = structuredClone(baseCatalog);
+  const original = raw.prices.find((item) => item.id === "price:xai:grok-4.5:input:short");
+  raw.prices.push({ ...structuredClone(original), id: `${original.id}:overlap` });
+  const result = evaluateModel(normalizeCatalog(raw, asOf), "xai:grok-4.5", defaultProfile, asOf);
+  assert.ok(reasonSet(result).has("ambiguous_price"));
+  assert.equal(result.costStatus, "unavailable");
 });
 
 test("a Gate 4 production katalógus négy új modellje teljes, útvonalhoz kötött árat és hivatalos kulcslinket ad", () => {
@@ -285,7 +371,7 @@ test("a Gate 5B capability-mátrix teljes, forráshű és pontos modellverzióho
       const matches = (index.capabilitiesByModel.get(model.id) ?? []).filter((item) => item.capability === key);
       assert.equal(matches.length, 1, `${model.id} / ${key}`);
       assert.equal(matches[0].source_url, index.sources.get(matches[0].source_id).url);
-      assert.equal(matches[0].freshness.verified_at, asOf);
+      assert.ok(Date.parse(matches[0].freshness.verified_at) <= Date.parse(asOf));
       assert.ok(["included", "priced_separately", "unknown", "not_applicable"].includes(matches[0].extra_cost_status));
     }
   }
@@ -305,7 +391,7 @@ test("a Gate 5B capability-mátrix teljes, forráshű és pontos modellverzióho
   assert.throws(() => normalizeCatalog(missingCostStatusRaw, asOf), /Hibás capability extra_cost_status/);
 });
 
-test("a Gate 5C LiveBench-adat külön licencelt fájlban, pontos 9/14-es lefedettséggel használható", () => {
+test("a Gate 5C LiveBench-adat külön licencelt fájlban, pontos 9/15-ös lefedettséggel használható", () => {
   const catalog = normalizeCatalog(baseCatalog, asOf);
   const benchmark = normalizeBenchmarkDataset(baseBenchmark, catalog, asOf);
   assert.equal(benchmark.definitions.size, 2);
@@ -318,7 +404,8 @@ test("a Gate 5C LiveBench-adat külön licencelt fájlban, pontos 9/14-es lefede
       "anthropic:claude-fable-5",
       "google-gemini:gemini-3.1-flash-lite",
       "mistral:mistral-medium-3-5",
-      "mistral:mistral-small-2603"
+      "mistral:mistral-small-2603",
+      "xai:grok-4.5"
     ]));
     assert.equal(benchmarkRecordHealth(benchmark, definition, asOf).usable, true);
   }
@@ -466,7 +553,7 @@ test("hibás benchmarkfájl nem teszi használhatatlanná az alap-katalógust", 
   const invalid = structuredClone(baseBenchmark);
   invalid.license = "unknown";
   assert.throws(() => normalizeBenchmarkDataset(invalid, catalog, asOf), /licence/);
-  assert.equal(catalog.models.size, 14);
+  assert.equal(catalog.models.size, 15);
   assert.equal(evaluateModel(catalog, "openai:gpt-5.6-sol", defaultProfile, asOf).costStatus, "complete");
 });
 

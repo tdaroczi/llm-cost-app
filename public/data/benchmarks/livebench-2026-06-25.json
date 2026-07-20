@@ -58,7 +58,7 @@
       "review_ref": "work/research/gate-5c-benchmark-review-2026-07-20.md",
       "record_status": "record_verified",
       "coverage": {
-        "catalog_model_count": 14,
+        "catalog_model_count": 15,
         "measured_model_count": 9,
         "provider_count": 5,
         "unmeasured_model_ids": [
@@ -66,7 +66,8 @@
           "anthropic:claude-fable-5",
           "google-gemini:gemini-3.1-flash-lite",
           "mistral:mistral-medium-3-5",
-          "mistral:mistral-small-2603"
+          "mistral:mistral-small-2603",
+          "xai:grok-4.5"
         ]
       },
       "freshness": {
@@ -100,7 +101,7 @@
       "review_ref": "work/research/gate-5c-benchmark-review-2026-07-20.md",
       "record_status": "record_verified",
       "coverage": {
-        "catalog_model_count": 14,
+        "catalog_model_count": 15,
         "measured_model_count": 9,
         "provider_count": 5,
         "unmeasured_model_ids": [
@@ -108,7 +109,8 @@
           "anthropic:claude-fable-5",
           "google-gemini:gemini-3.1-flash-lite",
           "mistral:mistral-medium-3-5",
-          "mistral:mistral-small-2603"
+          "mistral:mistral-small-2603",
+          "xai:grok-4.5"
         ]
       },
       "freshness": {
