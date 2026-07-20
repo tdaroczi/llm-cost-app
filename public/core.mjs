@@ -1,4 +1,4 @@
-const SCHEMA_VERSION = "2.1.0";
+const SCHEMA_VERSION = "2.2.0";
 const OFFICIAL_SOURCE_STATES = new Set(["official_source_page_verified", "official_login_required"]);
 const ACTIVE_STATES = new Set(["current", "current_degraded", "overdue_degraded"]);
 const CAPABILITY_SUPPORT_STATES = new Set(["supported", "unsupported", "conditional", "unknown"]);
@@ -382,8 +382,11 @@ const reason = (code, detail) => ({ code, label: detail ?? REASON_LABELS[code] ?
 
 const hasCompleteContextPricing = (contextPricing) =>
   contextPricing?.kind === "flat_within_limit" &&
+  (contextPricing.min_input_tokens === undefined ||
+    (Number.isSafeInteger(contextPricing.min_input_tokens) && contextPricing.min_input_tokens >= 0)) &&
   Number.isSafeInteger(contextPricing.max_input_tokens) &&
-  contextPricing.max_input_tokens > 0;
+  contextPricing.max_input_tokens > 0 &&
+  (contextPricing.min_input_tokens === undefined || contextPricing.min_input_tokens <= contextPricing.max_input_tokens);
 
 const hasCompleteRegionPricing = (regionPricing) => {
   if (!regionPricing || typeof regionPricing.kind !== "string") return false;
@@ -417,25 +420,33 @@ const priceScopeMatches = (price, profile) => {
     conditions.additional_price_components.length === 0;
 };
 
+const priceContextBandMatches = (price, profile) => {
+  const contextPricing = price.conditions?.context_pricing;
+  const promptInputTokens = profile.inputTextTokensPerRun + profile.cachedInputTextTokensPerRun;
+  const minInput = contextPricing?.min_input_tokens ?? 0;
+  const maxInput = contextPricing?.max_input_tokens;
+  return promptInputTokens >= minInput && promptInputTokens <= maxInput;
+};
+
 const selectPrice = (index, modelId, chargeType, profile, asOf, reasons) => {
   const all = (index.pricesByModel.get(modelId) ?? []).filter((item) => item.charge_type === chargeType);
   const scope = all.filter((item) => priceScopeMatches(item, profile));
-  if (scope.length > 1) {
+  const applicable = scope.filter((item) => priceContextBandMatches(item, profile));
+  if (applicable.length > 1) {
     reasons.push(reason("ambiguous_price"));
     return null;
   }
-  if (scope.length === 0) {
+  if (applicable.length === 0) {
+    if (scope.length > 0) {
+      reasons.push(reason("price_context_band"));
+      return null;
+    }
     reasons.push(reason(all.length ? "price_scope" : "price_missing"));
     return null;
   }
-  const price = scope[0];
+  const price = applicable[0];
   if (!recordHealth(index, price, asOf).usable) {
     reasons.push(reason("price_record_unusable"));
-    return null;
-  }
-  const maxInput = price.conditions?.context_pricing?.max_input_tokens;
-  if (Number.isFinite(maxInput) && profile.inputTextTokensPerRun > maxInput) {
-    reasons.push(reason("price_context_band"));
     return null;
   }
   const validThrough = price.conditions?.announced_valid_through_date;
@@ -522,11 +533,16 @@ export function evaluateModel(index, modelId, profileInput, asOf = index.asOf) {
   const technicalEligibility = reasons.some((item) => technicalReasonCodes.has(item.code)) ? "excluded" : "eligible";
   const capabilityEvidenceIds = requirements.map((item) => item.evidenceId).filter(Boolean);
 
-  if (profile.cachedInputTextTokensPerRun > 0) reasons.push(reason("unsupported_cache"));
   const inputPrice = selectPrice(index, modelId, "input_text_tokens", profile, asOf, reasons);
   const outputPrice = selectPrice(index, modelId, "output_text_tokens", profile, asOf, reasons);
+  let cachedInputPrice = null;
+  if (profile.cachedInputTextTokensPerRun > 0) {
+    const cacheReasons = [];
+    cachedInputPrice = selectPrice(index, modelId, "cached_input_text_tokens", profile, asOf, cacheReasons);
+    if (!cachedInputPrice) reasons.push(reason("unsupported_cache"));
+  }
   const blocking = reasons.length > 0;
-  if (blocking || !inputPrice || !outputPrice) {
+  if (blocking || !inputPrice || !outputPrice || (profile.cachedInputTextTokensPerRun > 0 && !cachedInputPrice)) {
     return {
       model,
       modelHealth,
@@ -539,17 +555,20 @@ export function evaluateModel(index, modelId, profileInput, asOf = index.asOf) {
       capabilityEvidenceIds,
       inputPrice,
       outputPrice,
+      cachedInputPrice,
       apiKeyLink: providerLinkFor(index, model.provider_id, "api_key", asOf),
       apiQuickstartLink: providerLinkFor(index, model.provider_id, "quickstart", asOf),
-      derivedFrom: [model.id, ...capabilityEvidenceIds, inputPrice?.id, outputPrice?.id].filter(Boolean)
+      derivedFrom: [model.id, ...capabilityEvidenceIds, inputPrice?.id, cachedInputPrice?.id, outputPrice?.id].filter(Boolean)
     };
   }
 
   const monthlyInput = BigInt(profile.runsPerMonth) * BigInt(profile.inputTextTokensPerRun);
+  const monthlyCachedInput = BigInt(profile.runsPerMonth) * BigInt(profile.cachedInputTextTokensPerRun);
   const monthlyOutput = BigInt(profile.runsPerMonth) * BigInt(profile.outputTextTokensPerRun);
   const inputNumerator = monthlyInput * parseUsdPerMillionToMicros(inputPrice.amount);
+  const cachedInputNumerator = cachedInputPrice ? monthlyCachedInput * parseUsdPerMillionToMicros(cachedInputPrice.amount) : 0n;
   const outputNumerator = monthlyOutput * parseUsdPerMillionToMicros(outputPrice.amount);
-  const totalNumerator = inputNumerator + outputNumerator;
+  const totalNumerator = inputNumerator + cachedInputNumerator + outputNumerator;
 
   return {
     model,
@@ -562,18 +581,21 @@ export function evaluateModel(index, modelId, profileInput, asOf = index.asOf) {
     technicalEligibility,
     capabilityEvidenceIds,
     monthlyInputTokens: monthlyInput.toString(),
+    monthlyCachedInputTokens: monthlyCachedInput.toString(),
     monthlyOutputTokens: monthlyOutput.toString(),
     inputCostUsd: fixedUsd(inputNumerator),
+    cachedInputCostUsd: fixedUsd(cachedInputNumerator),
     outputCostUsd: fixedUsd(outputNumerator),
     totalCostUsd: fixedUsd(totalNumerator),
     costNumerator: totalNumerator,
-    appliedPriceIds: [inputPrice.id, outputPrice.id],
-    verifiedAt: [inputPrice.freshness.verified_at, outputPrice.freshness.verified_at],
+    appliedPriceIds: [inputPrice.id, cachedInputPrice?.id, outputPrice.id].filter(Boolean),
+    verifiedAt: [inputPrice.freshness.verified_at, cachedInputPrice?.freshness?.verified_at, outputPrice.freshness.verified_at].filter(Boolean),
     inputPrice,
+    cachedInputPrice,
     outputPrice,
     apiKeyLink: providerLinkFor(index, model.provider_id, "api_key", asOf),
     apiQuickstartLink: providerLinkFor(index, model.provider_id, "quickstart", asOf),
-    derivedFrom: [model.id, ...capabilityEvidenceIds, inputPrice.id, outputPrice.id]
+    derivedFrom: [model.id, ...capabilityEvidenceIds, inputPrice.id, cachedInputPrice?.id, outputPrice.id].filter(Boolean)
   };
 }
 

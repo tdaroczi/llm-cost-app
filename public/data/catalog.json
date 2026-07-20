@@ -1,7 +1,7 @@
 {
-  "schema_version": "2.1.0",
-  "dataset_version": "2026-07-20T09:13:14Z",
-  "generated_at": "2026-07-20T09:13:14Z",
+  "schema_version": "2.2.0",
+  "dataset_version": "2026-07-20T17:52:25Z",
+  "generated_at": "2026-07-20T17:52:25Z",
   "proof_only": false,
   "production_publication_approved": true,
   "providers": [
@@ -529,6 +529,32 @@
         "expires_at": "2026-08-19T05:47:10Z",
         "freshness_state": "current",
         "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "xai:grok-4.5",
+      "provider_id": "xai",
+      "name": "Grok 4.5",
+      "api_model_id": "grok-4.5",
+      "lifecycle": "unknown",
+      "lifecycle_note_hu": "A hivatalos xAI modelloldal aktuális API-modellként közli, de nem használ a projekt stable címkéjének megfelelő lifecycle megjelölést.",
+      "retirement_at": null,
+      "context_window_tokens": 500000,
+      "max_output_tokens": null,
+      "source_id": "source:xai:model:grok-4.5",
+      "source_locator": "Grok 4.5 / At a glance / Context window; Details / Model name",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T17:52:25Z",
+      "review_ref": "review:gate5d:director-live-verification:20260720:xai-grok-4.5-model",
+      "freshness": {
+        "verified_at": "2026-07-20T17:52:25Z",
+        "check_due_at": "2026-07-27T17:52:25Z",
+        "stale_at": "2026-08-03T17:52:25Z",
+        "expires_at": "2026-08-19T17:52:25Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T17:52:25Z",
         "refresh_result": "success_no_change",
         "error_class": null
       }
@@ -1525,6 +1551,276 @@
         "expires_at": "2026-07-23T05:47:10Z",
         "freshness_state": "current",
         "last_refresh_attempt_at": "2026-07-20T05:47:10Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:xai:grok-4.5:input:short",
+      "model_id": "xai:grok-4.5",
+      "charge_type": "input_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "2.000000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "min_input_tokens": 0,
+          "max_input_tokens": 200000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "xai-direct-standard-short-context"
+        },
+        "scope_label_hu": "xAI közvetlen API · standard · legfeljebb 200 000 prompt token",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": ["cached_input", "batch", "priority", "tools", "web_search", "x_search", "code_execution", "file_search", "image", "audio"]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T17:52:25Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:xai:pricing",
+      "source_locator": "Text API / grok-4.5 / Short context / Input",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T17:52:25Z",
+      "review_ref": "review:gate5d:director-live-verification:20260720:price-xai-grok-4.5-input-short",
+      "freshness": {
+        "verified_at": "2026-07-20T17:52:25Z",
+        "check_due_at": "2026-07-21T17:52:25Z",
+        "stale_at": "2026-07-22T05:52:25Z",
+        "expires_at": "2026-07-23T17:52:25Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T17:52:25Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:xai:grok-4.5:cached-input:short",
+      "model_id": "xai:grok-4.5",
+      "charge_type": "cached_input_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "0.300000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "min_input_tokens": 0,
+          "max_input_tokens": 200000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "xai-direct-standard-short-context"
+        },
+        "scope_label_hu": "xAI közvetlen API · standard · cache-találat · legfeljebb 200 000 prompt token",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": ["batch", "priority", "tools", "web_search", "x_search", "code_execution", "file_search", "image", "audio"]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T17:52:25Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:xai:pricing",
+      "source_locator": "Text API / grok-4.5 / Short context / Cached input",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T17:52:25Z",
+      "review_ref": "review:gate5d:director-live-verification:20260720:price-xai-grok-4.5-cached-input-short",
+      "freshness": {
+        "verified_at": "2026-07-20T17:52:25Z",
+        "check_due_at": "2026-07-21T17:52:25Z",
+        "stale_at": "2026-07-22T05:52:25Z",
+        "expires_at": "2026-07-23T17:52:25Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T17:52:25Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:xai:grok-4.5:output:short",
+      "model_id": "xai:grok-4.5",
+      "charge_type": "output_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "6.000000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "min_input_tokens": 0,
+          "max_input_tokens": 200000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "xai-direct-standard-short-context"
+        },
+        "scope_label_hu": "xAI közvetlen API · standard · legfeljebb 200 000 prompt token",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": ["cached_input", "batch", "priority", "tools", "web_search", "x_search", "code_execution", "file_search", "image", "audio"]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T17:52:25Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:xai:pricing",
+      "source_locator": "Text API / grok-4.5 / Short context / Output",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T17:52:25Z",
+      "review_ref": "review:gate5d:director-live-verification:20260720:price-xai-grok-4.5-output-short",
+      "freshness": {
+        "verified_at": "2026-07-20T17:52:25Z",
+        "check_due_at": "2026-07-21T17:52:25Z",
+        "stale_at": "2026-07-22T05:52:25Z",
+        "expires_at": "2026-07-23T17:52:25Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T17:52:25Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:xai:grok-4.5:input:long",
+      "model_id": "xai:grok-4.5",
+      "charge_type": "input_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "4.000000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "min_input_tokens": 200001,
+          "max_input_tokens": 500000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "xai-direct-standard-long-context"
+        },
+        "scope_label_hu": "xAI közvetlen API · standard · 200 000 feletti, legfeljebb 500 000 prompt token",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": ["cached_input", "batch", "priority", "tools", "web_search", "x_search", "code_execution", "file_search", "image", "audio"]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T17:52:25Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:xai:pricing",
+      "source_locator": "Text API / grok-4.5 / Long context / Input; long rates apply to all tokens once the prompt crosses the model threshold",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T17:52:25Z",
+      "review_ref": "review:gate5d:director-live-verification:20260720:price-xai-grok-4.5-input-long",
+      "freshness": {
+        "verified_at": "2026-07-20T17:52:25Z",
+        "check_due_at": "2026-07-21T17:52:25Z",
+        "stale_at": "2026-07-22T05:52:25Z",
+        "expires_at": "2026-07-23T17:52:25Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T17:52:25Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:xai:grok-4.5:cached-input:long",
+      "model_id": "xai:grok-4.5",
+      "charge_type": "cached_input_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "0.600000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "min_input_tokens": 200001,
+          "max_input_tokens": 500000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "xai-direct-standard-long-context"
+        },
+        "scope_label_hu": "xAI közvetlen API · standard · cache-találat · 200 000 feletti, legfeljebb 500 000 prompt token",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": ["batch", "priority", "tools", "web_search", "x_search", "code_execution", "file_search", "image", "audio"]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T17:52:25Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:xai:pricing",
+      "source_locator": "Text API / grok-4.5 / Long context / Cached input; long rates apply to all tokens once the prompt crosses the model threshold",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T17:52:25Z",
+      "review_ref": "review:gate5d:director-live-verification:20260720:price-xai-grok-4.5-cached-input-long",
+      "freshness": {
+        "verified_at": "2026-07-20T17:52:25Z",
+        "check_due_at": "2026-07-21T17:52:25Z",
+        "stale_at": "2026-07-22T05:52:25Z",
+        "expires_at": "2026-07-23T17:52:25Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T17:52:25Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "price:xai:grok-4.5:output:long",
+      "model_id": "xai:grok-4.5",
+      "charge_type": "output_text_tokens",
+      "processing_mode": "standard",
+      "unit": "1m_tokens",
+      "amount": "12.000000",
+      "currency": "USD",
+      "conditions": {
+        "api_channel": "direct",
+        "modality": "text",
+        "context_pricing": {
+          "kind": "flat_within_limit",
+          "min_input_tokens": 200001,
+          "max_input_tokens": 500000
+        },
+        "region_pricing": {
+          "kind": "route_specific",
+          "route": "xai-direct-standard-long-context"
+        },
+        "scope_label_hu": "xAI közvetlen API · standard · 200 000 feletti, legfeljebb 500 000 prompt token",
+        "account_tier": "standard_paid",
+        "additional_price_components": [],
+        "excluded_components": ["cached_input", "batch", "priority", "tools", "web_search", "x_search", "code_execution", "file_search", "image", "audio"]
+      },
+      "effective_from": null,
+      "effective_to": null,
+      "observed_from": "2026-07-20T17:52:25Z",
+      "validity_basis": "first_observed",
+      "source_id": "source:xai:pricing",
+      "source_locator": "Text API / grok-4.5 / Long context / Output; long rates apply to all tokens once the prompt crosses the model threshold",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T17:52:25Z",
+      "review_ref": "review:gate5d:director-live-verification:20260720:price-xai-grok-4.5-output-long",
+      "freshness": {
+        "verified_at": "2026-07-20T17:52:25Z",
+        "check_due_at": "2026-07-21T17:52:25Z",
+        "stale_at": "2026-07-22T05:52:25Z",
+        "expires_at": "2026-07-23T17:52:25Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T17:52:25Z",
         "refresh_result": "success_no_change",
         "error_class": null
       }
@@ -3202,6 +3498,136 @@
       }
     },
     {
+      "id": "capability:xai:grok-4.5:image_input",
+      "model_id": "xai:grok-4.5",
+      "capability": "image_input",
+      "support": "supported",
+      "extra_cost_status": "unknown",
+      "api_route": "Direct provider API",
+      "conditions_hu": "A hivatalos modelloldal a Text és Image bemenetet, valamint Text kimenetet dokumentálja.",
+      "evidence_tier": "official_provider_documentation",
+      "source_id": "source:xai:model:grok-4.5",
+      "source_url": "https://docs.x.ai/developers/models/grok-4.5",
+      "source_locator": "At a glance / Modalities: Text, Image → Text",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T17:52:25Z",
+      "review_ref": "review:gate5d:director-live-verification:20260720:xai:grok-4.5:image_input",
+      "freshness": {
+        "verified_at": "2026-07-20T17:52:25Z",
+        "check_due_at": "2026-07-27T17:52:25Z",
+        "stale_at": "2026-08-03T17:52:25Z",
+        "expires_at": "2026-08-19T17:52:25Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T17:52:25Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "capability:xai:grok-4.5:function_calling",
+      "model_id": "xai:grok-4.5",
+      "capability": "function_calling",
+      "support": "supported",
+      "extra_cost_status": "unknown",
+      "api_route": "Direct provider API",
+      "conditions_hu": "A hivatalos modelloldal a function calling képességet dokumentálja.",
+      "evidence_tier": "official_provider_documentation",
+      "source_id": "source:xai:model:grok-4.5",
+      "source_url": "https://docs.x.ai/developers/models/grok-4.5",
+      "source_locator": "Capabilities / Function calling",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T17:52:25Z",
+      "review_ref": "review:gate5d:director-live-verification:20260720:xai:grok-4.5:function_calling",
+      "freshness": {
+        "verified_at": "2026-07-20T17:52:25Z",
+        "check_due_at": "2026-07-27T17:52:25Z",
+        "stale_at": "2026-08-03T17:52:25Z",
+        "expires_at": "2026-08-19T17:52:25Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T17:52:25Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "capability:xai:grok-4.5:structured_output",
+      "model_id": "xai:grok-4.5",
+      "capability": "structured_output",
+      "support": "supported",
+      "extra_cost_status": "unknown",
+      "api_route": "Direct provider API",
+      "conditions_hu": "A hivatalos modelloldal a structured outputs képességet dokumentálja.",
+      "evidence_tier": "official_provider_documentation",
+      "source_id": "source:xai:model:grok-4.5",
+      "source_url": "https://docs.x.ai/developers/models/grok-4.5",
+      "source_locator": "Capabilities / Structured outputs",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T17:52:25Z",
+      "review_ref": "review:gate5d:director-live-verification:20260720:xai:grok-4.5:structured_output",
+      "freshness": {
+        "verified_at": "2026-07-20T17:52:25Z",
+        "check_due_at": "2026-07-27T17:52:25Z",
+        "stale_at": "2026-08-03T17:52:25Z",
+        "expires_at": "2026-08-19T17:52:25Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T17:52:25Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "capability:xai:grok-4.5:provider_web_search",
+      "model_id": "xai:grok-4.5",
+      "capability": "provider_web_search",
+      "support": "unknown",
+      "extra_cost_status": "unknown",
+      "api_route": "Direct provider API",
+      "conditions_hu": "Az ellenőrzött exact modelloldal nem mondja ki egyértelműen a Grok 4.5 webes keresési támogatását.",
+      "evidence_tier": "official_provider_documentation",
+      "source_id": "source:xai:model:grok-4.5",
+      "source_url": "https://docs.x.ai/developers/models/grok-4.5",
+      "source_locator": "Exact-model capabilities reviewed; web_search support is not stated",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T17:52:25Z",
+      "review_ref": "review:gate5d:director-live-verification:20260720:xai:grok-4.5:provider_web_search",
+      "freshness": {
+        "verified_at": "2026-07-20T17:52:25Z",
+        "check_due_at": "2026-07-27T17:52:25Z",
+        "stale_at": "2026-08-03T17:52:25Z",
+        "expires_at": "2026-08-19T17:52:25Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T17:52:25Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
+      "id": "capability:xai:grok-4.5:file_or_pdf_input",
+      "model_id": "xai:grok-4.5",
+      "capability": "file_or_pdf_input",
+      "support": "unknown",
+      "extra_cost_status": "unknown",
+      "api_route": "Direct provider API",
+      "conditions_hu": "Az ellenőrzött exact modelloldal nem ad egyértelmű, Grok 4.5-höz kötött fájl- vagy PDF-bemeneti támogatási állítást.",
+      "evidence_tier": "official_provider_documentation",
+      "source_id": "source:xai:model:grok-4.5",
+      "source_url": "https://docs.x.ai/developers/models/grok-4.5",
+      "source_locator": "Exact-model capabilities reviewed; file or PDF input support is not stated",
+      "record_status": "record_verified",
+      "reviewed_at": "2026-07-20T17:52:25Z",
+      "review_ref": "review:gate5d:director-live-verification:20260720:xai:grok-4.5:file_or_pdf_input",
+      "freshness": {
+        "verified_at": "2026-07-20T17:52:25Z",
+        "check_due_at": "2026-07-27T17:52:25Z",
+        "stale_at": "2026-08-03T17:52:25Z",
+        "expires_at": "2026-08-19T17:52:25Z",
+        "freshness_state": "current",
+        "last_refresh_attempt_at": "2026-07-20T17:52:25Z",
+        "refresh_result": "success_no_change",
+        "error_class": null
+      }
+    },
+    {
       "id": "capability:deepseek:deepseek-v4-flash:image_input",
       "model_id": "deepseek:deepseek-v4-flash",
       "capability": "image_input",
@@ -4231,13 +4657,22 @@
       "retrieved_at": "2026-07-20T05:47:10Z"
     },
     {
+      "id": "source:xai:model:grok-4.5",
+      "source_type": "official_provider_page",
+      "source_status": "official_source_page_verified",
+      "title": "Grok 4.5",
+      "publisher": "xAI",
+      "url": "https://docs.x.ai/developers/models/grok-4.5",
+      "retrieved_at": "2026-07-20T17:52:25Z"
+    },
+    {
       "id": "source:xai:pricing",
       "source_type": "official_provider_page",
       "source_status": "official_source_page_verified",
       "title": "xAI API Pricing",
       "publisher": "xAI",
       "url": "https://docs.x.ai/developers/pricing",
-      "retrieved_at": "2026-07-20T05:47:10Z"
+      "retrieved_at": "2026-07-20T17:52:25Z"
     },
     {
       "id": "source:xai:api-key",
